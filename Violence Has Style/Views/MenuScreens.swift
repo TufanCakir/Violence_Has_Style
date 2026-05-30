@@ -184,20 +184,61 @@ struct OnlineRequiredView: View {
     }
 }
 
+struct OfflineView: View {
+    var body: some View {
+        ZStack {
+            Color.black
+                .ignoresSafeArea()
+
+            VStack(spacing: 16) {
+                Text("OFFLINE")
+                    .font(.system(size: 42, weight: .black, design: .rounded))
+                    .foregroundStyle(.red)
+
+                Text("INTERNET REQUIRED")
+                    .font(
+                        .system(size: 14, weight: .black, design: .monospaced)
+                    )
+                    .foregroundStyle(.white.opacity(0.78))
+
+                Text("WLAN OR MOBILE DATA")
+                    .font(
+                        .system(size: 10, weight: .black, design: .monospaced)
+                    )
+                    .foregroundStyle(.white.opacity(0.52))
+            }
+            .padding(28)
+        }
+    }
+}
+
 struct MainMenuView: View {
+    let presentedCharacter: PlayerCharacter
     let activeEvent: EventDefinition?
     let eventBalance: Int
-    let startRun: () -> Void
+    let openStoryMode: () -> Void
+    let openEventMode: () -> Void
+    let openEndlessMode: () -> Void
     let openCharacterSelect: () -> Void
-    let openStyleLab: () -> Void
+    let openStyleMode: () -> Void
     let openGallery: () -> Void
-    let openEventShop: () -> Void
     let openSettings: () -> Void
 
     var body: some View {
         ZStack {
             Color.black.opacity(0.76)
                 .ignoresSafeArea()
+
+            FighterSprite(
+                assetName: presentedCharacter.idleAsset,
+                fallbackTitle: presentedCharacter.title,
+                tint: presentedCharacter.tint,
+                isEnemy: false
+            )
+            .frame(width: 260, height: 360)
+            .opacity(0.28)
+            .offset(x: 92, y: 40)
+            .allowsHitTesting(false)
 
             VStack(alignment: .leading, spacing: 18) {
                 Spacer()
@@ -219,26 +260,31 @@ struct MainMenuView: View {
 
                 VStack(spacing: 10) {
                     MenuActionButton(
-                        title: "START RUN",
+                        title: "STORY MODE",
                         color: .red,
-                        action: startRun
+                        action: openStoryMode
+                    )
+                    MenuActionButton(
+                        title: "ENDLESS MODE",
+                        color: .orange,
+                        action: openEndlessMode
                     )
                     if let activeEvent {
                         MenuActionButton(
-                            title: "\(activeEvent.title) SHOP  \(eventBalance)",
+                            title: "\(activeEvent.title) EVENT",
                             color: activeEvent.themeColor,
-                            action: openEventShop
+                            action: openEventMode
                         )
                     }
+                    MenuActionButton(
+                        title: "STYLE MODE",
+                        color: .cyan,
+                        action: openStyleMode
+                    )
                     MenuActionButton(
                         title: "CHARACTER SELECT",
                         color: .white,
                         action: openCharacterSelect
-                    )
-                    MenuActionButton(
-                        title: "STYLE LAB",
-                        color: .cyan,
-                        action: openStyleLab
                     )
                     MenuActionButton(
                         title: "GALLERY",
@@ -292,16 +338,23 @@ struct EventShopView: View {
                 }
 
                 if let event {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(event.title)
-                            .font(
-                                .system(
-                                    size: 22,
-                                    weight: .black,
-                                    design: .rounded
-                                )
+
+                    HStack(spacing: 6) {
+                        AsyncImage(
+                            url: RemoteContentStore.shared.assetURL(
+                                named: event.currencyIconAsset
                             )
-                            .foregroundStyle(event.themeColor)
+                        ) { phase in
+                            if let image = phase.image {
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                            } else {
+                                Circle()
+                                    .fill(event.themeColor)
+                            }
+                        }
+                        .frame(width: 20, height: 20)
 
                         Text("\(balance) \(event.currencyTitle)")
                             .font(
@@ -411,6 +464,241 @@ struct EventShopView: View {
     }
 }
 
+struct StoryModeView: View {
+    let chapters: [StoryChapter]
+    let completedChapterCount: Int
+    let startChapter: (StoryChapter) -> Void
+    let back: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.86)
+                .ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Text("STORY MODE")
+                        .font(
+                            .system(size: 30, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(.white)
+
+                    Spacer()
+
+                    BackButton(action: back)
+                }
+
+                VStack(spacing: 10) {
+                    ForEach(chapters) { chapter in
+                        let isUnlocked =
+                            chapter.requiredChapter <= completedChapterCount
+                        Button {
+                            startChapter(chapter)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack {
+                                    Text(chapter.title)
+                                        .font(
+                                            .system(
+                                                size: 17,
+                                                weight: .black,
+                                                design: .rounded
+                                            )
+                                        )
+                                        .foregroundStyle(
+                                            isUnlocked ? chapter.color : .gray
+                                        )
+
+                                    Spacer()
+
+                                    Text(isUnlocked ? "READY" : "LOCKED")
+                                        .font(
+                                            .system(
+                                                size: 10,
+                                                weight: .black,
+                                                design: .monospaced
+                                            )
+                                        )
+                                        .foregroundStyle(
+                                            isUnlocked ? .white : .gray
+                                        )
+                                }
+
+                                Text(chapter.subtitle)
+                                    .font(
+                                        .system(
+                                            size: 11,
+                                            weight: .bold,
+                                            design: .monospaced
+                                        )
+                                    )
+                                    .foregroundStyle(
+                                        .white.opacity(isUnlocked ? 0.68 : 0.35)
+                                    )
+
+                                Text("\(chapter.targetFights) FIGHTS")
+                                    .font(
+                                        .system(
+                                            size: 10,
+                                            weight: .black,
+                                            design: .monospaced
+                                        )
+                                    )
+                                    .foregroundStyle(
+                                        chapter.color.opacity(
+                                            isUnlocked ? 0.8 : 0.35
+                                        )
+                                    )
+                            }
+                            .padding(14)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(.black.opacity(0.5))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(
+                                        chapter.color.opacity(
+                                            isUnlocked ? 0.7 : 0.22
+                                        ),
+                                        lineWidth: 1
+                                    )
+                            }
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(!isUnlocked)
+                    }
+                }
+
+                Spacer()
+            }
+            .padding(24)
+        }
+    }
+}
+
+struct EventModeView: View {
+    let event: EventDefinition?
+    let balance: Int
+    let startEventRun: () -> Void
+    let openShop: () -> Void
+    let back: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.86)
+                .ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Text("EVENT MODE")
+                        .font(
+                            .system(size: 30, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(.white)
+
+                    Spacer()
+
+                    BackButton(action: back)
+                }
+
+                if let event {
+                    Text(event.title)
+                        .font(
+                            .system(size: 34, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(event.themeColor)
+
+                    Text("\(balance) \(event.currencyTitle)")
+                        .font(
+                            .system(
+                                size: 12,
+                                weight: .black,
+                                design: .monospaced
+                            )
+                        )
+                        .foregroundStyle(.white.opacity(0.72))
+
+                    MenuActionButton(
+                        title: "START EVENT RUN",
+                        color: event.themeColor,
+                        action: startEventRun
+                    )
+                    MenuActionButton(
+                        title: "EVENT SHOP",
+                        color: .white,
+                        action: openShop
+                    )
+                } else {
+                    Text("NO ACTIVE EVENT")
+                        .font(
+                            .system(
+                                size: 14,
+                                weight: .black,
+                                design: .monospaced
+                            )
+                        )
+                        .foregroundStyle(.white.opacity(0.6))
+                }
+
+                Spacer()
+            }
+            .padding(24)
+        }
+    }
+}
+
+struct EndlessModeView: View {
+    let highScore: Int
+    let bestFights: Int
+    let startEndless: () -> Void
+    let back: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.86)
+                .ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Text("ENDLESS MODE")
+                        .font(
+                            .system(size: 30, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(.white)
+
+                    Spacer()
+
+                    BackButton(action: back)
+                }
+
+                GallerySection(title: "BEST ENDLESS") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        GalleryLine(
+                            label: "HIGH SCORE",
+                            value: "\(highScore)",
+                            color: .orange
+                        )
+                        GalleryLine(
+                            label: "FIGHTS",
+                            value: "\(bestFights)",
+                            color: .red
+                        )
+                    }
+                }
+
+                MenuActionButton(
+                    title: "START ENDLESS",
+                    color: .orange,
+                    action: startEndless
+                )
+
+                Spacer()
+            }
+            .padding(24)
+        }
+    }
+}
+
 struct StyleLabView: View {
     let back: () -> Void
 
@@ -503,13 +791,17 @@ struct CharacterSelectView: View {
                             selectCharacter(character)
                         } label: {
                             HStack(spacing: 12) {
-                                Circle()
-                                    .fill(character.tint)
-                                    .frame(width: 16, height: 16)
-                                    .shadow(
-                                        color: character.tint.opacity(0.75),
-                                        radius: 8
-                                    )
+                                FighterSprite(
+                                    assetName: character.idleAsset,
+                                    fallbackTitle: character.title,
+                                    tint: character.tint,
+                                    isEnemy: false
+                                )
+                                .frame(width: 64, height: 64)
+                                .shadow(
+                                    color: character.tint.opacity(0.75),
+                                    radius: 8
+                                )
 
                                 VStack(alignment: .leading, spacing: 5) {
                                     Text(character.title)
@@ -755,7 +1047,6 @@ struct GalleryView: View {
 }
 
 struct SettingsView: View {
-    @Binding var isSFXEnabled: Bool
     @Binding var isScreenShakeEnabled: Bool
     @Binding var isFlashFXEnabled: Bool
 
@@ -781,7 +1072,6 @@ struct SettingsView: View {
                 }
 
                 VStack(spacing: 12) {
-                    SettingsToggle(title: "SFX", isOn: $isSFXEnabled)
                     SettingsToggle(
                         title: "SCREEN SHAKE",
                         isOn: $isScreenShakeEnabled

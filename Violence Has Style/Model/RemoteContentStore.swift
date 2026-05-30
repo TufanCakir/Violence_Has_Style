@@ -9,27 +9,29 @@ import Foundation
 
 final class RemoteContentStore {
     static let shared = RemoteContentStore()
-
+    
     static let manifestURL = URL(
         string: "https://remoterviolencehasstyle.tufancakir.com/manifest.json"
     )!
-
+    
     private(set) var enemyDefinitions: [String: EnemyDefinition] = [:]
     private(set) var levelDefinitions: [LevelDefinition] = []
     private(set) var characterDefinitions: [PlayerCharacter] = []
     private(set) var rewardDefinitions: [RunReward] = []
     private(set) var eventDefinitions: [EventDefinition] = []
+    private(set) var storyChapters: [StoryChapter] = []
+    private(set) var musicTracks: [MusicTrack] = []
     private(set) var gameConfig = GameConfig.fallback
     private(set) var isOnline = false
     private(set) var statusMessage = "CONNECTING TO STYLE SERVER"
-
+    
     private var assetsBaseURL: URL?
     private var musicBaseURL: URL?
     private var assetURLs: [String: URL] = [:]
     private var musicURLs: [String: URL] = [:]
-
+    
     private init() {}
-
+    
     @MainActor
     func refresh() async {
         guard
@@ -40,12 +42,25 @@ final class RemoteContentStore {
             resetRemoteContent(status: "MANIFEST REQUIRED")
             return
         }
+        
+        assetsBaseURL = resolvedURL(
+            manifest.assetsBaseURL
+        )
 
-        assetsBaseURL = resolvedURL(manifest.assetsBaseURL)
-        musicBaseURL = resolvedURL(manifest.musicBaseURL)
-        assetURLs = mediaURLMap(from: manifest.assets)
-        musicURLs = mediaURLMap(from: manifest.music)
+        musicBaseURL = resolvedURL(
+            manifest.musicBaseURL
+        )
 
+        assetURLs = mediaURLMap(
+            from: manifest.assets,
+            baseURL: assetsBaseURL
+        )
+
+        musicURLs = mediaURLMap(
+            from: manifest.music,
+            baseURL: musicBaseURL
+        )
+        
         guard
             let enemyURL = manifest.dataURL(
                 for: "enemies",
@@ -67,6 +82,10 @@ final class RemoteContentStore {
                 for: "events",
                 baseURL: Self.manifestURL
             ),
+            let storyURL = manifest.dataURL(
+                for: "story",
+                baseURL: Self.manifestURL
+            ),
             let configURL = manifest.dataURL(
                 for: "config",
                 baseURL: Self.manifestURL
@@ -75,25 +94,27 @@ final class RemoteContentStore {
             resetRemoteContent(status: "MANIFEST DATA IDS MISSING")
             return
         }
-
+        
         async let enemies: [EnemyDefinition]? = loadJSON(from: enemyURL)
         async let levels: [LevelDefinition]? = loadJSON(from: levelURL)
         async let characters: [PlayerCharacter]? = loadJSON(from: characterURL)
         async let rewards: [RunReward]? = loadJSON(from: rewardURL)
         async let events: [EventDefinition]? = loadJSON(from: eventURL)
+        async let story: [StoryChapter]? = loadJSON(from: storyURL)
         let loadedConfig: GameConfig? = await loadJSON(from: configURL)
-
+        
         guard let loadedEnemies = await enemies, !loadedEnemies.isEmpty,
-            let loadedLevels = await levels, !loadedLevels.isEmpty,
-            let loadedCharacters = await characters, !loadedCharacters.isEmpty,
-            let loadedRewards = await rewards, !loadedRewards.isEmpty,
-            let loadedEvents = await events,
-            let loadedConfig
+              let loadedLevels = await levels, !loadedLevels.isEmpty,
+              let loadedCharacters = await characters, !loadedCharacters.isEmpty,
+              let loadedRewards = await rewards, !loadedRewards.isEmpty,
+              let loadedEvents = await events,
+              let loadedStory = await story, !loadedStory.isEmpty,
+              let loadedConfig
         else {
             resetRemoteContent(status: "REMOTE DATA REQUIRED")
             return
         }
-
+        
         enemyDefinitions = Dictionary(
             uniqueKeysWithValues: loadedEnemies.map { ($0.id, $0) }
         )
@@ -103,59 +124,115 @@ final class RemoteContentStore {
         characterDefinitions = loadedCharacters
         rewardDefinitions = loadedRewards
         eventDefinitions = loadedEvents
+        storyChapters = loadedStory.sorted { $0.requiredChapter < $1.requiredChapter }
         gameConfig = loadedConfig
         isOnline = true
         statusMessage = "REMOTE STYLE LOADED"
     }
-
+    
     func assetURL(named name: String, fileExtension: String = "png") -> URL {
         if let url = assetURLs[name] {
             return url
         }
-
+        
         if let assetsBaseURL {
             return assetsBaseURL.appendingPathComponent(
                 "\(name).\(fileExtension)"
             )
         }
-
+        
         return Self.manifestURL
     }
-
+    
     func musicURL(named name: String, fileExtension: String) -> URL {
         if let url = musicURLs[name] {
             return url
         }
-
+        
         if let musicBaseURL {
             return musicBaseURL.appendingPathComponent(
                 "\(name).\(fileExtension)"
             )
         }
-
+        
         return Self.manifestURL
     }
-
+    
+    func contentURL(_ value: String) -> URL? {
+        resolvedURL(value)
+    }
+    
+    func preloadRemoteMedia() async {
+        let urls = Array(assetURLs.values) + Array(musicURLs.values) + musicTracks.compactMap { contentURL($0.url) }
+        await withTaskGroup(of: Void.self) { group in
+            for url in urls {
+                group.addTask {
+                    _ = try? await URLSession.shared.data(from: url)
+                }
+            }
+        }
+    }
+    
     private func loadJSON<T: Decodable>(from url: URL) async -> T? {
+        
+        print("🌍 Loading:", url.absoluteString)
+        
         do {
-            let (data, response) = try await URLSession.shared.data(from: url)
-            guard let httpResponse = response as? HTTPURLResponse,
-                (200..<300).contains(httpResponse.statusCode)
-            else {
+            
+            let (data, response) =
+            try await URLSession.shared.data(from: url)
+            
+            guard let http =
+                    response as? HTTPURLResponse else {
+                
+                print("❌ No HTTP response")
                 return nil
             }
-            return try JSONDecoder().decode(T.self, from: data)
+            
+            print("📡 Status:", http.statusCode)
+            
+            guard (200..<300).contains(http.statusCode) else {
+                
+                print("❌ HTTP Error:", http.statusCode)
+                
+                if let text = String(
+                    data: data,
+                    encoding: .utf8
+                ) {
+                    print(text)
+                }
+                
+                return nil
+            }
+            
+            let decoded =
+            try JSONDecoder().decode(
+                T.self,
+                from: data
+            )
+            
+            print("✅ Success:", url.lastPathComponent)
+            
+            return decoded
+            
         } catch {
+            
+            print("❌ Decode failed")
+            print("URL:", url.absoluteString)
+            print("Error:", error)
+            
             return nil
         }
     }
-
+    
     private func resetRemoteContent(status: String) {
         enemyDefinitions = [:]
         levelDefinitions = []
         characterDefinitions = []
         rewardDefinitions = []
         eventDefinitions = []
+        storyChapters = []
+        musicTracks = []
         gameConfig = .fallback
         assetsBaseURL = nil
         musicBaseURL = nil
@@ -164,21 +241,49 @@ final class RemoteContentStore {
         isOnline = false
         statusMessage = status
     }
+    
+    private func resolvedURL(_ value: String?) -> URL? {
 
-    private func mediaURLMap(from files: [RemoteManifestMediaFile]) -> [String:
-        URL]
-    {
+        guard let value,
+              !value.isEmpty else {
+            return nil
+        }
+
+        return URL(
+            string: value,
+            relativeTo: Self.manifestURL
+        )?.absoluteURL
+    }
+    
+    private func mediaURLMap(
+        from files: [RemoteManifestMediaFile],
+        baseURL: URL?
+    ) -> [String: URL] {
+        
         Dictionary(
             uniqueKeysWithValues: files.compactMap { file in
-                guard let url = resolvedURL(file.url) else { return nil }
+                
+                let url: URL?
+                
+                if let baseURL {
+                    
+                    url = URL(
+                        string: file.url,
+                        relativeTo: baseURL
+                    )?.absoluteURL
+                    
+                } else {
+                    
+                    url = resolvedURL(file.url)
+                }
+                
+                guard let url else {
+                    return nil
+                }
+                
                 return (file.id, url)
             }
         )
-    }
-
-    private func resolvedURL(_ value: String?) -> URL? {
-        guard let value, !value.isEmpty else { return nil }
-        return URL(string: value, relativeTo: Self.manifestURL)?.absoluteURL
     }
 }
 

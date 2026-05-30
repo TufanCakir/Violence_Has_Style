@@ -1,0 +1,38 @@
+[
+  {
+    "id": "chapter_01",
+    "title": "CHAPTER 01",
+    "subtitle": "THE ALLEY LEARNS YOUR NAME",
+    "requiredChapter": 0,
+    "startFight": 1,
+    "targetFights": 2,
+    "levelId": "vhs_alley",
+    "introText": "Paint the first wall red.",
+    "rewardText": "Alley cleared.",
+    "colorHex": "#FF2A2A"
+  },
+  {
+    "id": "chapter_02",
+    "title": "CHAPTER 02",
+    "subtitle": "THE JUDGE WATCHES",
+    "requiredChapter": 1,
+    "startFight": 3,
+    "targetFights": 3,
+    "levelId": "static_subway",
+    "introText": "The city is judging every cut.",
+    "rewardText": "The Judge noticed.",
+    "colorHex": "#20D9FF"
+  },
+  {
+    "id": "chapter_03",
+    "title": "CHAPTER 03",
+    "subtitle": "STYLE GOD TRIAL",
+    "requiredChapter": 2,
+    "startFight": 5,
+    "targetFights": 4,
+    "levelId": "judge_arena",
+    "introText": "Be beautiful or be forgotten.",
+    "rewardText": "Trial cleared.",
+    "colorHex": "#FF9F1A"
+  }
+]

@@ -2,11 +2,11 @@
     {
         "id": "vhs_blade",
         "title": "VHS BLADE",
-        "idleAsset": "idle",
+        "idleAsset": "character_vhs_idle",
         "attackFrames": [
-            "attack1",
-            "attack2",
-            "attack3"
+            "character_vhs_attack1",
+            "character_vhs_attack2",
+            "character_vhs_attack3"
         ],
         "maxHP": 100,
         "styleGainBonus": 0,

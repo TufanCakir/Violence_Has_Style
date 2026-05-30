@@ -4,11 +4,15 @@
         "title": "BLOOD MOON",
         "startsAt": "2026-05-01T00:00:00Z",
         "endsAt": "2026-07-01T00:00:00Z",
+
         "currencyId": "blood_shards",
         "currencyTitle": "BLOOD SHARDS",
+        "currencyIconAsset": "currency_blood_coin",
+
         "themeColorHex": "#FF1744",
         "currencyPerFinisher": 12,
         "styleGodBonus": 8,
+
         "shopItems": [
             {
                 "id": "rose_blood_aura",

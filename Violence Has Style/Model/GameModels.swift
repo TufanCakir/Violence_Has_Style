@@ -12,11 +12,22 @@ enum GameScreen {
     case title
     case menu
     case run
+    case storyMode
+    case eventMode
+    case endlessMode
     case characterSelect
     case styleLab
     case gallery
     case eventShop
+    case leaderboard
     case settings
+}
+
+enum RunMode: String {
+    case story
+    case event
+    case endless
+    case style
 }
 
 enum StyleRank: Equatable {
@@ -139,6 +150,8 @@ enum CombatStyle: CaseIterable, Equatable {
     case reaper
     case phantom
     case blood
+    case void
+    case chaos
 
     var title: String {
         switch self {
@@ -150,6 +163,10 @@ enum CombatStyle: CaseIterable, Equatable {
             return "PHANTOM STYLE"
         case .blood:
             return "BLOOD STYLE"
+        case .void:
+            return "VOID STYLE"
+        case .chaos:
+            return "CHAOS STYLE"
         }
     }
 
@@ -163,6 +180,10 @@ enum CombatStyle: CaseIterable, Equatable {
             return "DASH"
         case .blood:
             return "HP FOR POWER"
+        case .void:
+            return "STYLE DRAIN"
+        case .chaos:
+            return "RISK BURST"
         }
     }
 
@@ -179,6 +200,10 @@ enum CombatStyle: CaseIterable, Equatable {
                 "Dash movement and clean dodges. Enough Style lets you avoid counterattacks."
         case .blood:
             return "Spend HP for extra Style and power. Dangerous, but violent."
+        case .void:
+            return "A darker Phantom variant. Lower damage, more control and clean movement."
+        case .chaos:
+            return "Unstable burst style. Big damage, volatile Style flow."
         }
     }
 
@@ -192,6 +217,10 @@ enum CombatStyle: CaseIterable, Equatable {
             return "VANISH"
         case .blood:
             return "BLEED BEAUTIFUL"
+        case .void:
+            return "EMPTY THE ROOM"
+        case .chaos:
+            return "MAKE IT LOUD"
         }
     }
 
@@ -205,6 +234,10 @@ enum CombatStyle: CaseIterable, Equatable {
             return .mint
         case .blood:
             return .red
+        case .void:
+            return .indigo
+        case .chaos:
+            return .yellow
         }
     }
 
@@ -218,6 +251,10 @@ enum CombatStyle: CaseIterable, Equatable {
             return .mint
         case .blood:
             return .red
+        case .void:
+            return .indigo
+        case .chaos:
+            return .yellow
         }
     }
 
@@ -231,6 +268,10 @@ enum CombatStyle: CaseIterable, Equatable {
             return 10
         case .blood:
             return 9
+        case .void:
+            return 13
+        case .chaos:
+            return 6
         }
     }
 
@@ -244,6 +285,10 @@ enum CombatStyle: CaseIterable, Equatable {
             return 8
         case .blood:
             return 14
+        case .void:
+            return 11
+        case .chaos:
+            return 22
         }
     }
 
@@ -257,6 +302,10 @@ enum CombatStyle: CaseIterable, Equatable {
             return 0.34
         case .blood:
             return 0.24
+        case .void:
+            return 0.12
+        case .chaos:
+            return 0.18
         }
     }
 
@@ -270,6 +319,10 @@ enum CombatStyle: CaseIterable, Equatable {
             return 0.08
         case .blood:
             return 0.22
+        case .void:
+            return 0.04
+        case .chaos:
+            return 0.3
         }
     }
 
@@ -283,6 +336,10 @@ enum CombatStyle: CaseIterable, Equatable {
             return 0.02
         case .blood:
             return 0.08
+        case .void:
+            return 0.03
+        case .chaos:
+            return 0.14
         }
     }
 
@@ -296,6 +353,10 @@ enum CombatStyle: CaseIterable, Equatable {
             return 2
         case .blood:
             return 4
+        case .void:
+            return 3
+        case .chaos:
+            return 5
         }
     }
 
@@ -309,6 +370,10 @@ enum CombatStyle: CaseIterable, Equatable {
             return 5
         case .blood:
             return 11
+        case .void:
+            return 7
+        case .chaos:
+            return 18
         }
     }
 
@@ -322,6 +387,10 @@ enum CombatStyle: CaseIterable, Equatable {
             return "VANISH"
         case .blood:
             return "BLEED"
+        case .void:
+            return "VOID"
+        case .chaos:
+            return "BURST"
         }
     }
 
@@ -334,6 +403,10 @@ enum CombatStyle: CaseIterable, Equatable {
         case .phantom:
             return .blood
         case .blood:
+            return .void
+        case .void:
+            return .chaos
+        case .chaos:
             return .killer
         }
     }
@@ -341,13 +414,17 @@ enum CombatStyle: CaseIterable, Equatable {
     var previous: CombatStyle {
         switch self {
         case .killer:
-            return .blood
+            return .chaos
         case .reaper:
             return .killer
         case .phantom:
             return .reaper
         case .blood:
             return .phantom
+        case .void:
+            return .blood
+        case .chaos:
+            return .void
         }
     }
 
@@ -362,6 +439,10 @@ enum CombatStyle: CaseIterable, Equatable {
             base = max(8, rank.damage - 2)
         case .blood:
             base = rank.damage + 14
+        case .void:
+            base = max(7, rank.damage - 3)
+        case .chaos:
+            base = rank.damage + 18
         }
 
         return base
@@ -562,6 +643,7 @@ struct EventDefinition: Codable, Equatable, Identifiable {
     let endsAt: String
     let currencyId: String
     let currencyTitle: String
+    let currencyIconAsset: String
     let themeColorHex: String
     let currencyPerFinisher: Int
     let styleGodBonus: Int
@@ -613,6 +695,79 @@ struct EventCatalog {
 
     var activeEvent: EventDefinition? {
         events.first { $0.isActive }
+    }
+}
+
+struct StoryChapter: Codable, Equatable, Identifiable {
+    let id: String
+    let title: String
+    let subtitle: String
+    let requiredChapter: Int
+    let startFight: Int
+    let targetFights: Int
+    let levelId: String?
+    let introText: String
+    let rewardText: String
+    let colorHex: String
+
+    var color: Color {
+        Color(hex: colorHex)
+    }
+}
+
+struct StoryCatalog {
+    static let shared = StoryCatalog()
+
+    private init() {}
+
+    var chapters: [StoryChapter] {
+        let remote = RemoteContentStore.shared.storyChapters
+        return remote.isEmpty ? Self.fallbackChapters : remote
+    }
+
+    func chapter(id: String?) -> StoryChapter? {
+        guard let id else { return nil }
+        return chapters.first { $0.id == id }
+    }
+
+    private static let fallbackChapters: [StoryChapter] = [
+        StoryChapter(
+            id: "chapter_01",
+            title: "CHAPTER 01",
+            subtitle: "THE ALLEY LEARNS YOUR NAME",
+            requiredChapter: 0,
+            startFight: 1,
+            targetFights: 2,
+            levelId: "vhs_alley",
+            introText: "Paint the first wall red.",
+            rewardText: "Alley cleared.",
+            colorHex: "#FF2A2A"
+        )
+    ]
+}
+
+struct MusicTrack: Codable, Equatable, Identifiable {
+    let id: String
+    let title: String
+    let url: String
+    let mode: String?
+}
+
+struct MusicCatalog {
+    static let shared = MusicCatalog()
+
+    private init() {}
+
+    var tracks: [MusicTrack] {
+        RemoteContentStore.shared.musicTracks
+    }
+
+    func playlist(for mode: RunMode? = nil) -> [MusicTrack] {
+        let activeTracks = tracks
+        guard let mode else { return activeTracks }
+
+        let filtered = activeTracks.filter { $0.mode == nil || $0.mode == mode.rawValue }
+        return filtered.isEmpty ? activeTracks : filtered
     }
 }
 

@@ -45,6 +45,8 @@ final class GameState {
     var activeStyle: CombatStyle = .killer
     var currentEnemy: EnemyType = .grunt
     var currentLevel: LevelDefinition = LevelCatalog.shared.level(for: 1)
+    var runMode: RunMode = .style
+    var storyChapterId: String?
     var isEnemyBroken = false
     var isChoosingReward = false
     var isGameOver = false
@@ -195,6 +197,22 @@ final class GameState {
         paintStrokes.removeAll()
     }
 
+    func startRun(mode: RunMode, storyChapter: StoryChapter? = nil) {
+        runMode = mode
+        storyChapterId = storyChapter?.id
+        restartRun()
+
+        if let storyChapter {
+            fightLevel = max(1, storyChapter.startFight)
+            currentLevel = LevelCatalog.shared.level(for: fightLevel)
+            currentEnemy = EnemyType.forFight(fightLevel)
+            enemyMaxHealth = nextEnemyHealth
+            enemyHealth = enemyMaxHealth
+            enemyFrame = currentEnemy.idleAsset
+            bossVerdict = storyChapter.introText
+        }
+    }
+
     func refreshDataDefinitions() {
         currentCharacter = CharacterCatalog.shared.character(
             id: currentCharacter.id
@@ -246,7 +264,7 @@ final class GameState {
             .finisherImpact,
         ]
 
-        if let activeEvent = EventCatalog.shared.activeEvent {
+        if runMode == .event, let activeEvent = EventCatalog.shared.activeEvent {
             events.append(
                 .awardEventCurrency(
                     activeEvent.currencyReward(for: styleRank),
@@ -304,6 +322,12 @@ final class GameState {
             addPhantomPaint(for: index)
         case .blood:
             addBloodPaint(for: index)
+        case .void:
+            addPhantomPaint(for: index)
+            addStyleGodCrossStroke(color: activeStyle.tint.opacity(0.8))
+        case .chaos:
+            addBloodPaint(for: index)
+            addReaperPaint(for: index)
         }
 
         if styleRank == .styleGod {
@@ -312,24 +336,34 @@ final class GameState {
 
         trimPaintStrokes()
     }
-
+    
     private func addKillerPaint(for index: Int) {
-        for burst in 0..<activeStyle.paintBurstCount {
-            let offset = CGFloat(burst) * 0.05
+
+        for _ in 0..<activeStyle.paintBurstCount {
+
+            let fromLeft = Bool.random()
+
+            let startX: CGFloat = fromLeft ? -0.1 : 1.1
+            let endX: CGFloat = fromLeft ? 1.1 : -0.1
+
+            let startY = CGFloat.random(in: 0.1...0.9)
+            let endY = CGFloat.random(in: 0.1...0.9)
+
             let stroke = basePaintStroke(
                 index: index,
-                startX: 0.2 + offset,
-                startY: 0.7 - CGFloat(index) * 0.08 - offset,
-                controlX: 0.34 + offset,
-                controlY: 0.18 + offset,
-                control2X: 0.66 + offset,
-                control2Y: 0.22 + CGFloat(index) * 0.08,
-                endX: 0.74 + offset,
-                endY: 0.34 + CGFloat(index) * 0.08,
+                startX: startX,
+                startY: startY,
+                controlX: 0.5,
+                controlY: CGFloat.random(in: 0...1),
+                control2X: 0.5,
+                control2Y: CGFloat.random(in: 0...1),
+                endX: endX,
+                endY: endY,
                 lineWidth: CGFloat(8 + styleRank.score * 4),
                 opacity: 0.62 + Double(styleRank.score) * 0.08,
                 color: activeStyle.paintColor
             )
+
             paintStrokes.append(stroke)
         }
     }
@@ -354,22 +388,52 @@ final class GameState {
     }
 
     private func addPhantomPaint(for index: Int) {
-        for burst in 0..<activeStyle.paintBurstCount {
-            let y = 0.28 + CGFloat(index) * 0.16 + CGFloat(burst) * 0.08
-            let stroke = basePaintStroke(
-                index: index,
-                startX: -0.1,
-                startY: y,
-                controlX: 0.2,
-                controlY: y - 0.14,
-                control2X: 0.72,
-                control2Y: y + 0.12,
-                endX: 1.12,
-                endY: y,
-                lineWidth: CGFloat(7 + styleRank.score * 3),
-                opacity: 0.46 + Double(styleRank.score) * 0.08,
-                color: activeStyle.paintColor
-            )
+
+        for _ in 0..<activeStyle.paintBurstCount {
+
+            let vertical = Bool.random()
+
+            let stroke: PaintStroke
+
+            if vertical {
+
+                let x = CGFloat.random(in: 0.15...0.85)
+
+                stroke = basePaintStroke(
+                    index: index,
+                    startX: x,
+                    startY: -0.1,
+                    controlX: x - 0.05,
+                    controlY: 0.3,
+                    control2X: x + 0.05,
+                    control2Y: 0.7,
+                    endX: x,
+                    endY: 1.1,
+                    lineWidth: CGFloat(7 + styleRank.score * 3),
+                    opacity: 0.5,
+                    color: activeStyle.paintColor
+                )
+
+            } else {
+
+                let y = CGFloat.random(in: 0.15...0.85)
+
+                stroke = basePaintStroke(
+                    index: index,
+                    startX: -0.1,
+                    startY: y,
+                    controlX: 0.3,
+                    controlY: y - 0.1,
+                    control2X: 0.7,
+                    control2Y: y + 0.1,
+                    endX: 1.1,
+                    endY: y,
+                    lineWidth: CGFloat(7 + styleRank.score * 3),
+                    opacity: 0.5,
+                    color: activeStyle.paintColor
+                )
+            }
+
             paintStrokes.append(stroke)
         }
     }
@@ -459,7 +523,7 @@ final class GameState {
         switch activeStyle {
         case .killer:
             return killerStyleBonus
-        case .phantom:
+        case .phantom, .void:
             return phantomStyleBonus
         default:
             return currentCharacter.styleGainBonus
@@ -467,7 +531,7 @@ final class GameState {
     }
 
     private var styleDamageBonus: Int {
-        activeStyle == .reaper ? reaperDamageBonus : 0
+        activeStyle == .reaper || activeStyle == .chaos ? reaperDamageBonus : 0
     }
 
     private var nextEnemyHealth: Int {
