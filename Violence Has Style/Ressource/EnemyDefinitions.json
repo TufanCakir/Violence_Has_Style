@@ -1,0 +1,82 @@
+[
+    {
+        "id": "grunt",
+        "title": "GRUNT",
+        "idleAsset": "enemy_grunt_idle",
+        "hitFrames": [
+            "enemy_grunt_hit1",
+            "enemy_grunt_hit2",
+            "enemy_grunt_hit3"
+        ],
+        "healthBonus": 0,
+        "counterDelay": 4,
+        "damageBonus": 0,
+        "styleBonus": 0,
+        "tintHex": "#FF4F8B",
+        "brokenHex": "#FF2A2A",
+        "scale": 1.0,
+        "glowRadius": 10,
+        "isBoss": false,
+        "introVerdict": "PROVE IT"
+    },
+    {
+        "id": "duelist",
+        "title": "DUELIST",
+        "idleAsset": "enemy_duelist_idle",
+        "hitFrames": [
+            "enemy_duelist_hit1",
+            "enemy_duelist_hit2",
+            "enemy_duelist_hit3"
+        ],
+        "healthBonus": 12,
+        "counterDelay": 2,
+        "damageBonus": 3,
+        "styleBonus": 8,
+        "tintHex": "#20D9FF",
+        "brokenHex": "#20D9FF",
+        "scale": 0.96,
+        "glowRadius": 16,
+        "isBoss": false,
+        "introVerdict": "KEEP UP"
+    },
+    {
+        "id": "brute",
+        "title": "BRUTE",
+        "idleAsset": "enemy_brute_idle",
+        "hitFrames": [
+            "enemy_brute_hit1",
+            "enemy_brute_hit2",
+            "enemy_brute_hit3"
+        ],
+        "healthBonus": 45,
+        "counterDelay": 4,
+        "damageBonus": 8,
+        "styleBonus": 4,
+        "tintHex": "#9B5CFF",
+        "brokenHex": "#9B5CFF",
+        "scale": 1.16,
+        "glowRadius": 18,
+        "isBoss": false,
+        "introVerdict": "HIT HARDER"
+    },
+    {
+        "id": "judge",
+        "title": "JUDGE",
+        "idleAsset": "enemy_judge_idle",
+        "hitFrames": [
+            "enemy_judge_hit1",
+            "enemy_judge_hit2",
+            "enemy_judge_hit3"
+        ],
+        "healthBonus": 80,
+        "counterDelay": 3,
+        "damageBonus": 10,
+        "styleBonus": 12,
+        "tintHex": "#FFFFFF",
+        "brokenHex": "#FF9F1A",
+        "scale": 1.22,
+        "glowRadius": 30,
+        "isBoss": true,
+        "introVerdict": "BE BEAUTIFUL"
+    }
+]

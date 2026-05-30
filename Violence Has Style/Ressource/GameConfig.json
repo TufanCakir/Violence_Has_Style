@@ -1,0 +1,21 @@
+{
+    "combat": {
+        "maxStyle": 100,
+        "baseEnemyHealth": 100,
+        "enemyHealthPerFight": 16,
+        "enemyCounterStart": 3,
+        "finisherStyleCost": 45,
+        "finisherHeal": 12,
+        "lowStyleFinisherPenalty": 10,
+        "phantomDodgeMinStyle": 20,
+        "phantomDodgeStyleGain": 8,
+        "enemyStylePenalty": 12,
+        "bloodBaseCost": 4,
+        "bloodStyleGain": 6
+    },
+    "run": {
+        "bossEveryXFights": 5,
+        "rewardChoices": 3,
+        "maxBloodCostReduction": 3
+    }
+}

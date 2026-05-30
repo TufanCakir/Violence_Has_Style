@@ -1,0 +1,66 @@
+[
+    {
+        "id": "vhs_blade",
+        "title": "VHS BLADE",
+        "idleAsset": "idle",
+        "attackFrames": [
+            "attack1",
+            "attack2",
+            "attack3"
+        ],
+        "maxHP": 100,
+        "styleGainBonus": 0,
+        "damageBonus": 0,
+        "bloodCostModifier": 0,
+        "phantomDodgeBonus": 0,
+        "tintHex": "#20D9FF"
+    },
+    {
+        "id": "blood_saint",
+        "title": "BLOOD SAINT",
+        "idleAsset": "character_blood_saint_idle",
+        "attackFrames": [
+            "character_blood_saint_attack1",
+            "character_blood_saint_attack2",
+            "character_blood_saint_attack3"
+        ],
+        "maxHP": 90,
+        "styleGainBonus": 4,
+        "damageBonus": 4,
+        "bloodCostModifier": -2,
+        "phantomDodgeBonus": 0,
+        "tintHex": "#FF2A2A"
+    },
+    {
+        "id": "phantom_kid",
+        "title": "PHANTOM KID",
+        "idleAsset": "character_phantom_kid_idle",
+        "attackFrames": [
+            "character_phantom_kid_attack1",
+            "character_phantom_kid_attack2",
+            "character_phantom_kid_attack3"
+        ],
+        "maxHP": 85,
+        "styleGainBonus": 2,
+        "damageBonus": -2,
+        "bloodCostModifier": 0,
+        "phantomDodgeBonus": 10,
+        "tintHex": "#7CFFCE"
+    },
+    {
+        "id": "reaper_zero",
+        "title": "REAPER ZERO",
+        "idleAsset": "character_reaper_zero_idle",
+        "attackFrames": [
+            "character_reaper_zero_attack1",
+            "character_reaper_zero_attack2",
+            "character_reaper_zero_attack3"
+        ],
+        "maxHP": 110,
+        "styleGainBonus": -2,
+        "damageBonus": 8,
+        "bloodCostModifier": 1,
+        "phantomDodgeBonus": 0,
+        "tintHex": "#9B5CFF"
+    }
+]

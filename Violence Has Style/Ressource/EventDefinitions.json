@@ -1,0 +1,42 @@
+[
+    {
+        "id": "blood_moon",
+        "title": "BLOOD MOON",
+        "startsAt": "2026-05-01T00:00:00Z",
+        "endsAt": "2026-07-01T00:00:00Z",
+        "currencyId": "blood_shards",
+        "currencyTitle": "BLOOD SHARDS",
+        "themeColorHex": "#FF1744",
+        "currencyPerFinisher": 12,
+        "styleGodBonus": 8,
+        "shopItems": [
+            {
+                "id": "rose_blood_aura",
+                "title": "ROSE BLOOD AURA",
+                "description": "Event aura cosmetic for Blood Style",
+                "cost": 40,
+                "kind": "style_cosmetic",
+                "value": "blood_rose",
+                "colorHex": "#FF1744"
+            },
+            {
+                "id": "void_phantom_paint",
+                "title": "VOID PHANTOM PAINT",
+                "description": "Event paint cosmetic for Phantom Style",
+                "cost": 55,
+                "kind": "paint_cosmetic",
+                "value": "void_phantom",
+                "colorHex": "#7CFFCE"
+            },
+            {
+                "id": "gold_reaper_title",
+                "title": "GOLD REAPER TITLE",
+                "description": "Event title for stylish finishers",
+                "cost": 75,
+                "kind": "title",
+                "value": "gold_reaper",
+                "colorHex": "#FFCC33"
+            }
+        ]
+    }
+]

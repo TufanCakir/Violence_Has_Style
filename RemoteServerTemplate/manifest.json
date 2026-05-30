@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "assetsBaseURL": "https://remoterviolencehasstyle.tufancakir.com/assets/",
+  "musicBaseURL": "https://remoterviolencehasstyle.tufancakir.com/music/",
+  "data": [
+    {
+      "id": "characters",
+      "url": "CharacterDefinitions.json"
+    },
+    {
+      "id": "enemies",
+      "url": "EnemyDefinitions.json"
+    },
+    {
+      "id": "levels",
+      "url": "LevelDefinitions.json"
+    }
+  ],
+  "assets": [
+    {
+      "id": "logo_vhs",
+      "url": "assets/logo_vhs.png"
+    },
+    {
+      "id": "bg_vhs",
+      "url": "assets/bg_vhs.png"
+    },
+    {
+      "id": "idle",
+      "url": "assets/idle.png"
+    },
+    {
+      "id": "attack1",
+      "url": "assets/attack1.png"
+    },
+    {
+      "id": "attack2",
+      "url": "assets/attack2.png"
+    },
+    {
+      "id": "attack3",
+      "url": "assets/attack3.png"
+    }
+  ],
+  "music": [
+    {
+      "id": "menu",
+      "url": "music/menu.wav"
+    },
+    {
+      "id": "slash_1",
+      "url": "music/slash_1.wav"
+    },
+    {
+      "id": "slash_2",
+      "url": "music/slash_2.wav"
+    },
+    {
+      "id": "slash_3",
+      "url": "music/slash_3.wav"
+    },
+    {
+      "id": "hit",
+      "url": "music/hit.wav"
+    },
+    {
+      "id": "finisher",
+      "url": "music/finisher.wav"
+    }
+  ]
+}

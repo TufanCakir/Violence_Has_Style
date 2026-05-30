@@ -1,0 +1,195 @@
+{
+    "version": 1,
+    "assetsBaseURL": "https://remoterviolencehasstyle.tufancakir.com/assets/",
+    "musicBaseURL": "https://remoterviolencehasstyle.tufancakir.com/music/",
+    "data": [
+        {
+            "id": "characters",
+            "url": "CharacterDefinitions.json"
+        },
+        {
+            "id": "enemies",
+            "url": "EnemyDefinitions.json"
+        },
+        {
+            "id": "levels",
+            "url": "LevelDefinitions.json"
+        },
+        {
+            "id": "rewards",
+            "url": "RewardDefinitions.json"
+        },
+        {
+            "id": "events",
+            "url": "EventDefinitions.json"
+        },
+        {
+            "id": "config",
+            "url": "GameConfig.json"
+        }
+    ],
+    "assets": [
+        {
+            "id": "logo_vhs",
+            "url": "assets/logo_vhs.png"
+        },
+        {
+            "id": "bg_vhs",
+            "url": "assets/bg_vhs.png"
+        },
+        {
+            "id": "idle",
+            "url": "assets/idle.png"
+        },
+        {
+            "id": "attack1",
+            "url": "assets/attack1.png"
+        },
+        {
+            "id": "attack2",
+            "url": "assets/attack2.png"
+        },
+        {
+            "id": "attack3",
+            "url": "assets/attack3.png"
+        },
+        {
+            "id": "character_blood_saint_idle",
+            "url": "assets/character_blood_saint_idle.png"
+        },
+        {
+            "id": "character_blood_saint_attack1",
+            "url": "assets/character_blood_saint_attack1.png"
+        },
+        {
+            "id": "character_blood_saint_attack2",
+            "url": "assets/character_blood_saint_attack2.png"
+        },
+        {
+            "id": "character_blood_saint_attack3",
+            "url": "assets/character_blood_saint_attack3.png"
+        },
+        {
+            "id": "character_phantom_kid_idle",
+            "url": "assets/character_phantom_kid_idle.png"
+        },
+        {
+            "id": "character_phantom_kid_attack1",
+            "url": "assets/character_phantom_kid_attack1.png"
+        },
+        {
+            "id": "character_phantom_kid_attack2",
+            "url": "assets/character_phantom_kid_attack2.png"
+        },
+        {
+            "id": "character_phantom_kid_attack3",
+            "url": "assets/character_phantom_kid_attack3.png"
+        },
+        {
+            "id": "character_reaper_zero_idle",
+            "url": "assets/character_reaper_zero_idle.png"
+        },
+        {
+            "id": "character_reaper_zero_attack1",
+            "url": "assets/character_reaper_zero_attack1.png"
+        },
+        {
+            "id": "character_reaper_zero_attack2",
+            "url": "assets/character_reaper_zero_attack2.png"
+        },
+        {
+            "id": "character_reaper_zero_attack3",
+            "url": "assets/character_reaper_zero_attack3.png"
+        },
+        {
+            "id": "enemy_grunt_idle",
+            "url": "assets/enemy_grunt_idle.png"
+        },
+        {
+            "id": "enemy_grunt_hit1",
+            "url": "assets/enemy_grunt_hit1.png"
+        },
+        {
+            "id": "enemy_grunt_hit2",
+            "url": "assets/enemy_grunt_hit2.png"
+        },
+        {
+            "id": "enemy_grunt_hit3",
+            "url": "assets/enemy_grunt_hit3.png"
+        },
+        {
+            "id": "enemy_duelist_idle",
+            "url": "assets/enemy_duelist_idle.png"
+        },
+        {
+            "id": "enemy_duelist_hit1",
+            "url": "assets/enemy_duelist_hit1.png"
+        },
+        {
+            "id": "enemy_duelist_hit2",
+            "url": "assets/enemy_duelist_hit2.png"
+        },
+        {
+            "id": "enemy_duelist_hit3",
+            "url": "assets/enemy_duelist_hit3.png"
+        },
+        {
+            "id": "enemy_brute_idle",
+            "url": "assets/enemy_brute_idle.png"
+        },
+        {
+            "id": "enemy_brute_hit1",
+            "url": "assets/enemy_brute_hit1.png"
+        },
+        {
+            "id": "enemy_brute_hit2",
+            "url": "assets/enemy_brute_hit2.png"
+        },
+        {
+            "id": "enemy_brute_hit3",
+            "url": "assets/enemy_brute_hit3.png"
+        },
+        {
+            "id": "enemy_judge_idle",
+            "url": "assets/enemy_judge_idle.png"
+        },
+        {
+            "id": "enemy_judge_hit1",
+            "url": "assets/enemy_judge_hit1.png"
+        },
+        {
+            "id": "enemy_judge_hit2",
+            "url": "assets/enemy_judge_hit2.png"
+        },
+        {
+            "id": "enemy_judge_hit3",
+            "url": "assets/enemy_judge_hit3.png"
+        }
+    ],
+    "music": [
+        {
+            "id": "menu",
+            "url": "music/menu.mp3"
+        },
+        {
+            "id": "slash_1",
+            "url": "music/slash_1.mp3"
+        },
+        {
+            "id": "slash_2",
+            "url": "music/slash_2.mp3"
+        },
+        {
+            "id": "slash_3",
+            "url": "music/slash_3.mp3"
+        },
+        {
+            "id": "hit",
+            "url": "music/hit.mp3"
+        },
+        {
+            "id": "finisher",
+            "url": "music/finisher.mp3"
+        }
+    ]
+}

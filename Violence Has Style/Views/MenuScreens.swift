@@ -1,0 +1,941 @@
+//
+//  MenuScreens.swift
+//  Violence Has Style
+//
+//  Created by Tufan Cakir on 30.05.26.
+//
+
+import SwiftUI
+
+struct TitleScreenView: View {
+    let start: () -> Void
+
+    var body: some View {
+        ZStack {
+            titleBackground
+
+            Color.black.opacity(0.48)
+                .ignoresSafeArea()
+
+            VStack(spacing: 22) {
+                Spacer()
+
+                logo
+                    .frame(maxWidth: 300)
+                    .frame(height: 180)
+                    .shadow(color: .red.opacity(0.8), radius: 18)
+
+                VStack(spacing: 2) {
+                    Text("VIOLENCE")
+                        .font(
+                            .system(size: 42, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(.white)
+
+                    Text("HAS STYLE")
+                        .font(
+                            .system(size: 42, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(.red)
+                }
+                .tracking(1.2)
+
+                Spacer()
+
+                Text("TAP TO START")
+                    .font(
+                        .system(size: 13, weight: .black, design: .monospaced)
+                    )
+                    .foregroundStyle(.white.opacity(0.74))
+                    .tracking(1.4)
+                    .padding(.bottom, 28)
+            }
+            .padding(28)
+
+            VStack(spacing: 12) {
+                ForEach(0..<18, id: \.self) { _ in
+                    Rectangle()
+                        .fill(.white.opacity(0.035))
+                        .frame(height: 1)
+                }
+            }
+            .allowsHitTesting(false)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            start()
+        }
+    }
+
+    private var titleBackground: some View {
+        AsyncImage(url: RemoteContentStore.shared.assetURL(named: "bg_vhs")) {
+            phase in
+            if let image = phase.image {
+                image
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                Color.black
+            }
+        }
+        .ignoresSafeArea()
+    }
+
+    private var logo: some View {
+        AsyncImage(url: RemoteContentStore.shared.assetURL(named: "logo_vhs")) {
+            phase in
+            if let image = phase.image {
+                image
+                    .resizable()
+                    .scaledToFit()
+            } else {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(.red.opacity(0.8), lineWidth: 2)
+                        .background(.black.opacity(0.42))
+
+                    Text("VHS")
+                        .font(
+                            .system(size: 54, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(.white)
+                        .tracking(3)
+                }
+            }
+        }
+    }
+}
+
+struct OnlineRequiredView: View {
+    let isLoading: Bool
+    let status: String
+    let retry: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black
+                .ignoresSafeArea()
+
+            VStack(spacing: 18) {
+                Text("VIOLENCE")
+                    .font(.system(size: 40, weight: .black, design: .rounded))
+                    .foregroundStyle(.white)
+
+                Text("HAS STYLE")
+                    .font(.system(size: 40, weight: .black, design: .rounded))
+                    .foregroundStyle(.red)
+
+                VStack(spacing: 8) {
+                    Text(isLoading ? "LOADING REMOTE GAME" : "ONLINE REQUIRED")
+                        .font(
+                            .system(
+                                size: 14,
+                                weight: .black,
+                                design: .monospaced
+                            )
+                        )
+                        .foregroundStyle(.white.opacity(0.78))
+
+                    Text(status)
+                        .font(
+                            .system(
+                                size: 10,
+                                weight: .black,
+                                design: .monospaced
+                            )
+                        )
+                        .foregroundStyle(.red.opacity(0.85))
+                }
+                .padding(.top, 8)
+
+                if isLoading {
+                    ProgressView()
+                        .tint(.red)
+                } else {
+                    Button(action: retry) {
+                        Text("RETRY CONNECTION")
+                            .font(
+                                .system(
+                                    size: 15,
+                                    weight: .black,
+                                    design: .rounded
+                                )
+                            )
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.red)
+                    .padding(.top, 8)
+
+                    Text("WLAN OR MOBILE DATA NEEDED")
+                        .font(
+                            .system(
+                                size: 10,
+                                weight: .black,
+                                design: .monospaced
+                            )
+                        )
+                        .foregroundStyle(.white.opacity(0.52))
+                }
+            }
+            .padding(28)
+        }
+    }
+}
+
+struct MainMenuView: View {
+    let activeEvent: EventDefinition?
+    let eventBalance: Int
+    let startRun: () -> Void
+    let openCharacterSelect: () -> Void
+    let openStyleLab: () -> Void
+    let openGallery: () -> Void
+    let openEventShop: () -> Void
+    let openSettings: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.76)
+                .ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: 18) {
+                Spacer()
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("VIOLENCE")
+                        .font(
+                            .system(size: 46, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(.white)
+
+                    Text("HAS STYLE")
+                        .font(
+                            .system(size: 46, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(.red)
+                }
+                .tracking(1.2)
+
+                VStack(spacing: 10) {
+                    MenuActionButton(
+                        title: "START RUN",
+                        color: .red,
+                        action: startRun
+                    )
+                    if let activeEvent {
+                        MenuActionButton(
+                            title: "\(activeEvent.title) SHOP  \(eventBalance)",
+                            color: activeEvent.themeColor,
+                            action: openEventShop
+                        )
+                    }
+                    MenuActionButton(
+                        title: "CHARACTER SELECT",
+                        color: .white,
+                        action: openCharacterSelect
+                    )
+                    MenuActionButton(
+                        title: "STYLE LAB",
+                        color: .cyan,
+                        action: openStyleLab
+                    )
+                    MenuActionButton(
+                        title: "GALLERY",
+                        color: .purple,
+                        action: openGallery
+                    )
+                    MenuActionButton(
+                        title: "SETTINGS",
+                        color: .orange,
+                        action: openSettings
+                    )
+                }
+
+                Spacer()
+
+                Text("TAP ATTACK. SWIPE STYLE. KILL WITH STYLE.")
+                    .font(
+                        .system(size: 10, weight: .black, design: .monospaced)
+                    )
+                    .foregroundStyle(.white.opacity(0.55))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(28)
+        }
+    }
+}
+
+struct EventShopView: View {
+    let event: EventDefinition?
+    let balance: Int
+    let purchasedItemIds: [String]
+    let buyItem: (EventShopItem) -> Void
+    let back: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.86)
+                .ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Text("EVENT SHOP")
+                        .font(
+                            .system(size: 30, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(.white)
+
+                    Spacer()
+
+                    BackButton(action: back)
+                }
+
+                if let event {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(event.title)
+                            .font(
+                                .system(
+                                    size: 22,
+                                    weight: .black,
+                                    design: .rounded
+                                )
+                            )
+                            .foregroundStyle(event.themeColor)
+
+                        Text("\(balance) \(event.currencyTitle)")
+                            .font(
+                                .system(
+                                    size: 12,
+                                    weight: .black,
+                                    design: .monospaced
+                                )
+                            )
+                            .foregroundStyle(.white.opacity(0.72))
+                    }
+
+                    VStack(spacing: 10) {
+                        ForEach(event.shopItems) { item in
+                            Button {
+                                buyItem(item)
+                            } label: {
+                                HStack(spacing: 12) {
+                                    Circle()
+                                        .fill(item.color)
+                                        .frame(width: 18, height: 18)
+                                        .shadow(
+                                            color: item.color.opacity(0.8),
+                                            radius: 8
+                                        )
+
+                                    VStack(alignment: .leading, spacing: 5) {
+                                        Text(item.title)
+                                            .font(
+                                                .system(
+                                                    size: 15,
+                                                    weight: .black,
+                                                    design: .rounded
+                                                )
+                                            )
+                                            .foregroundStyle(item.color)
+
+                                        Text(item.description)
+                                            .font(
+                                                .system(
+                                                    size: 10,
+                                                    weight: .bold,
+                                                    design: .monospaced
+                                                )
+                                            )
+                                            .foregroundStyle(
+                                                .white.opacity(0.66)
+                                            )
+                                    }
+
+                                    Spacer()
+
+                                    Text(
+                                        purchasedItemIds.contains(item.id)
+                                            ? "OWNED" : "\(item.cost)"
+                                    )
+                                    .font(
+                                        .system(
+                                            size: 11,
+                                            weight: .black,
+                                            design: .monospaced
+                                        )
+                                    )
+                                    .foregroundStyle(
+                                        purchasedItemIds.contains(item.id)
+                                            ? .white : event.themeColor
+                                    )
+                                }
+                                .padding(13)
+                                .background(.black.opacity(0.5))
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(
+                                            item.color.opacity(0.65),
+                                            lineWidth: 1
+                                        )
+                                }
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(
+                                purchasedItemIds.contains(item.id)
+                                    || balance < item.cost
+                            )
+                            .opacity(
+                                purchasedItemIds.contains(item.id)
+                                    || balance >= item.cost ? 1 : 0.45
+                            )
+                        }
+                    }
+                } else {
+                    Text("NO ACTIVE EVENT")
+                        .font(
+                            .system(
+                                size: 14,
+                                weight: .black,
+                                design: .monospaced
+                            )
+                        )
+                        .foregroundStyle(.white.opacity(0.6))
+                }
+
+                Spacer()
+            }
+            .padding(24)
+        }
+    }
+}
+
+struct StyleLabView: View {
+    let back: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.82)
+                .ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Text("STYLE LAB")
+                        .font(
+                            .system(size: 30, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(.white)
+
+                    Spacer()
+
+                    BackButton(action: back)
+                }
+
+                VStack(spacing: 10) {
+                    ForEach(CombatStyle.allCases, id: \.self) { style in
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text(style.title)
+                                .font(
+                                    .system(
+                                        size: 16,
+                                        weight: .black,
+                                        design: .rounded
+                                    )
+                                )
+                                .foregroundStyle(style.tint)
+
+                            Text(style.labDescription)
+                                .font(
+                                    .system(
+                                        size: 11,
+                                        weight: .bold,
+                                        design: .monospaced
+                                    )
+                                )
+                                .foregroundStyle(.white.opacity(0.72))
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(13)
+                        .background(.black.opacity(0.5))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(style.tint.opacity(0.65), lineWidth: 1)
+                        }
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                }
+
+                Spacer()
+            }
+            .padding(24)
+        }
+    }
+}
+
+struct CharacterSelectView: View {
+    let characters: [PlayerCharacter]
+    let selectedCharacter: PlayerCharacter
+    let selectCharacter: (PlayerCharacter) -> Void
+    let back: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.84)
+                .ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Text("CHARACTER SELECT")
+                        .font(
+                            .system(size: 26, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(.white)
+
+                    Spacer()
+
+                    BackButton(action: back)
+                }
+
+                VStack(spacing: 10) {
+                    ForEach(characters) { character in
+                        Button {
+                            selectCharacter(character)
+                        } label: {
+                            HStack(spacing: 12) {
+                                Circle()
+                                    .fill(character.tint)
+                                    .frame(width: 16, height: 16)
+                                    .shadow(
+                                        color: character.tint.opacity(0.75),
+                                        radius: 8
+                                    )
+
+                                VStack(alignment: .leading, spacing: 5) {
+                                    Text(character.title)
+                                        .font(
+                                            .system(
+                                                size: 16,
+                                                weight: .black,
+                                                design: .rounded
+                                            )
+                                        )
+                                        .foregroundStyle(character.tint)
+
+                                    Text(characterSummary(character))
+                                        .font(
+                                            .system(
+                                                size: 10,
+                                                weight: .bold,
+                                                design: .monospaced
+                                            )
+                                        )
+                                        .foregroundStyle(.white.opacity(0.68))
+                                }
+
+                                Spacer()
+
+                                if character.id == selectedCharacter.id {
+                                    Text("SELECTED")
+                                        .font(
+                                            .system(
+                                                size: 10,
+                                                weight: .black,
+                                                design: .monospaced
+                                            )
+                                        )
+                                        .foregroundStyle(.white)
+                                }
+                            }
+                            .padding(13)
+                            .background(.black.opacity(0.5))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(
+                                        character.id == selectedCharacter.id
+                                            ? character.tint
+                                            : .white.opacity(0.14),
+                                        lineWidth: 1
+                                    )
+                            }
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+
+                Spacer()
+            }
+            .padding(24)
+        }
+    }
+
+    private func characterSummary(_ character: PlayerCharacter) -> String {
+        "HP \(character.maxHP) / DMG \(signed(character.damageBonus)) / STYLE \(signed(character.styleGainBonus)) / BLOOD \(signed(-character.bloodCostModifier))"
+    }
+
+    private func signed(_ value: Int) -> String {
+        value >= 0 ? "+\(value)" : "\(value)"
+    }
+}
+
+struct FightIntroView: View {
+    let fightLevel: Int
+    let level: LevelDefinition
+    let enemy: EnemyType
+    let character: PlayerCharacter
+    let start: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(enemy.isBoss ? 0.88 : 0.78)
+                .ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: 16) {
+                Spacer()
+
+                Text(enemy.isBoss ? "BOSS FIGHT" : "FIGHT \(fightLevel)")
+                    .font(
+                        .system(
+                            size: enemy.isBoss ? 42 : 34,
+                            weight: .black,
+                            design: .rounded
+                        )
+                    )
+                    .foregroundStyle(enemy.isBoss ? enemy.brokenColor : .white)
+                    .tracking(1.4)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(level.title)
+                        .font(
+                            .system(size: 18, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(level.accentColor)
+
+                    Text(level.moodText)
+                        .font(
+                            .system(
+                                size: 11,
+                                weight: .black,
+                                design: .monospaced
+                            )
+                        )
+                        .foregroundStyle(.white.opacity(0.62))
+                }
+
+                HStack(spacing: 12) {
+                    introStat(
+                        title: "CHARACTER",
+                        value: character.title,
+                        color: character.tint
+                    )
+                    introStat(
+                        title: "ENEMY",
+                        value: enemy.title,
+                        color: enemy.tint
+                    )
+                }
+
+                Spacer()
+
+                Text("TAP TO ENTER")
+                    .font(
+                        .system(size: 12, weight: .black, design: .monospaced)
+                    )
+                    .foregroundStyle(.white.opacity(0.66))
+                    .tracking(1.3)
+                    .padding(.bottom, 16)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(28)
+
+            if enemy.isBoss {
+                Rectangle()
+                    .stroke(enemy.brokenColor.opacity(0.85), lineWidth: 3)
+                    .padding(12)
+                    .allowsHitTesting(false)
+            }
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            start()
+        }
+    }
+
+    private func introStat(title: String, value: String, color: Color)
+        -> some View
+    {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.system(size: 9, weight: .black, design: .monospaced))
+                .foregroundStyle(.white.opacity(0.5))
+
+            Text(value)
+                .font(.system(size: 12, weight: .black, design: .rounded))
+                .foregroundStyle(color)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(.black.opacity(0.5))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(color.opacity(0.65), lineWidth: 1)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+}
+
+struct GalleryView: View {
+    let bestStyleRank: StyleRank
+    let bestFightsCleared: Int
+    let bestMaxCombo: Int
+    let unlockedRewards: [String]
+    let bossVerdicts: [String]
+    let back: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.84)
+                .ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Text("GALLERY")
+                        .font(
+                            .system(size: 30, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(.white)
+
+                    Spacer()
+
+                    BackButton(action: back)
+                }
+
+                GallerySection(title: "BEST RUN") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        GalleryLine(
+                            label: "BEST STYLE",
+                            value: bestStyleRank.title,
+                            color: bestStyleRank.color
+                        )
+                        GalleryLine(
+                            label: "MOST FIGHTS",
+                            value: "\(bestFightsCleared)",
+                            color: .red
+                        )
+                        GalleryLine(
+                            label: "MAX COMBO",
+                            value: "\(bestMaxCombo)",
+                            color: .cyan
+                        )
+                    }
+                }
+
+                GallerySection(title: "UNLOCKED REWARDS") {
+                    GalleryList(
+                        items: unlockedRewards,
+                        emptyText: "NO REWARDS YET"
+                    )
+                }
+
+                GallerySection(title: "BOSS VERDICTS") {
+                    GalleryList(
+                        items: bossVerdicts,
+                        emptyText: "NO VERDICTS YET"
+                    )
+                }
+
+                Spacer()
+            }
+            .padding(24)
+        }
+    }
+}
+
+struct SettingsView: View {
+    @Binding var isSFXEnabled: Bool
+    @Binding var isScreenShakeEnabled: Bool
+    @Binding var isFlashFXEnabled: Bool
+
+    let resetGalleryData: () -> Void
+    let back: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.84)
+                .ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Text("SETTINGS")
+                        .font(
+                            .system(size: 30, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(.white)
+
+                    Spacer()
+
+                    BackButton(action: back)
+                }
+
+                VStack(spacing: 12) {
+                    SettingsToggle(title: "SFX", isOn: $isSFXEnabled)
+                    SettingsToggle(
+                        title: "SCREEN SHAKE",
+                        isOn: $isScreenShakeEnabled
+                    )
+                    SettingsToggle(title: "FLASH FX", isOn: $isFlashFXEnabled)
+                }
+                .padding(14)
+                .background(.black.opacity(0.48))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(.white.opacity(0.16), lineWidth: 1)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                Button(action: resetGalleryData) {
+                    Text("RESET GALLERY DATA")
+                        .font(
+                            .system(size: 14, weight: .black, design: .rounded)
+                        )
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.red)
+
+                Spacer()
+            }
+            .padding(24)
+        }
+    }
+}
+
+private struct MenuActionButton: View {
+    let title: String
+    let color: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                Text(title)
+                    .font(.system(size: 17, weight: .black, design: .rounded))
+
+                Spacer()
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 16)
+            .frame(height: 54)
+            .background(.black.opacity(0.55))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(color.opacity(0.75), lineWidth: 1)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct BackButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text("BACK")
+                .font(.system(size: 12, weight: .black, design: .monospaced))
+        }
+        .buttonStyle(.bordered)
+        .tint(.white)
+    }
+}
+
+private struct SettingsToggle: View {
+    let title: String
+    @Binding var isOn: Bool
+
+    var body: some View {
+        Toggle(isOn: $isOn) {
+            Text(title)
+                .font(.system(size: 13, weight: .black, design: .monospaced))
+                .foregroundStyle(.white.opacity(0.82))
+        }
+        .tint(.red)
+    }
+}
+
+private struct GallerySection<Content: View>: View {
+    let title: String
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(.system(size: 12, weight: .black, design: .monospaced))
+                .foregroundStyle(.white.opacity(0.58))
+
+            content
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(.black.opacity(0.48))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(.white.opacity(0.16), lineWidth: 1)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+}
+
+private struct GalleryLine: View {
+    let label: String
+    let value: String
+    let color: Color
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.system(size: 11, weight: .black, design: .monospaced))
+                .foregroundStyle(.white.opacity(0.62))
+
+            Spacer()
+
+            Text(value)
+                .font(.system(size: 13, weight: .black, design: .rounded))
+                .foregroundStyle(color)
+        }
+    }
+}
+
+private struct GalleryList: View {
+    let items: [String]
+    let emptyText: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            if items.isEmpty {
+                Text(emptyText)
+                    .font(
+                        .system(size: 11, weight: .black, design: .monospaced)
+                    )
+                    .foregroundStyle(.white.opacity(0.48))
+            } else {
+                ForEach(items, id: \.self) { item in
+                    Text(item)
+                        .font(
+                            .system(
+                                size: 12,
+                                weight: .black,
+                                design: .monospaced
+                            )
+                        )
+                        .foregroundStyle(.white.opacity(0.78))
+                }
+            }
+        }
+    }
+}

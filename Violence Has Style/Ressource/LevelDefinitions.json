@@ -1,0 +1,72 @@
+[
+    {
+        "id": "vhs_alley",
+        "title": "VHS ALLEY",
+        "requiredFight": 1,
+        "moodText": "PROVE IT",
+        "styleMultiplier": 1.0,
+        "enemyDamageMultiplier": 1.0,
+        "accentHex": "#FF2A2A",
+        "paintPalette": [
+            "#FF2A2A",
+            "#FFFFFF",
+            "#FF4F8B"
+        ]
+    },
+    {
+        "id": "blood_rooftop",
+        "title": "BLOOD ROOFTOP",
+        "requiredFight": 2,
+        "moodText": "NO SKY, ONLY STYLE",
+        "styleMultiplier": 1.08,
+        "enemyDamageMultiplier": 1.05,
+        "accentHex": "#FF4F8B",
+        "paintPalette": [
+            "#FF1744",
+            "#FF8A80",
+            "#FFFFFF"
+        ]
+    },
+    {
+        "id": "static_subway",
+        "title": "STATIC SUBWAY",
+        "requiredFight": 3,
+        "moodText": "MOVE FAST",
+        "styleMultiplier": 1.12,
+        "enemyDamageMultiplier": 1.08,
+        "accentHex": "#20D9FF",
+        "paintPalette": [
+            "#20D9FF",
+            "#FFFFFF",
+            "#FF2A2A"
+        ]
+    },
+    {
+        "id": "neon_church",
+        "title": "NEON CHURCH",
+        "requiredFight": 4,
+        "moodText": "CONFESS WITH VIOLENCE",
+        "styleMultiplier": 1.16,
+        "enemyDamageMultiplier": 1.12,
+        "accentHex": "#9B5CFF",
+        "paintPalette": [
+            "#9B5CFF",
+            "#FF2A2A",
+            "#FFFFFF"
+        ]
+    },
+    {
+        "id": "judge_arena",
+        "title": "JUDGE ARENA",
+        "requiredFight": 5,
+        "moodText": "BE BEAUTIFUL",
+        "styleMultiplier": 1.25,
+        "enemyDamageMultiplier": 1.2,
+        "accentHex": "#FF9F1A",
+        "paintPalette": [
+            "#FF9F1A",
+            "#FFFFFF",
+            "#FF2A2A"
+        ]
+    }
+]

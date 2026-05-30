@@ -1,0 +1,42 @@
+[
+    {
+        "id": "blood_rose",
+        "title": "BLOOD ROSE",
+        "description": "+15 Style Startwert pro Fight",
+        "verdict": "THE ROSE REMEMBERS",
+        "colorHex": "#FF2A2A",
+        "styleStartBonus": 15
+    },
+    {
+        "id": "sharp_ego",
+        "title": "SHARP EGO",
+        "description": "Killer Style gibt mehr Style",
+        "verdict": "EGO SHARPENED",
+        "colorHex": "#20D9FF",
+        "killerStyleBonus": 4
+    },
+    {
+        "id": "red_reaper",
+        "title": "RED REAPER",
+        "description": "Reaper Style macht mehr Schaden",
+        "verdict": "HEAVIER CUTS",
+        "colorHex": "#9B5CFF",
+        "reaperDamageBonus": 6
+    },
+    {
+        "id": "phantom_step",
+        "title": "PHANTOM STEP",
+        "description": "Phantom Dash gibt extra Style",
+        "verdict": "FASTER THAN FEAR",
+        "colorHex": "#7CFFCE",
+        "phantomStyleBonus": 5
+    },
+    {
+        "id": "last_drop",
+        "title": "LAST DROP",
+        "description": "Blood Style kostet weniger HP",
+        "verdict": "BLEED LESS, HURT MORE",
+        "colorHex": "#FF9F1A",
+        "bloodCostReduction": 1
+    }
+]
