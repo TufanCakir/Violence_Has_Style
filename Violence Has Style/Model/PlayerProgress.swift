@@ -22,6 +22,10 @@ final class PlayerProgress {
     var stylePassPoints = 0
     var unlockedStylePassRewardIds: [String] = []
     var ownedThemeIds: [String] = ["vhs_default", "blood_moon"]
+    var purchasedPremiumProductIds: [String] = []
+    var ownedMusicPackIds: [String] = []
+    var ownedPaintFxIds: [String] = []
+    var ownedTitleIds: [String] = []
 
     init() {}
 }

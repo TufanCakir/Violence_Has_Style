@@ -34,5 +34,41 @@
         "textHex": "#FFFFFF",
         "symbol": "crown.fill",
         "isStylePassExclusive": true
+    },
+    {
+        "id": "void_neon_theme",
+        "title": "VOID NEON",
+        "primaryHex": "#9B5CFF",
+        "secondaryHex": "#20D9FF",
+        "accentHex": "#FFFFFF",
+        "backgroundHex": "#02030A",
+        "panelHex": "#10071E",
+        "textHex": "#FFFFFF",
+        "symbol": "moon.stars.fill",
+        "isStylePassExclusive": true
+    },
+    {
+        "id": "blood_royal_theme",
+        "title": "BLOOD ROYAL",
+        "primaryHex": "#FF2A2A",
+        "secondaryHex": "#FFCC33",
+        "accentHex": "#FFFFFF",
+        "backgroundHex": "#080102",
+        "panelHex": "#22050A",
+        "textHex": "#FFFFFF",
+        "symbol": "crown.fill",
+        "isStylePassExclusive": true
+    },
+    {
+        "id": "founding_stylist",
+        "title": "FOUNDING STYLIST",
+        "primaryHex": "#FFCC33",
+        "secondaryHex": "#FF1744",
+        "accentHex": "#20D9FF",
+        "backgroundHex": "#060505",
+        "panelHex": "#181004",
+        "textHex": "#FFFFFF",
+        "symbol": "star.circle.fill",
+        "isStylePassExclusive": true
     }
 ]

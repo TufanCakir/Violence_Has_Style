@@ -107,10 +107,11 @@ struct OnlineRequiredView: View {
 
     var body: some View {
         ZStack {
-            ThemeManager.shared.currentTheme.backgroundColor
-                .ignoresSafeArea()
+            ThemeBackgroundView()
 
-            VStack(spacing: 18) {
+            VStack(spacing: 20) {
+                Spacer()
+
                 Text("VIOLENCE")
                     .font(.system(size: 40, weight: .black, design: .rounded))
                     .foregroundStyle(.white)
@@ -119,7 +120,7 @@ struct OnlineRequiredView: View {
                     .font(.system(size: 40, weight: .black, design: .rounded))
                     .foregroundStyle(.red)
 
-                VStack(spacing: 8) {
+                VStack(spacing: 10) {
                     Text(isLoading ? "LOADING REMOTE GAME" : "ONLINE REQUIRED")
                         .font(
                             .system(
@@ -129,6 +130,22 @@ struct OnlineRequiredView: View {
                             )
                         )
                         .foregroundStyle(.white.opacity(0.78))
+
+                    Text(
+                        isLoading
+                            ? "Downloading live game data, themes, characters and music."
+                            : "This game needs WLAN or mobile data because gameplay data and media are loaded online."
+                    )
+                    .font(
+                        .system(
+                            size: 12,
+                            weight: .bold,
+                            design: .rounded
+                        )
+                    )
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.white.opacity(0.62))
+                    .fixedSize(horizontal: false, vertical: true)
 
                     Text(status)
                         .font(
@@ -141,6 +158,20 @@ struct OnlineRequiredView: View {
                         .foregroundStyle(.red.opacity(0.85))
                 }
                 .padding(.top, 8)
+                .padding(18)
+                .frame(maxWidth: .infinity)
+                .background(
+                    ThemeManager.shared.currentTheme.panelColor.opacity(0.62)
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(
+                            ThemeManager.shared.currentTheme.primaryColor
+                                .opacity(0.42),
+                            lineWidth: 1
+                        )
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 8))
 
                 if isLoading {
                     ProgressView()
@@ -172,6 +203,8 @@ struct OnlineRequiredView: View {
                         )
                         .foregroundStyle(.white.opacity(0.52))
                 }
+
+                Spacer()
             }
             .padding(28)
         }
@@ -216,6 +249,7 @@ struct MainMenuView: View {
     let openCharacterSelect: () -> Void
     let openStyleMode: () -> Void
     let openGallery: () -> Void
+    let openStylePasses: () -> Void
     let openSettings: () -> Void
 
     var body: some View {
@@ -231,28 +265,11 @@ struct MainMenuView: View {
             )
             .frame(width: 260, height: 360)
             .opacity(0.28)
-            .offset(x: 92, y: 40)
+            .offset(x: 104, y: -12)
             .allowsHitTesting(false)
 
-            VStack(alignment: .leading, spacing: 18) {
-                Spacer()
-
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("VIOLENCE")
-                        .font(
-                            .system(size: 46, weight: .black, design: .rounded)
-                        )
-                        .foregroundStyle(.white)
-
-                    Text("HAS STYLE")
-                        .font(
-                            .system(size: 46, weight: .black, design: .rounded)
-                        )
-                        .foregroundStyle(.red)
-                }
-                .tracking(1.2)
-
-                VStack(spacing: 10) {
+            VStack(alignment: .leading, spacing: 14) {
+                VStack(spacing: 8) {
                     MenuActionButton(
                         title: "STORY MODE",
                         color: .red,
@@ -286,6 +303,11 @@ struct MainMenuView: View {
                         action: openGallery
                     )
                     MenuActionButton(
+                        title: "STYLE PASS",
+                        color: .yellow,
+                        action: openStylePasses
+                    )
+                    MenuActionButton(
                         title: "SETTINGS",
                         color: .orange,
                         action: openSettings
@@ -301,7 +323,9 @@ struct MainMenuView: View {
                     .foregroundStyle(.white.opacity(0.55))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(28)
+            .padding(.horizontal, 28)
+            .padding(.top, 30)
+            .padding(.bottom, 24)
         }
     }
 }
@@ -1060,20 +1084,13 @@ struct SettingsView: View {
             ThemeBackgroundView()
                 .ignoresSafeArea()
 
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Text("SETTINGS")
-                        .font(
-                            .system(size: 30, weight: .black, design: .rounded)
-                        )
-                        .foregroundStyle(.white)
-
                     Spacer()
-
                     BackButton(action: back)
                 }
 
-                VStack(spacing: 12) {
+                VStack(spacing: 9) {
                     SettingsToggle(
                         title: "SCREEN SHAKE",
                         isOn: $isScreenShakeEnabled
@@ -1114,7 +1131,7 @@ struct SettingsView: View {
                             .opacity(isMusicEnabled ? 1 : 0.4)
                     }
                 }
-                .padding(14)
+                .padding(12)
                 .background(
                     ThemeManager.shared.currentTheme.panelColor.opacity(0.48)
                 )
@@ -1124,7 +1141,41 @@ struct SettingsView: View {
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("APP STORE BUILD")
+                        .font(
+                            .system(
+                                size: 12,
+                                weight: .black,
+                                design: .monospaced
+                            )
+                        )
+                        .foregroundStyle(.white.opacity(0.58))
+
+                    SettingsInfoLine(
+                        title: "ONLINE GAME",
+                        value: "REMOTE CONTENT REQUIRED"
+                    )
+                    SettingsInfoLine(
+                        title: "CONTENT",
+                        value: "JSON, THEMES, MUSIC, CHARACTERS"
+                    )
+                    SettingsInfoLine(
+                        title: "PURCHASES",
+                        value: "COSMETICS ONLY"
+                    )
+                }
+                .padding(12)
+                .background(
+                    ThemeManager.shared.currentTheme.panelColor.opacity(0.48)
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(.white.opacity(0.16), lineWidth: 1)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                VStack(alignment: .leading, spacing: 8) {
                     Text("THEME")
                         .font(
                             .system(
@@ -1197,7 +1248,7 @@ struct SettingsView: View {
                                         .foregroundStyle(.gray)
                                 }
                             }
-                            .padding(12)
+                            .padding(10)
                             .background(theme.panelColor.opacity(0.72))
                             .overlay {
                                 RoundedRectangle(cornerRadius: 8)
@@ -1219,17 +1270,19 @@ struct SettingsView: View {
                 Button(action: resetGalleryData) {
                     Text("RESET GALLERY DATA")
                         .font(
-                            .system(size: 14, weight: .black, design: .rounded)
+                            .system(size: 12, weight: .black, design: .rounded)
                         )
                         .frame(maxWidth: .infinity)
-                        .frame(height: 50)
+                        .frame(height: 40)
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.red)
 
                 Spacer()
             }
-            .padding(24)
+            .padding(.horizontal, 24)
+            .padding(.top, 12)
+            .padding(.bottom, 20)
         }
     }
 }
@@ -1263,13 +1316,15 @@ private struct MenuActionButton: View {
     }
 }
 
-private struct BackButton: View {
+struct BackButton: View {
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             Text("BACK")
-                .font(.system(size: 12, weight: .black, design: .monospaced))
+                .font(.system(size: 10, weight: .black, design: .monospaced))
+                .padding(.horizontal, 8)
+                .frame(height: 30)
         }
         .buttonStyle(.bordered)
         .tint(.white)
@@ -1287,6 +1342,28 @@ private struct SettingsToggle: View {
                 .foregroundStyle(.white.opacity(0.82))
         }
         .tint(.red)
+    }
+}
+
+private struct SettingsInfoLine: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(title)
+                .font(.system(size: 11, weight: .black, design: .monospaced))
+                .foregroundStyle(.white.opacity(0.56))
+
+            Spacer(minLength: 12)
+
+            Text(value)
+                .font(.system(size: 11, weight: .black, design: .monospaced))
+                .foregroundStyle(ThemeManager.shared.currentTheme.accentColor)
+                .multilineTextAlignment(.trailing)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
+        }
     }
 }
 

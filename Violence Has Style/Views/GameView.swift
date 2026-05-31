@@ -171,6 +171,7 @@ struct GameView: View {
                 openCharacterSelect: { currentScreen = .characterSelect },
                 openStyleMode: { currentScreen = .styleLab },
                 openGallery: { currentScreen = .gallery },
+                openStylePasses: { currentScreen = .stylePasses },
                 openSettings: { currentScreen = .settings }
             )
         case .storyMode:
@@ -235,7 +236,16 @@ struct GameView: View {
                 passes: StylePassCatalog.shared.activePasses,
                 points: progress.stylePassPoints,
                 unlockedRewardIds: progress.unlockedStylePassRewardIds,
-                claimReward: claimStylePassReward
+                claimReward: claimStylePassReward,
+                back: { currentScreen = .menu }
+            )
+        case .premiumStore:
+            PremiumStoreView(
+                products: PremiumStoreCatalog.shared.products,
+                purchasedProductIds: progress.purchasedPremiumProductIds,
+                unlockProduct: unlockPremiumProduct,
+                restoreProducts: restorePremiumProducts,
+                back: { currentScreen = .menu }
             )
         case .settings:
             SettingsView(
@@ -602,6 +612,58 @@ struct GameView: View {
         try? modelContext.save()
     }
 
+    private func unlockPremiumProduct(productId: String) {
+        guard !progress.purchasedPremiumProductIds.contains(productId) else {
+            return
+        }
+
+        progress.purchasedPremiumProductIds.append(productId)
+        applyPremiumUnlock(productId: productId)
+        try? modelContext.save()
+    }
+
+    private func restorePremiumProducts(productIds: [String]) {
+        for productId in productIds {
+            if !progress.purchasedPremiumProductIds.contains(productId) {
+                progress.purchasedPremiumProductIds.append(productId)
+            }
+            applyPremiumUnlock(productId: productId)
+        }
+
+        try? modelContext.save()
+    }
+
+    private func applyPremiumUnlock(productId: String) {
+        guard
+            let product = PremiumStoreCatalog.shared.products.first(where: {
+                $0.productId == productId
+            })
+        else { return }
+
+        switch product.unlockType {
+        case "theme":
+            appendUnique(product.unlockValue, to: &progress.ownedThemeIds)
+        case "stylePassPoints":
+            progress.stylePassPoints += max(0, product.unlockAmount)
+        case "musicPack":
+            appendUnique(product.unlockValue, to: &progress.ownedMusicPackIds)
+        case "paintFx":
+            appendUnique(product.unlockValue, to: &progress.ownedPaintFxIds)
+        case "title":
+            appendUnique(product.unlockValue, to: &progress.ownedTitleIds)
+        case "supporter":
+            appendUnique(product.unlockValue, to: &progress.ownedTitleIds)
+            appendUnique("founding_stylist", to: &progress.ownedThemeIds)
+        default:
+            break
+        }
+    }
+
+    private func appendUnique(_ value: String, to values: inout [String]) {
+        guard !value.isEmpty, !values.contains(value) else { return }
+        values.append(value)
+    }
+
     private func triggerPlayerHitImpact() {
         triggerScreenShake(intensity: 13)
         guard isFlashFXEnabled else { return }
@@ -664,7 +726,8 @@ struct GameView: View {
         MusicManager.shared.play(
             mode: mode,
             isEnabled: isMusicEnabled,
-            volume: musicVolume
+            volume: musicVolume,
+            ownedUnlockIds: progress.ownedMusicPackIds
         )
     }
 

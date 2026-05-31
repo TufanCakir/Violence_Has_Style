@@ -29,10 +29,10 @@
             "colorHex": "#20D9FF"
         },
         {
-            "id": "pass",
-            "title": "PASS",
-            "symbol": "ticket.fill",
-            "screen": "stylePasses",
+            "id": "store",
+            "title": "STORE",
+            "symbol": "bag.fill",
+            "screen": "premiumStore",
             "colorHex": "#FFCC33"
         }
     ],

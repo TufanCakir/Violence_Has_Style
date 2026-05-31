@@ -31,6 +31,20 @@ final class MusicManager {
     }
 
     func play(mode: RunMode?, isEnabled: Bool, volume: Double) {
+        play(
+            mode: mode,
+            isEnabled: isEnabled,
+            volume: volume,
+            ownedUnlockIds: []
+        )
+    }
+
+    func play(
+        mode: RunMode?,
+        isEnabled: Bool,
+        volume: Double,
+        ownedUnlockIds: [String]
+    ) {
         currentMode = mode
 
         guard isEnabled else {
@@ -38,7 +52,10 @@ final class MusicManager {
             return
         }
 
-        let tracks = MusicCatalog.shared.playlist(for: mode)
+        let tracks = MusicCatalog.shared.playlist(
+            for: mode,
+            ownedUnlockIds: ownedUnlockIds
+        )
         let playlistIds = tracks.map(\.id)
 
         if playlistIds == currentPlaylistIds, let player {

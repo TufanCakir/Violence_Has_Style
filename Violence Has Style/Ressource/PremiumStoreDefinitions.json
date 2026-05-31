@@ -1,0 +1,98 @@
+[
+    {
+        "id": "premium_pass_s1",
+        "productId": "com.tufancakir.violencehasstyle.premiumpass.season1",
+        "title": "SEASON 1 PREMIUM PASS",
+        "description":
+            "Premium cosmetic rewards, exclusive themes, paint FX and finisher style.",
+        "category": "STYLE PASS",
+        "priceText": "COMING SOON",
+        "badge": "BEST VALUE",
+        "symbol": "ticket.fill",
+        "colorHex": "#FF1744",
+        "isFeatured": true,
+        "unlockType": "stylePassPoints",
+        "unlockValue": "season1_premium",
+        "unlockAmount": 250
+    },
+    {
+        "id": "void_neon_theme",
+        "productId": "com.tufancakir.violencehasstyle.theme.voidneon",
+        "title": "VOID NEON THEME",
+        "description":
+            "Dark UI theme with violet panels, cyan highlights and void aura.",
+        "category": "THEME",
+        "priceText": "COMING SOON",
+        "badge": "PREMIUM",
+        "symbol": "moon.stars.fill",
+        "colorHex": "#9B5CFF",
+        "isFeatured": false,
+        "unlockType": "theme",
+        "unlockValue": "void_neon_theme",
+        "unlockAmount": 0
+    },
+    {
+        "id": "blood_royal_theme",
+        "productId": "com.tufancakir.violencehasstyle.theme.bloodroyal",
+        "title": "BLOOD ROYAL THEME",
+        "description":
+            "Red premium background colors, sharper borders and royal blood accents.",
+        "category": "THEME",
+        "priceText": "COMING SOON",
+        "badge": "PREMIUM",
+        "symbol": "crown.fill",
+        "colorHex": "#FF2A2A",
+        "isFeatured": false,
+        "unlockType": "theme",
+        "unlockValue": "blood_royal_theme",
+        "unlockAmount": 0
+    },
+    {
+        "id": "phantom_paint_fx",
+        "productId": "com.tufancakir.violencehasstyle.fx.phantompaint",
+        "title": "PHANTOM PAINT FX",
+        "description":
+            "Alternative paint strokes for Phantom and Void style attacks.",
+        "category": "PAINT FX",
+        "priceText": "COMING SOON",
+        "badge": "COSMETIC",
+        "symbol": "paintbrush.pointed.fill",
+        "colorHex": "#20D9FF",
+        "isFeatured": false,
+        "unlockType": "paintFx",
+        "unlockValue": "phantom_paint_fx",
+        "unlockAmount": 0
+    },
+    {
+        "id": "dark_vhs_music_pack",
+        "productId": "com.tufancakir.violencehasstyle.music.darkvhs",
+        "title": "DARK VHS MUSIC PACK",
+        "description": "Extra remote menu and battle tracks for darker runs.",
+        "category": "MUSIC",
+        "priceText": "COMING SOON",
+        "badge": "PACK",
+        "symbol": "music.note.list",
+        "colorHex": "#FF9F1A",
+        "isFeatured": false,
+        "unlockType": "musicPack",
+        "unlockValue": "dark_vhs_music_pack",
+        "unlockAmount": 0
+    },
+    {
+        "id": "founding_stylist",
+        "productId":
+            "com.tufancakir.violencehasstyle.supporter.foundingstylist",
+        "title": "FOUNDING STYLIST PACK",
+        "description":
+            "Supporter badge, exclusive title, VHS aura and launch theme.",
+        "category": "SUPPORTER",
+        "priceText": "COMING SOON",
+        "badge": "LIMITED",
+        "symbol": "star.circle.fill",
+        "colorHex": "#FFCC33",
+        "isFeatured": true,
+        "unlockType": "supporter",
+        "unlockValue": "founding_stylist",
+        "unlockAmount": 0
+    }
+]

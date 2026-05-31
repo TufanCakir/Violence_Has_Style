@@ -20,6 +20,7 @@ enum GameScreen {
     case gallery
     case eventShop
     case stylePasses
+    case premiumStore
     case settings
 }
 
@@ -48,6 +49,8 @@ extension GameScreen {
             self = .eventShop
         case "stylePasses":
             self = .stylePasses
+        case "premiumStore":
+            self = .premiumStore
         case "settings":
             self = .settings
         default:
@@ -91,10 +94,10 @@ struct UIConfig: Codable, Equatable {
                 colorHex: "#20D9FF"
             ),
             FooterTabDefinition(
-                id: "pass",
-                title: "PASS",
-                symbol: "ticket.fill",
-                screen: "stylePasses",
+                id: "store",
+                title: "STORE",
+                symbol: "bag.fill",
+                screen: "premiumStore",
                 colorHex: "#FFCC33"
             ),
         ],
@@ -885,6 +888,7 @@ struct MusicTrack: Codable, Equatable, Identifiable {
     let title: String
     let url: String
     let mode: String?
+    let requiredUnlock: String?
 }
 
 struct MusicCatalog {
@@ -896,8 +900,19 @@ struct MusicCatalog {
         RemoteContentStore.shared.musicTracks
     }
 
-    func playlist(for mode: RunMode? = nil) -> [MusicTrack] {
-        let activeTracks = tracks
+    func playlist(
+        for mode: RunMode? = nil,
+        ownedUnlockIds: [String] = []
+    ) -> [MusicTrack] {
+        let activeTracks = tracks.filter { track in
+            guard let requiredUnlock = track.requiredUnlock,
+                !requiredUnlock.isEmpty
+            else {
+                return true
+            }
+
+            return ownedUnlockIds.contains(requiredUnlock)
+        }
         guard let mode else { return activeTracks }
 
         let filtered = activeTracks.filter {
@@ -952,6 +967,110 @@ struct StylePassCatalog {
 
     var activePasses: [StylePassDefinition] {
         passes.filter(\.isActive)
+    }
+}
+
+struct PremiumStoreProduct: Codable, Equatable, Identifiable {
+    let id: String
+    let productId: String
+    let title: String
+    let description: String
+    let category: String
+    let priceText: String
+    let badge: String
+    let symbol: String
+    let colorHex: String
+    let isFeatured: Bool
+    let unlockType: String
+    let unlockValue: String
+    let unlockAmount: Int
+
+    var color: Color {
+        Color(hex: colorHex)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case productId
+        case title
+        case description
+        case category
+        case priceText
+        case badge
+        case symbol
+        case colorHex
+        case isFeatured
+        case unlockType
+        case unlockValue
+        case unlockAmount
+    }
+
+    init(
+        id: String,
+        productId: String,
+        title: String,
+        description: String,
+        category: String,
+        priceText: String,
+        badge: String,
+        symbol: String,
+        colorHex: String,
+        isFeatured: Bool,
+        unlockType: String = "none",
+        unlockValue: String = "",
+        unlockAmount: Int = 0
+    ) {
+        self.id = id
+        self.productId = productId
+        self.title = title
+        self.description = description
+        self.category = category
+        self.priceText = priceText
+        self.badge = badge
+        self.symbol = symbol
+        self.colorHex = colorHex
+        self.isFeatured = isFeatured
+        self.unlockType = unlockType
+        self.unlockValue = unlockValue
+        self.unlockAmount = unlockAmount
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        productId = try container.decode(String.self, forKey: .productId)
+        title = try container.decode(String.self, forKey: .title)
+        description = try container.decode(String.self, forKey: .description)
+        category = try container.decode(String.self, forKey: .category)
+        priceText = try container.decode(String.self, forKey: .priceText)
+        badge = try container.decode(String.self, forKey: .badge)
+        symbol = try container.decode(String.self, forKey: .symbol)
+        colorHex = try container.decode(String.self, forKey: .colorHex)
+        isFeatured =
+            try container.decodeIfPresent(Bool.self, forKey: .isFeatured)
+            ?? false
+        unlockType =
+            try container.decodeIfPresent(String.self, forKey: .unlockType)
+            ?? "none"
+        unlockValue =
+            try container.decodeIfPresent(String.self, forKey: .unlockValue)
+            ?? ""
+        unlockAmount =
+            try container.decodeIfPresent(Int.self, forKey: .unlockAmount) ?? 0
+    }
+}
+
+struct PremiumStoreCatalog {
+    static let shared = PremiumStoreCatalog()
+
+    private init() {}
+
+    var products: [PremiumStoreProduct] {
+        RemoteContentStore.shared.premiumStoreProducts
+    }
+
+    var featuredProducts: [PremiumStoreProduct] {
+        products.filter(\.isFeatured)
     }
 }
 

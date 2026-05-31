@@ -12,23 +12,44 @@ struct StylePassView: View {
     let points: Int
     let unlockedRewardIds: [String]
     let claimReward: (StylePassReward) -> Void
+    let back: () -> Void
 
     var body: some View {
         ZStack {
             ThemeBackgroundView()
 
-            VStack(alignment: .leading, spacing: 16) {
-                Text("STYLE PASSES")
-                    .font(.system(size: 30, weight: .black, design: .rounded))
-                    .foregroundStyle(ThemeManager.shared.currentTheme.textColor)
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("STYLE PASSES")
+                            .font(
+                                .system(
+                                    size: 24,
+                                    weight: .black,
+                                    design: .rounded
+                                )
+                            )
+                            .foregroundStyle(
+                                ThemeManager.shared.currentTheme.textColor
+                            )
 
-                Text("\(points) STYLE POINTS")
-                    .font(
-                        .system(size: 12, weight: .black, design: .monospaced)
-                    )
-                    .foregroundStyle(
-                        ThemeManager.shared.currentTheme.primaryColor
-                    )
+                        Text("\(points) STYLE POINTS")
+                            .font(
+                                .system(
+                                    size: 11,
+                                    weight: .black,
+                                    design: .monospaced
+                                )
+                            )
+                            .foregroundStyle(
+                                ThemeManager.shared.currentTheme.primaryColor
+                            )
+                    }
+
+                    Spacer()
+
+                    BackButton(action: back)
+                }
 
                 ScrollView {
                     VStack(spacing: 14) {

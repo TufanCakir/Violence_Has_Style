@@ -23,6 +23,7 @@ final class RemoteContentStore {
     private(set) var musicTracks: [MusicTrack] = []
     private(set) var themeDefinitions: [ThemeDefinition] = []
     private(set) var stylePassDefinitions: [StylePassDefinition] = []
+    private(set) var premiumStoreProducts: [PremiumStoreProduct] = []
     private(set) var uiConfig = UIConfig.fallback
     private(set) var gameConfig = GameConfig.fallback
     private(set) var isOnline = false
@@ -68,7 +69,8 @@ final class RemoteContentStore {
                 id: file.id,
                 title: file.title ?? file.id.uppercased(),
                 url: musicURLs[file.id]?.absoluteString ?? file.url,
-                mode: file.mode
+                mode: file.mode,
+                requiredUnlock: file.requiredUnlock
             )
         }
 
@@ -118,6 +120,10 @@ final class RemoteContentStore {
             for: "uiConfig",
             baseURL: Self.manifestURL
         )
+        let premiumStoreURL = manifest.dataURL(
+            for: "premiumStore",
+            baseURL: Self.manifestURL
+        )
 
         async let enemies: [EnemyDefinition]? = loadJSON(from: enemyURL)
         async let levels: [LevelDefinition]? = loadJSON(from: levelURL)
@@ -132,6 +138,8 @@ final class RemoteContentStore {
         async let loadedUIConfigTask: UIConfig? = loadOptionalUIConfig(
             from: uiConfigURL
         )
+        async let premiumStore: [PremiumStoreProduct]? =
+            loadOptionalPremiumStore(from: premiumStoreURL)
         let loadedConfig: GameConfig? = await loadJSON(from: configURL)
 
         guard let loadedEnemies = await enemies, !loadedEnemies.isEmpty,
@@ -143,6 +151,7 @@ final class RemoteContentStore {
             let loadedThemes = await themes, !loadedThemes.isEmpty,
             let loadedStylePasses = await stylePasses,
             let loadedUIConfig = await loadedUIConfigTask,
+            let loadedPremiumStore = await premiumStore,
             let loadedConfig
         else {
             resetRemoteContent(status: "REMOTE DATA REQUIRED")
@@ -163,6 +172,7 @@ final class RemoteContentStore {
         }
         themeDefinitions = loadedThemes
         stylePassDefinitions = loadedStylePasses
+        premiumStoreProducts = loadedPremiumStore
         uiConfig = loadedUIConfig
         gameConfig = loadedConfig
         isOnline = true
@@ -240,6 +250,16 @@ final class RemoteContentStore {
         return await loadJSON(from: url) ?? .fallback
     }
 
+    private func loadOptionalPremiumStore(
+        from url: URL?
+    ) async -> [PremiumStoreProduct]? {
+        guard let url else {
+            return []
+        }
+
+        return await loadJSON(from: url) ?? []
+    }
+
     private func resetRemoteContent(status: String) {
         enemyDefinitions = [:]
         levelDefinitions = []
@@ -250,6 +270,7 @@ final class RemoteContentStore {
         musicTracks = []
         themeDefinitions = []
         stylePassDefinitions = []
+        premiumStoreProducts = []
         uiConfig = .fallback
         gameConfig = .fallback
         assetsBaseURL = nil
@@ -367,4 +388,5 @@ struct RemoteManifestMediaFile: Codable, Equatable {
     let url: String
     let title: String?
     let mode: String?
+    let requiredUnlock: String?
 }
