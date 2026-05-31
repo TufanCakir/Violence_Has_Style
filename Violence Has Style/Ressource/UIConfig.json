@@ -1,0 +1,65 @@
+{
+    "footerTabs": [
+        {
+            "id": "story",
+            "title": "STORY",
+            "symbol": "book.closed.fill",
+            "screen": "storyMode",
+            "colorHex": "#FF1744"
+        },
+        {
+            "id": "event",
+            "title": "EVENT",
+            "symbol": "sparkles",
+            "screen": "eventMode",
+            "colorHex": "#9B5CFF"
+        },
+        {
+            "id": "endless",
+            "title": "ENDLESS",
+            "symbol": "infinity",
+            "screen": "endlessMode",
+            "colorHex": "#FF9F1A"
+        },
+        {
+            "id": "style",
+            "title": "STYLE",
+            "symbol": "paintbrush.fill",
+            "screen": "styleLab",
+            "colorHex": "#20D9FF"
+        },
+        {
+            "id": "pass",
+            "title": "PASS",
+            "symbol": "ticket.fill",
+            "screen": "stylePasses",
+            "colorHex": "#FFCC33"
+        }
+    ],
+    "headerCurrencies": [
+        {
+            "id": "coins",
+            "title": "COINS",
+            "symbol": "circle.hexagongrid.fill",
+            "colorHex": "#FFCC33"
+        },
+        {
+            "id": "crystals",
+            "title": "CRYSTAL",
+            "symbol": "diamond.fill",
+            "colorHex": "#20D9FF"
+        },
+        {
+            "id": "stylePoints",
+            "title": "STYLE POINTS",
+            "symbol": "bolt.fill",
+            "colorHex": "#FF2A2A"
+        },
+        {
+            "id": "event",
+            "title": "EVENT",
+            "symbol": "drop.fill",
+            "colorHex": "#FF1744"
+        }
+    ]
+}

@@ -68,62 +68,65 @@ struct GameView: View {
             game: game,
             screenShakeOffset: screenShakeOffset,
             brokenPulse: brokenPulse,
-            styleGodPulse: styleGodPulse
+            styleGodPulse: styleGodPulse,
+            exit: {
+                currentScreen = .menu
+            }
         )
     }
 
     var body: some View {
         RootView(
-            styleRank: game.styleRank,
-            coins: progress.coins,
-            crystals: progress.crystals,
-            eventTitle: activeEvent?.currencyTitle,
-            eventBalance: activeEventBalance,
+            theme: ThemeManager.shared.currentTheme,
+            styleRank: headerStyleRank,
+            currencies: headerCurrencies,
+            footerTabs: RemoteContentStore.shared.uiConfig.footerTabs,
             selectedScreen: currentScreen,
-            selectScreen: selectFooterScreen
+            selectScreen: selectFooterScreen,
+            showNavigation: currentScreen != .run
         ) {
             screenContent
         }
-            .overlay { flashOverlay }
-            .overlay { runOverlay }
-            .overlay { connectionOverlay }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                startAttack()
-            }
-            .gesture(
-                DragGesture(minimumDistance: 28)
-                    .onEnded { value in
-                        handleSwipe(width: value.translation.width)
-                    }
-            )
-            .onAppear {
-                styleGodPulse = true
-            }
-            .task {
-                await refreshRemoteContent()
-            }
-            .onChange(of: game.isEnemyBroken) { _, newValue in
-                brokenPulse = newValue
-            }
-            .onChange(of: network.isConnected) { _, connected in
-                if connected && !isRemoteContentReady {
-                    Task {
-                        await refreshRemoteContent()
-                    }
+        .overlay { flashOverlay }
+        .overlay { runOverlay }
+        .overlay { connectionOverlay }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            startAttack()
+        }
+        .gesture(
+            DragGesture(minimumDistance: 28)
+                .onEnded { value in
+                    handleSwipe(width: value.translation.width)
+                }
+        )
+        .onAppear {
+            styleGodPulse = true
+        }
+        .task {
+            await refreshRemoteContent()
+        }
+        .onChange(of: game.isEnemyBroken) { _, newValue in
+            brokenPulse = newValue
+        }
+        .onChange(of: network.isConnected) { _, connected in
+            if connected && !isRemoteContentReady {
+                Task {
+                    await refreshRemoteContent()
                 }
             }
-            .onAppear {
+        }
+        .onAppear {
 
-                if progressEntries.isEmpty {
+            if progressEntries.isEmpty {
 
-                    let progress = PlayerProgress()
+                let progress = PlayerProgress()
 
-                    modelContext.insert(progress)
+                modelContext.insert(progress)
 
-                    try? modelContext.save()
-                }
+                try? modelContext.save()
             }
+        }
     }
 
     @ViewBuilder
@@ -204,12 +207,23 @@ struct GameView: View {
                 buyItem: buyEventItem,
                 back: { currentScreen = .menu }
             )
-        case .leaderboard:
-            LeaderboardView()
+        case .stylePasses:
+            StylePassView(
+                passes: StylePassCatalog.shared.activePasses,
+                points: progress.stylePassPoints,
+                unlockedRewardIds: progress.unlockedStylePassRewardIds,
+                claimReward: claimStylePassReward
+            )
         case .settings:
             SettingsView(
                 isScreenShakeEnabled: $isScreenShakeEnabled,
                 isFlashFXEnabled: $isFlashFXEnabled,
+                themes: ThemeManager.shared.themes,
+                selectedTheme: ThemeManager.shared.currentTheme,
+                ownedThemeIds: progress.ownedThemeIds,
+                selectTheme: { theme in
+                    ThemeManager.shared.selectTheme(theme)
+                },
                 resetGalleryData: resetGalleryData,
                 back: { currentScreen = .menu }
             )
@@ -253,17 +267,6 @@ struct GameView: View {
                 chooseReward: chooseReward
             )
         }
-
-        if game.isGameOver {
-            RunEndedOverlayView(
-                game: game,
-                restart: restartRun,
-                mainMenu: {
-                    restartRun()
-                    currentScreen = .menu
-                }
-            )
-        }
     }
 
     @ViewBuilder
@@ -287,6 +290,54 @@ struct GameView: View {
         guard let activeEvent else { return 0 }
 
         return wallet(for: activeEvent.currencyId).balance
+    }
+
+    private var headerStyleRank: StyleRank {
+        StyleRank(score: max(progress.bestStyleScore, game.bestStyleRank.score))
+    }
+
+    private var headerCurrencies: [HeaderCurrencyDisplay] {
+        RemoteContentStore.shared.uiConfig.headerCurrencies.compactMap {
+            definition in
+            switch definition.id {
+            case "coins":
+                return HeaderCurrencyDisplay(
+                    id: definition.id,
+                    title: definition.title,
+                    symbol: definition.symbol,
+                    value: progress.coins,
+                    color: definition.color
+                )
+            case "crystals":
+                return HeaderCurrencyDisplay(
+                    id: definition.id,
+                    title: definition.title,
+                    symbol: definition.symbol,
+                    value: progress.crystals,
+                    color: definition.color
+                )
+            case "stylePoints":
+                return HeaderCurrencyDisplay(
+                    id: definition.id,
+                    title: definition.title,
+                    symbol: definition.symbol,
+                    value: progress.stylePassPoints,
+                    color: definition.color
+                )
+            case "event":
+                guard let activeEvent else { return nil }
+
+                return HeaderCurrencyDisplay(
+                    id: definition.id,
+                    title: activeEvent.currencyTitle,
+                    symbol: activeEvent.currencySymbol ?? definition.symbol,
+                    value: activeEventBalance,
+                    color: activeEvent.themeColor
+                )
+            default:
+                return nil
+            }
+        }
     }
 
     private func selectFooterScreen(_ screen: GameScreen) {
@@ -392,8 +443,34 @@ struct GameView: View {
                 isShowingFightIntro = true
             case .awardEventCurrency(let amount, let currencyId):
                 addEventCurrency(amount, currencyId: currencyId)
+            case .awardStylePassPoints(let amount):
+                progress.stylePassPoints += amount
+                try? modelContext.save()
             }
         }
+    }
+
+    private func claimStylePassReward(_ reward: StylePassReward) {
+        guard progress.stylePassPoints >= reward.requiredPoints,
+            !progress.unlockedStylePassRewardIds.contains(reward.id)
+        else {
+            return
+        }
+
+        progress.unlockedStylePassRewardIds.append(reward.id)
+        if reward.rewardType == "coins", let value = Int(reward.rewardValue) {
+            progress.coins += value
+        } else if reward.rewardType == "crystals",
+            let value = Int(reward.rewardValue)
+        {
+            progress.crystals += value
+        } else if reward.rewardType == "theme",
+            !progress.ownedThemeIds.contains(reward.rewardValue)
+        {
+            progress.ownedThemeIds.append(reward.rewardValue)
+        }
+
+        try? modelContext.save()
     }
 
     private func buyEventItem(

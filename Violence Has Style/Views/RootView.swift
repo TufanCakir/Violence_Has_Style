@@ -8,44 +8,67 @@
 import SwiftUI
 
 struct RootView<Content: View>: View {
+    let theme: ThemeDefinition
     let styleRank: StyleRank
-    let coins: Int
-    let crystals: Int
-    let eventTitle: String?
-    let eventBalance: Int
+    let currencies: [HeaderCurrencyDisplay]
+    let footerTabs: [FooterTabDefinition]
     let selectedScreen: GameScreen
     let selectScreen: (GameScreen) -> Void
+    let showNavigation: Bool
+
     @ViewBuilder let content: Content
 
     var body: some View {
         VStack(spacing: 0) {
-            GlobalHeaderView(
-                styleRank: styleRank,
-                coins: coins,
-                crystals: crystals,
-                eventTitle: eventTitle,
-                eventBalance: eventBalance
-            )
+
+            if showNavigation {
+
+                GlobalHeaderView(
+                    theme: theme,
+                    styleRank: styleRank,
+                    currencies: currencies
+                )
+            }
 
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .clipped()
 
-            GlobalFooterView(
-                selectedScreen: selectedScreen,
-                selectScreen: selectScreen
-            )
+            if showNavigation {
+
+                GlobalFooterView(
+                    theme: theme,
+                    tabs: footerTabs,
+                    selectedScreen: selectedScreen,
+                    selectScreen: selectScreen
+                )
+            }
         }
-        .background(Color.black.ignoresSafeArea())
+        .background(theme.backgroundColor.ignoresSafeArea())
+    }
+}
+
+struct ThemeBackgroundView: View {
+    var body: some View {
+        let theme = ThemeManager.shared.currentTheme
+
+        LinearGradient(
+            colors: [
+                theme.backgroundColor,
+                theme.primaryColor.opacity(0.42),
+                theme.secondaryColor.opacity(0.22),
+                theme.backgroundColor,
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
     }
 }
 
 private struct GlobalHeaderView: View {
+    let theme: ThemeDefinition
     let styleRank: StyleRank
-    let coins: Int
-    let crystals: Int
-    let eventTitle: String?
-    let eventBalance: Int
+    let currencies: [HeaderCurrencyDisplay]
 
     var body: some View {
         HStack(spacing: 10) {
@@ -62,34 +85,18 @@ private struct GlobalHeaderView: View {
 
             Spacer(minLength: 8)
 
-            HeaderCurrencyView(
-                title: "COINS",
-                value: coins,
-                color: .yellow,
-                iconAsset: "currency_coin",
-                fallbackSymbol: "circle.hexagongrid.fill"
-            )
-            HeaderCurrencyView(
-                title: "CRYSTAL",
-                value: crystals,
-                color: .cyan,
-                iconAsset: "currency_crystal",
-                fallbackSymbol: "circle.hexagongrid.fill"
-            )
-
-            if let eventTitle {
+            ForEach(currencies) { currency in
                 HeaderCurrencyView(
-                    title: eventTitle,
-                    value: eventBalance,
-                    color: .red,
-                    iconAsset: "currency_blood_coin",
-                    fallbackSymbol: "drop.fill"
+                    title: currency.title,
+                    value: currency.value,
+                    color: currency.color,
+                    symbol: currency.symbol
                 )
             }
         }
         .frame(height: 56)
         .padding(.horizontal, 14)
-        .background(.black.opacity(0.92))
+        .background(theme.panelColor.opacity(0.94))
         .overlay(alignment: .bottom) {
             Rectangle()
                 .fill(.white.opacity(0.12))
@@ -98,48 +105,19 @@ private struct GlobalHeaderView: View {
     }
 }
 
-struct RemoteIcon: View {
-
-    let assetName: String
-    let fallbackSymbol: String
-
-    var body: some View {
-
-        AsyncImage(
-            url: RemoteContentStore.shared.assetURL(
-                named: assetName
-            )
-        ) { phase in
-
-            if let image = phase.image {
-
-                image
-                    .resizable()
-                    .scaledToFit()
-
-            } else {
-
-                Image(systemName: fallbackSymbol)
-            }
-        }
-    }
-}
-
 private struct HeaderCurrencyView: View {
     let title: String
     let value: Int
     let color: Color
-    let iconAsset: String
-    let fallbackSymbol: String
+    let symbol: String
 
     var body: some View {
         VStack(alignment: .trailing, spacing: 2) {
             HStack(spacing: 4) {
-                RemoteIcon(
-                    assetName: iconAsset,
-                    fallbackSymbol: fallbackSymbol
-                )
-                .frame(width: 16, height: 16)
+                Image(systemName: symbol)
+                    .font(.system(size: 15, weight: .black))
+                    .foregroundStyle(color)
+                    .frame(width: 18, height: 18)
 
                 Text("\(value)")
                     .font(.system(size: 14, weight: .black, design: .rounded))
@@ -159,75 +137,49 @@ private struct HeaderCurrencyView: View {
 }
 
 private struct GlobalFooterView: View {
+    let theme: ThemeDefinition
+    let tabs: [FooterTabDefinition]
     let selectedScreen: GameScreen
     let selectScreen: (GameScreen) -> Void
-
-    private let tabs: [FooterTab] = [
-        .init(
-            title: "STORY",
-            iconName: "tab_story",
-            fallbackSymbol: "book.closed.fill",
-            screen: .storyMode
-        ),
-        .init(
-            title: "EVENT",
-            iconName: "tab_event",
-            fallbackSymbol: "sparkles",
-            screen: .eventMode
-        ),
-        .init(
-            title: "ENDLESS",
-            iconName: "tab_endless",
-            fallbackSymbol: "infinity",
-            screen: .endlessMode
-        ),
-        .init(
-            title: "STYLE",
-            iconName: "tab_style",
-            fallbackSymbol: "paintbrush.fill",
-            screen: .styleLab
-        ),
-        .init(
-            title: "RANK",
-            iconName: "tab_leaderboard",
-            fallbackSymbol: "trophy.fill",
-            screen: .leaderboard
-        )
-    ]
 
     var body: some View {
         HStack(spacing: 0) {
             ForEach(tabs) { tab in
-                Button {
-                    selectScreen(tab.screen)
-                } label: {
-                    VStack(spacing: 4) {
-                        AsyncImage(url: RemoteContentStore.shared.assetURL(named: tab.iconName)) { phase in
-                            if let image = phase.image {
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                            } else {
-                                Image(systemName: tab.fallbackSymbol)
-                                    .font(.system(size: 18, weight: .bold))
-                            }
-                        }
-                        .frame(width: 22, height: 22)
+                if let screen = tab.gameScreen {
+                    Button {
+                        selectScreen(screen)
+                    } label: {
+                        VStack(spacing: 4) {
+                            Image(systemName: tab.symbol)
+                                .font(.system(size: 19, weight: .black))
+                                .frame(width: 24, height: 24)
 
-                        Text(tab.title)
-                            .font(.system(size: 8, weight: .black, design: .monospaced))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
+                            Text(tab.title)
+                                .font(
+                                    .system(
+                                        size: 8,
+                                        weight: .black,
+                                        design: .monospaced
+                                    )
+                                )
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
+                        }
+                        .foregroundStyle(
+                            isSelected(tab) ? tab.color : .white.opacity(0.45)
+                        )
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 62)
+                        .background(
+                            isSelected(tab)
+                                ? tab.color.opacity(0.12) : .clear
+                        )
                     }
-                    .foregroundStyle(isSelected(tab) ? tabColor(tab) : .white.opacity(0.45))
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 62)
-                    .background(isSelected(tab) ? tabColor(tab).opacity(0.12) : .clear)
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
         }
-        .background(.black.opacity(0.94))
+        .background(theme.panelColor.opacity(0.94))
         .overlay(alignment: .top) {
             Rectangle()
                 .fill(.white.opacity(0.12))
@@ -235,33 +187,7 @@ private struct GlobalFooterView: View {
         }
     }
 
-    private func isSelected(_ tab: FooterTab) -> Bool {
-        selectedScreen == tab.screen
+    private func isSelected(_ tab: FooterTabDefinition) -> Bool {
+        selectedScreen == tab.gameScreen
     }
-
-    private func tabColor(_ tab: FooterTab) -> Color {
-        switch tab.screen {
-        case .storyMode:
-            return .red
-        case .eventMode:
-            return .purple
-        case .endlessMode:
-            return .orange
-        case .styleLab:
-            return .cyan
-        case .leaderboard:
-            return .yellow
-        default:
-            return .white
-        }
-    }
-}
-
-struct FooterTab: Identifiable {
-    let title: String
-    let iconName: String
-    let fallbackSymbol: String
-    let screen: GameScreen
-
-    var id: String { title }
 }

@@ -7,7 +7,7 @@
 
         "currencyId": "blood_shards",
         "currencyTitle": "BLOOD SHARDS",
-        "currencyIconAsset": "currency_blood_coin",
+        "currencySymbol": "drop.fill",
 
         "themeColorHex": "#FF1744",
         "currencyPerFinisher": 12,

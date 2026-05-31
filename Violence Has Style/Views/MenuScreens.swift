@@ -14,7 +14,7 @@ struct TitleScreenView: View {
         ZStack {
             titleBackground
 
-            Color.black.opacity(0.48)
+            ThemeBackgroundView()
                 .ignoresSafeArea()
 
             VStack(spacing: 22) {
@@ -68,17 +68,7 @@ struct TitleScreenView: View {
     }
 
     private var titleBackground: some View {
-        AsyncImage(url: RemoteContentStore.shared.assetURL(named: "bg_vhs")) {
-            phase in
-            if let image = phase.image {
-                image
-                    .resizable()
-                    .scaledToFill()
-            } else {
-                Color.black
-            }
-        }
-        .ignoresSafeArea()
+        ThemeBackgroundView()
     }
 
     private var logo: some View {
@@ -92,7 +82,11 @@ struct TitleScreenView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(.red.opacity(0.8), lineWidth: 2)
-                        .background(.black.opacity(0.42))
+                        .background(
+                            ThemeManager.shared.currentTheme.panelColor.opacity(
+                                0.42
+                            )
+                        )
 
                     Text("VHS")
                         .font(
@@ -113,7 +107,7 @@ struct OnlineRequiredView: View {
 
     var body: some View {
         ZStack {
-            Color.black
+            ThemeManager.shared.currentTheme.backgroundColor
                 .ignoresSafeArea()
 
             VStack(spacing: 18) {
@@ -187,7 +181,7 @@ struct OnlineRequiredView: View {
 struct OfflineView: View {
     var body: some View {
         ZStack {
-            Color.black
+            ThemeManager.shared.currentTheme.backgroundColor
                 .ignoresSafeArea()
 
             VStack(spacing: 16) {
@@ -226,7 +220,7 @@ struct MainMenuView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.76)
+            ThemeBackgroundView()
                 .ignoresSafeArea()
 
             FighterSprite(
@@ -321,7 +315,7 @@ struct EventShopView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.86)
+            ThemeBackgroundView()
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 16) {
@@ -340,21 +334,10 @@ struct EventShopView: View {
                 if let event {
 
                     HStack(spacing: 6) {
-                        AsyncImage(
-                            url: RemoteContentStore.shared.assetURL(
-                                named: event.currencyIconAsset
-                            )
-                        ) { phase in
-                            if let image = phase.image {
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                            } else {
-                                Circle()
-                                    .fill(event.themeColor)
-                            }
-                        }
-                        .frame(width: 20, height: 20)
+                        Image(systemName: event.currencySymbol ?? "drop.fill")
+                            .font(.system(size: 18, weight: .black))
+                            .foregroundStyle(event.themeColor)
+                            .frame(width: 20, height: 20)
 
                         Text("\(balance) \(event.currencyTitle)")
                             .font(
@@ -424,7 +407,10 @@ struct EventShopView: View {
                                     )
                                 }
                                 .padding(13)
-                                .background(.black.opacity(0.5))
+                                .background(
+                                    ThemeManager.shared.currentTheme.panelColor
+                                        .opacity(0.5)
+                                )
                                 .overlay {
                                     RoundedRectangle(cornerRadius: 8)
                                         .stroke(
@@ -472,7 +458,7 @@ struct StoryModeView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.86)
+            ThemeBackgroundView()
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 16) {
@@ -552,7 +538,10 @@ struct StoryModeView: View {
                             }
                             .padding(14)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(.black.opacity(0.5))
+                            .background(
+                                ThemeManager.shared.currentTheme.panelColor
+                                    .opacity(0.5)
+                            )
                             .overlay {
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(
@@ -585,7 +574,7 @@ struct EventModeView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.86)
+            ThemeBackgroundView()
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 16) {
@@ -655,7 +644,7 @@ struct EndlessModeView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.86)
+            ThemeBackgroundView()
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 16) {
@@ -704,7 +693,7 @@ struct StyleLabView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.82)
+            ThemeBackgroundView()
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 16) {
@@ -745,7 +734,11 @@ struct StyleLabView: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(13)
-                        .background(.black.opacity(0.5))
+                        .background(
+                            ThemeManager.shared.currentTheme.panelColor.opacity(
+                                0.5
+                            )
+                        )
                         .overlay {
                             RoundedRectangle(cornerRadius: 8)
                                 .stroke(style.tint.opacity(0.65), lineWidth: 1)
@@ -769,7 +762,7 @@ struct CharacterSelectView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.84)
+            ThemeBackgroundView()
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 16) {
@@ -840,7 +833,10 @@ struct CharacterSelectView: View {
                                 }
                             }
                             .padding(13)
-                            .background(.black.opacity(0.5))
+                            .background(
+                                ThemeManager.shared.currentTheme.panelColor
+                                    .opacity(0.5)
+                            )
                             .overlay {
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(
@@ -880,7 +876,7 @@ struct FightIntroView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(enemy.isBoss ? 0.88 : 0.78)
+            ThemeBackgroundView()
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 16) {
@@ -970,7 +966,7 @@ struct FightIntroView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
-        .background(.black.opacity(0.5))
+        .background(ThemeManager.shared.currentTheme.panelColor.opacity(0.5))
         .overlay {
             RoundedRectangle(cornerRadius: 8)
                 .stroke(color.opacity(0.65), lineWidth: 1)
@@ -989,7 +985,7 @@ struct GalleryView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.84)
+            ThemeBackgroundView()
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 16) {
@@ -1050,12 +1046,16 @@ struct SettingsView: View {
     @Binding var isScreenShakeEnabled: Bool
     @Binding var isFlashFXEnabled: Bool
 
+    let themes: [ThemeDefinition]
+    let selectedTheme: ThemeDefinition
+    let ownedThemeIds: [String]
+    let selectTheme: (ThemeDefinition) -> Void
     let resetGalleryData: () -> Void
     let back: () -> Void
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.84)
+            ThemeBackgroundView()
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 16) {
@@ -1079,12 +1079,106 @@ struct SettingsView: View {
                     SettingsToggle(title: "FLASH FX", isOn: $isFlashFXEnabled)
                 }
                 .padding(14)
-                .background(.black.opacity(0.48))
+                .background(
+                    ThemeManager.shared.currentTheme.panelColor.opacity(0.48)
+                )
                 .overlay {
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(.white.opacity(0.16), lineWidth: 1)
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("THEME")
+                        .font(
+                            .system(
+                                size: 12,
+                                weight: .black,
+                                design: .monospaced
+                            )
+                        )
+                        .foregroundStyle(.white.opacity(0.58))
+
+                    ForEach(themes) { theme in
+                        let isOwned =
+                            !theme.isStylePassExclusive
+                            || ownedThemeIds.contains(theme.id)
+                        Button {
+                            selectTheme(theme)
+                        } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: theme.symbol)
+                                    .foregroundStyle(theme.primaryColor)
+                                    .frame(width: 22)
+
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(theme.title)
+                                        .font(
+                                            .system(
+                                                size: 14,
+                                                weight: .black,
+                                                design: .rounded
+                                            )
+                                        )
+                                        .foregroundStyle(theme.textColor)
+
+                                    Text(
+                                        theme.isStylePassExclusive
+                                            ? "STYLE PASS EXCLUSIVE"
+                                            : "REMOTE THEME"
+                                    )
+                                    .font(
+                                        .system(
+                                            size: 9,
+                                            weight: .black,
+                                            design: .monospaced
+                                        )
+                                    )
+                                    .foregroundStyle(.white.opacity(0.45))
+                                }
+
+                                Spacer()
+
+                                if theme.id == selectedTheme.id {
+                                    Text("ACTIVE")
+                                        .font(
+                                            .system(
+                                                size: 9,
+                                                weight: .black,
+                                                design: .monospaced
+                                            )
+                                        )
+                                        .foregroundStyle(theme.secondaryColor)
+                                } else if !isOwned {
+                                    Text("LOCKED")
+                                        .font(
+                                            .system(
+                                                size: 9,
+                                                weight: .black,
+                                                design: .monospaced
+                                            )
+                                        )
+                                        .foregroundStyle(.gray)
+                                }
+                            }
+                            .padding(12)
+                            .background(theme.panelColor.opacity(0.72))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(
+                                        theme.id == selectedTheme.id
+                                            ? theme.primaryColor
+                                            : .white.opacity(0.14),
+                                        lineWidth: 1
+                                    )
+                            }
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(!isOwned)
+                        .opacity(isOwned ? 1 : 0.45)
+                    }
+                }
 
                 Button(action: resetGalleryData) {
                     Text("RESET GALLERY DATA")
@@ -1120,7 +1214,9 @@ private struct MenuActionButton: View {
             .foregroundStyle(.white)
             .padding(.horizontal, 16)
             .frame(height: 54)
-            .background(.black.opacity(0.55))
+            .background(
+                ThemeManager.shared.currentTheme.panelColor.opacity(0.55)
+            )
             .overlay {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(color.opacity(0.75), lineWidth: 1)
@@ -1172,7 +1268,7 @@ private struct GallerySection<Content: View>: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
-        .background(.black.opacity(0.48))
+        .background(ThemeManager.shared.currentTheme.panelColor.opacity(0.48))
         .overlay {
             RoundedRectangle(cornerRadius: 8)
                 .stroke(.white.opacity(0.16), lineWidth: 1)

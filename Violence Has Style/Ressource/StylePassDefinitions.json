@@ -1,0 +1,38 @@
+[
+    {
+        "id": "gold_style_pass_01",
+        "title": "GOLD STYLE PASS",
+        "startsAt": "2026-05-31T00:00:00Z",
+        "endsAt": "2026-07-01T00:00:00Z",
+        "themeColorHex": "#FFCC33",
+        "rewards": [
+            {
+                "id": "gold_pass_coins_01",
+                "title": "COIN DROP",
+                "description": "Style Pass coin reward",
+                "requiredPoints": 50,
+                "rewardType": "coins",
+                "rewardValue": "250",
+                "colorHex": "#FFCC33"
+            },
+            {
+                "id": "gold_pass_crystals_01",
+                "title": "CRYSTAL CUT",
+                "description": "Style Pass crystal reward",
+                "requiredPoints": 120,
+                "rewardType": "crystals",
+                "rewardValue": "25",
+                "colorHex": "#7CFFCE"
+            },
+            {
+                "id": "gold_pass_theme_01",
+                "title": "STYLE PASS GOLD THEME",
+                "description": "Exclusive background theme",
+                "requiredPoints": 250,
+                "rewardType": "theme",
+                "rewardValue": "style_pass_gold",
+                "colorHex": "#FFCC33"
+            }
+        ]
+    }
+]

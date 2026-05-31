@@ -12,10 +12,14 @@ struct BattleSceneView: View {
     let screenShakeOffset: CGSize
     let brokenPulse: Bool
     let styleGodPulse: Bool
+    let exit: () -> Void
 
     var body: some View {
         VStack(spacing: 18) {
-            BattleHUDView(game: game)
+            BattleHUDView(
+                game: game,
+                exit: exit
+            )
 
             Spacer(minLength: 12)
 
@@ -25,7 +29,7 @@ struct BattleSceneView: View {
                 styleGodPulse: styleGodPulse
             )
             .frame(maxWidth: .infinity)
-            .frame(height: 380)
+            .frame(height: 460)
             .contentShape(Rectangle())
 
             BattleStatusView(game: game)
@@ -52,7 +56,7 @@ private struct BattleArenaView: View {
                     tint: game.currentCharacter.tint,
                     isEnemy: false
                 )
-                .frame(width: 140, height: 220)
+                .frame(width: 180, height: 280)
                 .scaleEffect(styleGodScale)
                 .offset(x: game.playerOffset)
                 .shadow(
@@ -153,6 +157,7 @@ private struct BattleArenaView: View {
 
 private struct BattleHUDView: View {
     let game: GameState
+    let exit: () -> Void
 
     var body: some View {
         VStack(spacing: 12) {
@@ -228,6 +233,14 @@ private struct BattleHUDView: View {
                         )
                         .foregroundStyle(game.currentEnemy.tint.opacity(0.9))
 
+                    Button("EXIT") {
+                        exit()
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(.red.opacity(0.2))
+                    .clipShape(Capsule())
+
                     Text(game.currentLevel.title)
                         .font(
                             .system(
@@ -268,7 +281,11 @@ private struct BattleMeterView<S: ShapeStyle>: View {
         GeometryReader { proxy in
             ZStack(alignment: .leading) {
                 Capsule()
-                    .fill(.black.opacity(0.35))
+                    .fill(
+                        ThemeManager.shared.currentTheme.panelColor.opacity(
+                            0.35
+                        )
+                    )
 
                 Capsule()
                     .fill(fill)
@@ -388,7 +405,7 @@ struct BattleBackgroundView: View {
     let level: LevelDefinition
 
     var body: some View {
-        Color.black
+        ThemeBackgroundView()
             .overlay {
                 RadialGradient(
                     colors: [level.accentColor.opacity(0.18), .clear],
@@ -417,7 +434,7 @@ struct RewardChoiceOverlayView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.72)
+            ThemeBackgroundView()
                 .ignoresSafeArea()
 
             VStack(spacing: 16) {
@@ -460,7 +477,10 @@ struct RewardChoiceOverlayView: View {
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(14)
-                            .background(.black.opacity(0.58))
+                            .background(
+                                ThemeManager.shared.currentTheme.panelColor
+                                    .opacity(0.58)
+                            )
                             .overlay {
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(
@@ -473,80 +493,6 @@ struct RewardChoiceOverlayView: View {
                         .buttonStyle(.plain)
                     }
                 }
-            }
-            .padding(24)
-        }
-    }
-}
-
-struct RunEndedOverlayView: View {
-    let game: GameState
-    let restart: () -> Void
-    let mainMenu: () -> Void
-
-    var body: some View {
-        ZStack {
-            Color.black.opacity(0.82)
-                .ignoresSafeArea()
-
-            VStack(spacing: 14) {
-                Text("RUN ENDED")
-                    .font(.system(size: 34, weight: .black, design: .rounded))
-                    .foregroundStyle(.red)
-                    .tracking(1.4)
-
-                Text("BEST STYLE \(game.bestStyleRank.title)")
-                    .font(.system(size: 16, weight: .black, design: .rounded))
-                    .foregroundStyle(game.bestStyleRank.color)
-
-                Text("FIGHTS CLEARED \(game.fightsCleared)")
-                    .font(
-                        .system(size: 12, weight: .black, design: .monospaced)
-                    )
-                    .foregroundStyle(.white.opacity(0.76))
-
-                Text("MAX COMBO \(game.maxCombo)")
-                    .font(
-                        .system(size: 12, weight: .black, design: .monospaced)
-                    )
-                    .foregroundStyle(.white.opacity(0.76))
-
-                Text("REWARDS \(game.rewardHistoryText)")
-                    .font(
-                        .system(size: 10, weight: .black, design: .monospaced)
-                    )
-                    .foregroundStyle(.white.opacity(0.64))
-                    .multilineTextAlignment(.center)
-
-                Text("BOSS: \(game.bossVerdict)")
-                    .font(
-                        .system(size: 12, weight: .black, design: .monospaced)
-                    )
-                    .foregroundStyle(.white.opacity(0.7))
-                    .multilineTextAlignment(.center)
-
-                Button(action: restart) {
-                    Text("RESTART RUN")
-                        .font(
-                            .system(size: 17, weight: .black, design: .rounded)
-                        )
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 52)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(.red)
-                .padding(.top, 8)
-
-                Button(action: mainMenu) {
-                    Text("MAIN MENU")
-                        .font(
-                            .system(size: 14, weight: .black, design: .rounded)
-                        )
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 44)
-                }
-                .buttonStyle(.bordered)
-                .tint(.white)
             }
             .padding(24)
         }

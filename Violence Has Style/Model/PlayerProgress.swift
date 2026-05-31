@@ -19,6 +19,9 @@ final class PlayerProgress {
     var storyCompletedChapterCount = 0
     var endlessHighScore = 0
     var endlessBestFights = 0
+    var stylePassPoints = 0
+    var unlockedStylePassRewardIds: [String] = []
+    var ownedThemeIds: [String] = ["vhs_default", "blood_moon"]
 
     init() {}
 }
@@ -29,7 +32,8 @@ final class EventWallet {
     var balance: Int
     var purchasedItemIds: [String]
 
-    init(currencyId: String, balance: Int = 0, purchasedItemIds: [String] = []) {
+    init(currencyId: String, balance: Int = 0, purchasedItemIds: [String] = [])
+    {
         self.currencyId = currencyId
         self.balance = balance
         self.purchasedItemIds = purchasedItemIds

@@ -30,48 +30,24 @@
         {
             "id": "config",
             "url": "GameConfig.json"
+        },
+        {
+            "id": "themes",
+            "url": "ThemeDefinition.json"
+        },
+        {
+            "id": "stylePasses",
+            "url": "StylePassDefinitions.json"
+        },
+        {
+            "id": "uiConfig",
+            "url": "UIConfig.json"
         }
     ],
     "assets": [
         {
-            "id": "tab_story",
-            "url": "tab_story.png"
-        },
-        {
-            "id": "tab_event",
-            "url": "tab_event.png"
-        },
-        {
-            "id": "tab_endless",
-            "url": "tab_endless.png"
-        },
-        {
-            "id": "tab_style",
-            "url": "tab_style.png"
-        },
-        {
-            "id": "tab_leaderboard",
-            "url": "tab_leaderboard.png"
-        },
-        {
-            "id": "currency_coin",
-            "url": "currency_coin.png"
-        },
-        {
-            "id": "currency_crystal",
-            "url": "currency_crystal.png"
-        },
-        {
-            "id": "currency_blood_coin",
-            "url": "currency_blood_coin.png"
-        },
-        {
             "id": "logo_vhs",
             "url": "logo_vhs.png"
-        },
-        {
-            "id": "bg_vhs",
-            "url": "bg_vhs.png"
         },
         {
             "id": "character_vhs_idle",

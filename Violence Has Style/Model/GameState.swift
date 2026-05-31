@@ -121,6 +121,7 @@ final class GameState {
 
         attackFrameIndex = (attackFrameIndex + 1) % playerAttackFrames.count
         events.append(contentsOf: tickEnemyAction())
+        events.append(.awardStylePassPoints(3 + styleRank.score * 2))
         return events
     }
 
@@ -264,7 +265,8 @@ final class GameState {
             .finisherImpact,
         ]
 
-        if runMode == .event, let activeEvent = EventCatalog.shared.activeEvent {
+        if runMode == .event, let activeEvent = EventCatalog.shared.activeEvent
+        {
             events.append(
                 .awardEventCurrency(
                     activeEvent.currencyReward(for: styleRank),
@@ -336,7 +338,7 @@ final class GameState {
 
         trimPaintStrokes()
     }
-    
+
     private func addKillerPaint(for index: Int) {
 
         for _ in 0..<activeStyle.paintBurstCount {
@@ -380,7 +382,11 @@ final class GameState {
             control2Y: 0.18 + CGFloat(index) * 0.12,
             endX: 1.08 + spread,
             endY: 0.22 + CGFloat(index) * 0.16,
-            lineWidth: CGFloat(26 + styleRank.score * 9),
+            lineWidth: CGFloat(
+                30
+                    + styleRank.score * 12
+                    + fightLevel * 4
+            ),
             opacity: 0.78 + Double(styleRank.score) * 0.05,
             color: activeStyle.paintColor
         )
@@ -444,7 +450,11 @@ final class GameState {
         for burst in 0..<activeStyle.paintBurstCount {
             let angle =
                 CGFloat(burst) / CGFloat(activeStyle.paintBurstCount) * .pi * 2
-            let radius = CGFloat(0.18 + Double(styleRank.score) * 0.06)
+            let radius = CGFloat(
+                0.18
+                    + Double(styleRank.score) * 0.08
+                    + Double(fightLevel) * 0.03
+            )
             let stroke = basePaintStroke(
                 index: index,
                 startX: centerX,
@@ -545,7 +555,7 @@ final class GameState {
     }
 
     private var maxPaintStrokes: Int {
-        8 + styleRank.score * 8
+        60 + fightLevel * 10
     }
 
     private func paintColor(for index: Int, preferred: Color) -> Color {
@@ -648,13 +658,17 @@ final class GameState {
 
     @discardableResult
     private func checkGameOver() -> Bool {
-        guard playerHealth == 0 else { return false }
 
-        isGameOver = true
-        isChoosingReward = false
-        isEnemyBroken = false
-        bossVerdict = "PATHETIC END"
-        return true
+        if playerHealth <= 0 {
+
+            playerHealth = currentCharacter.maxHP
+
+            bossVerdict = "STYLE NEVER DIES"
+
+            return false
+        }
+
+        return false
     }
 }
 
@@ -666,4 +680,5 @@ enum GameEvent {
     case persistRunProgress(String)
     case unlockReward(String)
     case awardEventCurrency(Int, String)
+    case awardStylePassPoints(Int)
 }

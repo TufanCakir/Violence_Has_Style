@@ -19,8 +19,141 @@ enum GameScreen {
     case styleLab
     case gallery
     case eventShop
-    case leaderboard
+    case stylePasses
     case settings
+}
+
+extension GameScreen {
+    init?(remoteId: String) {
+        switch remoteId {
+        case "title":
+            self = .title
+        case "menu":
+            self = .menu
+        case "run":
+            self = .run
+        case "storyMode":
+            self = .storyMode
+        case "eventMode":
+            self = .eventMode
+        case "endlessMode":
+            self = .endlessMode
+        case "characterSelect":
+            self = .characterSelect
+        case "styleLab":
+            self = .styleLab
+        case "gallery":
+            self = .gallery
+        case "eventShop":
+            self = .eventShop
+        case "stylePasses":
+            self = .stylePasses
+        case "settings":
+            self = .settings
+        default:
+            return nil
+        }
+    }
+}
+
+struct UIConfig: Codable, Equatable {
+    let footerTabs: [FooterTabDefinition]
+    let headerCurrencies: [HeaderCurrencyDefinition]
+
+    static let fallback = UIConfig(
+        footerTabs: [
+            FooterTabDefinition(
+                id: "story",
+                title: "STORY",
+                symbol: "book.closed.fill",
+                screen: "storyMode",
+                colorHex: "#FF1744"
+            ),
+            FooterTabDefinition(
+                id: "event",
+                title: "EVENT",
+                symbol: "sparkles",
+                screen: "eventMode",
+                colorHex: "#9B5CFF"
+            ),
+            FooterTabDefinition(
+                id: "endless",
+                title: "ENDLESS",
+                symbol: "infinity",
+                screen: "endlessMode",
+                colorHex: "#FF9F1A"
+            ),
+            FooterTabDefinition(
+                id: "style",
+                title: "STYLE",
+                symbol: "paintbrush.fill",
+                screen: "styleLab",
+                colorHex: "#20D9FF"
+            ),
+            FooterTabDefinition(
+                id: "pass",
+                title: "PASS",
+                symbol: "ticket.fill",
+                screen: "stylePasses",
+                colorHex: "#FFCC33"
+            ),
+        ],
+        headerCurrencies: [
+            HeaderCurrencyDefinition(
+                id: "coins",
+                title: "COINS",
+                symbol: "circle.hexagongrid.fill",
+                colorHex: "#FFCC33"
+            ),
+            HeaderCurrencyDefinition(
+                id: "crystals",
+                title: "CRYSTAL",
+                symbol: "diamond.fill",
+                colorHex: "#20D9FF"
+            ),
+            HeaderCurrencyDefinition(
+                id: "event",
+                title: "EVENT",
+                symbol: "drop.fill",
+                colorHex: "#FF1744"
+            ),
+        ]
+    )
+}
+
+struct FooterTabDefinition: Codable, Equatable, Identifiable {
+    let id: String
+    let title: String
+    let symbol: String
+    let screen: String
+    let colorHex: String
+
+    var gameScreen: GameScreen? {
+        GameScreen(remoteId: screen)
+    }
+
+    var color: Color {
+        Color(hex: colorHex)
+    }
+}
+
+struct HeaderCurrencyDefinition: Codable, Equatable, Identifiable {
+    let id: String
+    let title: String
+    let symbol: String
+    let colorHex: String
+
+    var color: Color {
+        Color(hex: colorHex)
+    }
+}
+
+struct HeaderCurrencyDisplay: Identifiable {
+    let id: String
+    let title: String
+    let symbol: String
+    let value: Int
+    let color: Color
 }
 
 enum RunMode: String {
@@ -201,7 +334,8 @@ enum CombatStyle: CaseIterable, Equatable {
         case .blood:
             return "Spend HP for extra Style and power. Dangerous, but violent."
         case .void:
-            return "A darker Phantom variant. Lower damage, more control and clean movement."
+            return
+                "A darker Phantom variant. Lower damage, more control and clean movement."
         case .chaos:
             return "Unstable burst style. Big damage, volatile Style flow."
         }
@@ -643,7 +777,7 @@ struct EventDefinition: Codable, Equatable, Identifiable {
     let endsAt: String
     let currencyId: String
     let currencyTitle: String
-    let currencyIconAsset: String
+    let currencySymbol: String?
     let themeColorHex: String
     let currencyPerFinisher: Int
     let styleGodBonus: Int
@@ -766,8 +900,58 @@ struct MusicCatalog {
         let activeTracks = tracks
         guard let mode else { return activeTracks }
 
-        let filtered = activeTracks.filter { $0.mode == nil || $0.mode == mode.rawValue }
+        let filtered = activeTracks.filter {
+            $0.mode == nil || $0.mode == mode.rawValue
+        }
         return filtered.isEmpty ? activeTracks : filtered
+    }
+}
+
+struct StylePassDefinition: Codable, Equatable, Identifiable {
+    let id: String
+    let title: String
+    let startsAt: String
+    let endsAt: String
+    let themeColorHex: String
+    let rewards: [StylePassReward]
+
+    var themeColor: Color { Color(hex: themeColorHex) }
+
+    var isActive: Bool {
+        let parser = ISO8601DateFormatter()
+        guard let start = parser.date(from: startsAt),
+            let end = parser.date(from: endsAt)
+        else {
+            return false
+        }
+        let now = Date()
+        return start <= now && now <= end
+    }
+}
+
+struct StylePassReward: Codable, Equatable, Identifiable {
+    let id: String
+    let title: String
+    let description: String
+    let requiredPoints: Int
+    let rewardType: String
+    let rewardValue: String
+    let colorHex: String
+
+    var color: Color { Color(hex: colorHex) }
+}
+
+struct StylePassCatalog {
+    static let shared = StylePassCatalog()
+
+    private init() {}
+
+    var passes: [StylePassDefinition] {
+        RemoteContentStore.shared.stylePassDefinitions
+    }
+
+    var activePasses: [StylePassDefinition] {
+        passes.filter(\.isActive)
     }
 }
 
@@ -1310,7 +1494,7 @@ struct CharacterCatalog {
 }
 
 extension Color {
-    fileprivate init(hex: String) {
+    init(hex: String) {
         let cleaned = hex.trimmingCharacters(
             in: CharacterSet.alphanumerics.inverted
         )

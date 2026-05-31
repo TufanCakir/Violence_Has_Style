@@ -1,0 +1,38 @@
+[
+    {
+        "id": "vhs_default",
+        "title": "VHS DEFAULT",
+        "primaryHex": "#FF1744",
+        "secondaryHex": "#7CFFCE",
+        "accentHex": "#FFFFFF",
+        "backgroundHex": "#050505",
+        "panelHex": "#111111",
+        "textHex": "#FFFFFF",
+        "symbol": "slash.circle.fill",
+        "isStylePassExclusive": false
+    },
+    {
+        "id": "blood_moon",
+        "title": "BLOOD MOON",
+        "primaryHex": "#FF1744",
+        "secondaryHex": "#FF8A80",
+        "accentHex": "#FFFFFF",
+        "backgroundHex": "#080103",
+        "panelHex": "#170509",
+        "textHex": "#FFFFFF",
+        "symbol": "moon.stars.fill",
+        "isStylePassExclusive": false
+    },
+    {
+        "id": "style_pass_gold",
+        "title": "STYLE PASS GOLD",
+        "primaryHex": "#FFCC33",
+        "secondaryHex": "#FF1744",
+        "accentHex": "#FFFFFF",
+        "backgroundHex": "#090704",
+        "panelHex": "#181208",
+        "textHex": "#FFFFFF",
+        "symbol": "crown.fill",
+        "isStylePassExclusive": true
+    }
+]
