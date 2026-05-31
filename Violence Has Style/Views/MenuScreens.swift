@@ -1045,6 +1045,8 @@ struct GalleryView: View {
 struct SettingsView: View {
     @Binding var isScreenShakeEnabled: Bool
     @Binding var isFlashFXEnabled: Bool
+    @Binding var isMusicEnabled: Bool
+    @Binding var musicVolume: Double
 
     let themes: [ThemeDefinition]
     let selectedTheme: ThemeDefinition
@@ -1077,6 +1079,40 @@ struct SettingsView: View {
                         isOn: $isScreenShakeEnabled
                     )
                     SettingsToggle(title: "FLASH FX", isOn: $isFlashFXEnabled)
+                    SettingsToggle(title: "MUSIC", isOn: $isMusicEnabled)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("MUSIC VOLUME")
+                                .font(
+                                    .system(
+                                        size: 13,
+                                        weight: .black,
+                                        design: .monospaced
+                                    )
+                                )
+                                .foregroundStyle(.white.opacity(0.82))
+
+                            Spacer()
+
+                            Text("\(Int(musicVolume * 100))%")
+                                .font(
+                                    .system(
+                                        size: 12,
+                                        weight: .black,
+                                        design: .monospaced
+                                    )
+                                )
+                                .foregroundStyle(
+                                    ThemeManager.shared.currentTheme.accentColor
+                                )
+                        }
+
+                        Slider(value: $musicVolume, in: 0...1)
+                            .tint(ThemeManager.shared.currentTheme.primaryColor)
+                            .disabled(!isMusicEnabled)
+                            .opacity(isMusicEnabled ? 1 : 0.4)
+                    }
                 }
                 .padding(14)
                 .background(

@@ -127,12 +127,12 @@
         },
         {
             "id": "event_blood_moon",
-            "url": "event_blood_moon.mp3",
+            "url": "vhs_music_1.mp3",
             "mode": "event"
         },
         {
             "id": "endless_pressure",
-            "url": "endless_pressure.mp3",
+            "url": "vhs_music_2.mp3",
             "mode": "endless"
         }
     ]

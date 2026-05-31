@@ -5,7 +5,6 @@
 //  Created by Tufan Cakir on 30.05.26.
 //
 
-import AVFoundation
 import SwiftData
 import SwiftUI
 
@@ -24,7 +23,6 @@ struct GameView: View {
     @State private var brokenPulse = false
     @State private var styleGodPulse = false
     @State private var isShowingFightIntro = false
-    @State private var musicQueuePlayer: AVQueuePlayer?
     @State private var remoteContentRefreshID = UUID()
     @State private var isRemoteContentLoading = true
     @State private var isRemoteContentReady = false
@@ -32,6 +30,8 @@ struct GameView: View {
     @AppStorage("settingsScreenShakeEnabled") private var isScreenShakeEnabled =
         true
     @AppStorage("settingsFlashFXEnabled") private var isFlashFXEnabled = true
+    @AppStorage("settingsMusicEnabled") private var isMusicEnabled = true
+    @AppStorage("settingsMusicVolume") private var musicVolume = 0.72
 
     private var activeEvent: EventDefinition? {
         EventCatalog.shared.activeEvent
@@ -102,6 +102,10 @@ struct GameView: View {
         )
         .onAppear {
             styleGodPulse = true
+            MusicManager.shared.configure(
+                isEnabled: isMusicEnabled,
+                volume: musicVolume
+            )
         }
         .task {
             await refreshRemoteContent()
@@ -109,12 +113,31 @@ struct GameView: View {
         .onChange(of: game.isEnemyBroken) { _, newValue in
             brokenPulse = newValue
         }
+        .onChange(of: currentScreen) { _, screen in
+            guard isRemoteContentReady else { return }
+            startMusicPlaylist(mode: screen == .run ? game.runMode : nil)
+        }
         .onChange(of: network.isConnected) { _, connected in
             if connected && !isRemoteContentReady {
                 Task {
                     await refreshRemoteContent()
                 }
             }
+        }
+        .onChange(of: isMusicEnabled) { _, enabled in
+            if enabled {
+                startMusicPlaylist(
+                    mode: currentScreen == .run ? game.runMode : nil
+                )
+            } else {
+                MusicManager.shared.stop()
+            }
+        }
+        .onChange(of: musicVolume) { _, volume in
+            MusicManager.shared.configure(
+                isEnabled: isMusicEnabled,
+                volume: volume
+            )
         }
         .onAppear {
 
@@ -218,6 +241,8 @@ struct GameView: View {
             SettingsView(
                 isScreenShakeEnabled: $isScreenShakeEnabled,
                 isFlashFXEnabled: $isFlashFXEnabled,
+                isMusicEnabled: $isMusicEnabled,
+                musicVolume: $musicVolume,
                 themes: ThemeManager.shared.themes,
                 selectedTheme: ThemeManager.shared.currentTheme,
                 ownedThemeIds: progress.ownedThemeIds,
@@ -636,18 +661,11 @@ struct GameView: View {
     }
 
     private func startMusicPlaylist(mode: RunMode? = nil) {
-        let items = MusicCatalog.shared.playlist(for: mode).compactMap {
-            track -> AVPlayerItem? in
-            guard let url = RemoteContentStore.shared.contentURL(track.url)
-            else { return nil }
-            return AVPlayerItem(url: url)
-        }
-        guard !items.isEmpty else { return }
-
-        let player = AVQueuePlayer(items: items)
-        player.actionAtItemEnd = .advance
-        player.play()
-        musicQueuePlayer = player
+        MusicManager.shared.play(
+            mode: mode,
+            isEnabled: isMusicEnabled,
+            volume: musicVolume
+        )
     }
 
     private func resetGalleryData() {

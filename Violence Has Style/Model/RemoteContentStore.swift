@@ -63,6 +63,14 @@ final class RemoteContentStore {
             from: manifest.music,
             baseURL: musicBaseURL
         )
+        musicTracks = manifest.music.map { file in
+            MusicTrack(
+                id: file.id,
+                title: file.title ?? file.id.uppercased(),
+                url: musicURLs[file.id]?.absoluteString ?? file.url,
+                mode: file.mode
+            )
+        }
 
         guard
             let enemyURL = manifest.dataURL(
@@ -357,4 +365,6 @@ struct RemoteManifestDataFile: Codable, Equatable {
 struct RemoteManifestMediaFile: Codable, Equatable {
     let id: String
     let url: String
+    let title: String?
+    let mode: String?
 }
