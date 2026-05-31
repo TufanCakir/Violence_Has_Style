@@ -165,9 +165,9 @@ struct PremiumStoreView: View {
             symbol: "ticket.fill",
             colorHex: "#FF1744",
             isFeatured: true,
-            unlockType: "stylePassPoints",
-            unlockValue: "season1_premium",
-            unlockAmount: 250
+            unlockType: "premiumPass",
+            unlockValue: "gold_style_pass_01",
+            unlockAmount: 0
         )
     ]
 }

@@ -133,7 +133,7 @@ struct OnlineRequiredView: View {
 
                     Text(
                         isLoading
-                            ? "Downloading live game data, themes, characters and music."
+                            ? "Loading live game data. Media continues in the background."
                             : "This game needs WLAN or mobile data because gameplay data and media are loaded online."
                     )
                     .font(
@@ -1072,10 +1072,7 @@ struct SettingsView: View {
     @Binding var isMusicEnabled: Bool
     @Binding var musicVolume: Double
 
-    let themes: [ThemeDefinition]
-    let selectedTheme: ThemeDefinition
-    let ownedThemeIds: [String]
-    let selectTheme: (ThemeDefinition) -> Void
+    let openThemeSelection: () -> Void
     let resetGalleryData: () -> Void
     let back: () -> Void
 
@@ -1141,6 +1138,43 @@ struct SettingsView: View {
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
+                Button(action: openThemeSelection) {
+                    HStack {
+                        Image(systemName: "paintpalette.fill")
+                            .frame(width: 24)
+
+                        Text("THEME SELECT")
+                            .font(
+                                .system(
+                                    size: 13,
+                                    weight: .black,
+                                    design: .monospaced
+                                )
+                            )
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                    }
+                    .foregroundStyle(.white)
+                    .padding(12)
+                    .background(
+                        ThemeManager.shared.currentTheme.panelColor.opacity(
+                            0.56
+                        )
+                    )
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(
+                                ThemeManager.shared.currentTheme.primaryColor
+                                    .opacity(0.5),
+                                lineWidth: 1
+                            )
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
+                .buttonStyle(.plain)
+
                 VStack(alignment: .leading, spacing: 6) {
                     Text("APP STORE BUILD")
                         .font(
@@ -1174,98 +1208,6 @@ struct SettingsView: View {
                         .stroke(.white.opacity(0.16), lineWidth: 1)
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 8))
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("THEME")
-                        .font(
-                            .system(
-                                size: 12,
-                                weight: .black,
-                                design: .monospaced
-                            )
-                        )
-                        .foregroundStyle(.white.opacity(0.58))
-
-                    ForEach(themes) { theme in
-                        let isOwned =
-                            !theme.isStylePassExclusive
-                            || ownedThemeIds.contains(theme.id)
-                        Button {
-                            selectTheme(theme)
-                        } label: {
-                            HStack(spacing: 10) {
-                                Image(systemName: theme.symbol)
-                                    .foregroundStyle(theme.primaryColor)
-                                    .frame(width: 22)
-
-                                VStack(alignment: .leading, spacing: 3) {
-                                    Text(theme.title)
-                                        .font(
-                                            .system(
-                                                size: 14,
-                                                weight: .black,
-                                                design: .rounded
-                                            )
-                                        )
-                                        .foregroundStyle(theme.textColor)
-
-                                    Text(
-                                        theme.isStylePassExclusive
-                                            ? "STYLE PASS EXCLUSIVE"
-                                            : "REMOTE THEME"
-                                    )
-                                    .font(
-                                        .system(
-                                            size: 9,
-                                            weight: .black,
-                                            design: .monospaced
-                                        )
-                                    )
-                                    .foregroundStyle(.white.opacity(0.45))
-                                }
-
-                                Spacer()
-
-                                if theme.id == selectedTheme.id {
-                                    Text("ACTIVE")
-                                        .font(
-                                            .system(
-                                                size: 9,
-                                                weight: .black,
-                                                design: .monospaced
-                                            )
-                                        )
-                                        .foregroundStyle(theme.secondaryColor)
-                                } else if !isOwned {
-                                    Text("LOCKED")
-                                        .font(
-                                            .system(
-                                                size: 9,
-                                                weight: .black,
-                                                design: .monospaced
-                                            )
-                                        )
-                                        .foregroundStyle(.gray)
-                                }
-                            }
-                            .padding(10)
-                            .background(theme.panelColor.opacity(0.72))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(
-                                        theme.id == selectedTheme.id
-                                            ? theme.primaryColor
-                                            : .white.opacity(0.14),
-                                        lineWidth: 1
-                                    )
-                            }
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(!isOwned)
-                        .opacity(isOwned ? 1 : 0.45)
-                    }
-                }
 
                 Button(action: resetGalleryData) {
                     Text("RESET GALLERY DATA")

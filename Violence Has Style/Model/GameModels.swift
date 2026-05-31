@@ -21,6 +21,7 @@ enum GameScreen {
     case eventShop
     case stylePasses
     case premiumStore
+    case themeSelection
     case settings
 }
 
@@ -51,6 +52,8 @@ extension GameScreen {
             self = .stylePasses
         case "premiumStore":
             self = .premiumStore
+        case "themeSelection":
+            self = .themeSelection
         case "settings":
             self = .settings
         default:
@@ -952,6 +955,7 @@ struct StylePassReward: Codable, Equatable, Identifiable {
     let rewardType: String
     let rewardValue: String
     let colorHex: String
+    let isPremium: Bool?
 
     var color: Color { Color(hex: colorHex) }
 }

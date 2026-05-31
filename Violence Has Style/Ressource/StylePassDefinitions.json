@@ -22,7 +22,8 @@
                 "requiredPoints": 120,
                 "rewardType": "crystals",
                 "rewardValue": "25",
-                "colorHex": "#7CFFCE"
+                "colorHex": "#7CFFCE",
+                "isPremium": true
             },
             {
                 "id": "gold_pass_theme_01",
@@ -31,7 +32,8 @@
                 "requiredPoints": 250,
                 "rewardType": "theme",
                 "rewardValue": "style_pass_gold",
-                "colorHex": "#FFCC33"
+                "colorHex": "#FFCC33",
+                "isPremium": true
             }
         ]
     }

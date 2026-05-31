@@ -236,6 +236,7 @@ struct GameView: View {
                 passes: StylePassCatalog.shared.activePasses,
                 points: progress.stylePassPoints,
                 unlockedRewardIds: progress.unlockedStylePassRewardIds,
+                ownedPremiumPassIds: progress.ownedPremiumPassIds,
                 claimReward: claimStylePassReward,
                 back: { currentScreen = .menu }
             )
@@ -253,14 +254,19 @@ struct GameView: View {
                 isFlashFXEnabled: $isFlashFXEnabled,
                 isMusicEnabled: $isMusicEnabled,
                 musicVolume: $musicVolume,
+                openThemeSelection: { currentScreen = .themeSelection },
+                resetGalleryData: resetGalleryData,
+                back: { currentScreen = .menu }
+            )
+        case .themeSelection:
+            ThemeSelectionView(
                 themes: ThemeManager.shared.themes,
                 selectedTheme: ThemeManager.shared.currentTheme,
                 ownedThemeIds: progress.ownedThemeIds,
                 selectTheme: { theme in
                     ThemeManager.shared.selectTheme(theme)
                 },
-                resetGalleryData: resetGalleryData,
-                back: { currentScreen = .menu }
+                back: { currentScreen = .settings }
             )
         case .run:
             battleView
@@ -416,10 +422,12 @@ struct GameView: View {
         remoteContentStatus = RemoteContentStore.shared.statusMessage
 
         if isRemoteContentReady {
-            remoteContentStatus = "PRELOADING REMOTE MEDIA"
-            await RemoteContentStore.shared.preloadRemoteMedia()
             game.refreshDataDefinitions()
             startMusicPlaylist()
+            Task {
+                await RemoteContentStore.shared.warmStartupMedia()
+                RemoteContentStore.shared.warmAllRemoteMediaInBackground()
+            }
             remoteContentRefreshID = UUID()
         }
 
@@ -486,6 +494,16 @@ struct GameView: View {
     }
 
     private func claimStylePassReward(_ reward: StylePassReward) {
+        guard
+            let pass = StylePassCatalog.shared.activePasses.first(where: {
+                $0.rewards.contains(where: { $0.id == reward.id })
+            }),
+            reward.isPremium != true
+                || progress.ownedPremiumPassIds.contains(pass.id)
+        else {
+            return
+        }
+
         guard progress.stylePassPoints >= reward.requiredPoints,
             !progress.unlockedStylePassRewardIds.contains(reward.id)
         else {
@@ -651,6 +669,8 @@ struct GameView: View {
             appendUnique(product.unlockValue, to: &progress.ownedPaintFxIds)
         case "title":
             appendUnique(product.unlockValue, to: &progress.ownedTitleIds)
+        case "premiumPass":
+            appendUnique(product.unlockValue, to: &progress.ownedPremiumPassIds)
         case "supporter":
             appendUnique(product.unlockValue, to: &progress.ownedTitleIds)
             appendUnique("founding_stylist", to: &progress.ownedThemeIds)

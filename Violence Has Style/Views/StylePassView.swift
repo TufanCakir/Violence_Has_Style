@@ -11,6 +11,7 @@ struct StylePassView: View {
     let passes: [StylePassDefinition]
     let points: Int
     let unlockedRewardIds: [String]
+    let ownedPremiumPassIds: [String]
     let claimReward: (StylePassReward) -> Void
     let back: () -> Void
 
@@ -69,6 +70,12 @@ struct StylePassView: View {
                                     Button {
                                         claimReward(reward)
                                     } label: {
+                                        let isPremiumLocked =
+                                            reward.isPremium == true
+                                            && !ownedPremiumPassIds.contains(
+                                                pass.id
+                                            )
+
                                         HStack(spacing: 10) {
                                             Circle()
                                                 .fill(reward.color)
@@ -110,7 +117,9 @@ struct StylePassView: View {
                                                     reward.id
                                                 )
                                                     ? "CLAIMED"
-                                                    : "\(reward.requiredPoints)"
+                                                    : isPremiumLocked
+                                                        ? "PREMIUM"
+                                                        : "\(reward.requiredPoints)"
                                             )
                                             .font(
                                                 .system(
@@ -144,12 +153,19 @@ struct StylePassView: View {
                                     .buttonStyle(.plain)
                                     .disabled(
                                         points < reward.requiredPoints
+                                            || reward.isPremium == true
+                                                && !ownedPremiumPassIds
+                                                    .contains(pass.id)
                                             || unlockedRewardIds.contains(
                                                 reward.id
                                             )
                                     )
                                     .opacity(
                                         points >= reward.requiredPoints
+                                            && (reward.isPremium != true
+                                                || ownedPremiumPassIds.contains(
+                                                    pass.id
+                                                ))
                                             || unlockedRewardIds.contains(
                                                 reward.id
                                             ) ? 1 : 0.45

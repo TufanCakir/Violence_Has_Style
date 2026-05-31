@@ -33,8 +33,21 @@ final class RemoteContentStore {
     private var musicBaseURL: URL?
     private var assetURLs: [String: URL] = [:]
     private var musicURLs: [String: URL] = [:]
+    private var warmedURLStrings: Set<String> = []
+    private let urlSession: URLSession
 
-    private init() {}
+    private init() {
+        let cache = URLCache(
+            memoryCapacity: 40 * 1024 * 1024,
+            diskCapacity: 180 * 1024 * 1024
+        )
+        let configuration = URLSessionConfiguration.default
+        configuration.urlCache = cache
+        configuration.requestCachePolicy = .returnCacheDataElseLoad
+        configuration.timeoutIntervalForRequest = 12
+        configuration.timeoutIntervalForResource = 24
+        urlSession = URLSession(configuration: configuration)
+    }
 
     @MainActor
     func refresh() async {
@@ -211,14 +224,46 @@ final class RemoteContentStore {
         resolvedURL(value)
     }
 
-    func preloadRemoteMedia() async {
+    func warmStartupMedia() async {
+        let startupAssetIds = Set(
+            CharacterCatalog.shared.defaultCharacter.attackFrames
+                + [CharacterCatalog.shared.defaultCharacter.idleAsset]
+                + ["logo_vhs"]
+        )
+
+        let startupMusicURLs = MusicCatalog.shared.playlist(for: nil)
+            .filter { $0.requiredUnlock == nil }
+            .prefix(1)
+            .compactMap { contentURL($0.url) }
+
+        let urls =
+            startupAssetIds.compactMap { assetURLs[$0] }
+            + Array(startupMusicURLs)
+
+        await warmURLs(urls)
+    }
+
+    func warmAllRemoteMediaInBackground() {
         let urls =
             Array(assetURLs.values) + Array(musicURLs.values)
             + musicTracks.compactMap { contentURL($0.url) }
+
+        Task.detached(priority: .background) { [weak self] in
+            await self?.warmURLs(urls)
+        }
+    }
+
+    private func warmURLs(_ urls: [URL]) async {
+        let urls =
+            urls
+            .filter { warmedURLStrings.insert($0.absoluteString).inserted }
+
         await withTaskGroup(of: Void.self) { group in
-            for url in urls {
+            for url in urls.prefix(8) {
                 group.addTask {
-                    _ = try? await URLSession.shared.data(from: url)
+                    var request = URLRequest(url: url)
+                    request.cachePolicy = .returnCacheDataElseLoad
+                    _ = try? await self.urlSession.data(for: request)
                 }
             }
         }
@@ -226,7 +271,9 @@ final class RemoteContentStore {
 
     private func loadJSON<T: Decodable>(from url: URL) async -> T? {
         do {
-            let (data, response) = try await URLSession.shared.data(from: url)
+            var request = URLRequest(url: url)
+            request.cachePolicy = .returnCacheDataElseLoad
+            let (data, response) = try await urlSession.data(for: request)
 
             guard let http = response as? HTTPURLResponse else {
                 return nil

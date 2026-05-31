@@ -26,6 +26,7 @@ final class PlayerProgress {
     var ownedMusicPackIds: [String] = []
     var ownedPaintFxIds: [String] = []
     var ownedTitleIds: [String] = []
+    var ownedPremiumPassIds: [String] = []
 
     init() {}
 }
