@@ -1006,8 +1006,9 @@ struct RunConfig: Codable, Equatable {
 struct EnemyDefinition: Codable, Equatable {
     let id: String
     let title: String
-    let idleAsset: String
-    let hitFrames: [String]
+    let shape: String
+    let symbol: String
+    let impactSymbols: [String]
     let healthBonus: Int
     let counterDelay: Int
     let damageBonus: Int
@@ -1025,6 +1026,129 @@ struct EnemyDefinition: Codable, Equatable {
 
     var brokenColor: Color {
         Color(hex: brokenHex)
+    }
+
+    var idleState: String {
+        "\(id)_shape_idle"
+    }
+
+    var hitStates: [String] {
+        impactSymbols.isEmpty
+            ? ["\(id)_shape_hit1", "\(id)_shape_hit2", "\(id)_shape_hit3"]
+            : impactSymbols
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case title
+        case idleAsset
+        case hitFrames
+        case shape
+        case symbol
+        case impactSymbols
+        case healthBonus
+        case counterDelay
+        case damageBonus
+        case styleBonus
+        case tintHex
+        case brokenHex
+        case scale
+        case glowRadius
+        case isBoss
+        case introVerdict
+    }
+
+    init(
+        id: String,
+        title: String,
+        shape: String,
+        symbol: String,
+        impactSymbols: [String],
+        healthBonus: Int,
+        counterDelay: Int,
+        damageBonus: Int,
+        styleBonus: Int,
+        tintHex: String,
+        brokenHex: String,
+        scale: CGFloat,
+        glowRadius: CGFloat,
+        isBoss: Bool,
+        introVerdict: String
+    ) {
+        self.id = id
+        self.title = title
+        self.shape = shape
+        self.symbol = symbol
+        self.impactSymbols = impactSymbols
+        self.healthBonus = healthBonus
+        self.counterDelay = counterDelay
+        self.damageBonus = damageBonus
+        self.styleBonus = styleBonus
+        self.tintHex = tintHex
+        self.brokenHex = brokenHex
+        self.scale = scale
+        self.glowRadius = glowRadius
+        self.isBoss = isBoss
+        self.introVerdict = introVerdict
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        title = try container.decode(String.self, forKey: .title)
+        shape =
+            try container.decodeIfPresent(String.self, forKey: .shape)
+            ?? "diamond"
+        symbol =
+            try container.decodeIfPresent(String.self, forKey: .symbol)
+            ?? "sparkle"
+        impactSymbols =
+            try container.decodeIfPresent([String].self, forKey: .impactSymbols)
+            ?? container.decodeIfPresent([String].self, forKey: .hitFrames)
+            ?? []
+        healthBonus =
+            try container.decodeIfPresent(Int.self, forKey: .healthBonus) ?? 0
+        counterDelay =
+            try container.decodeIfPresent(Int.self, forKey: .counterDelay) ?? 4
+        damageBonus =
+            try container.decodeIfPresent(Int.self, forKey: .damageBonus) ?? 0
+        styleBonus =
+            try container.decodeIfPresent(Int.self, forKey: .styleBonus) ?? 0
+        tintHex =
+            try container.decodeIfPresent(String.self, forKey: .tintHex)
+            ?? "#FF1744"
+        brokenHex =
+            try container.decodeIfPresent(String.self, forKey: .brokenHex)
+            ?? tintHex
+        scale =
+            try container.decodeIfPresent(CGFloat.self, forKey: .scale) ?? 1
+        glowRadius =
+            try container.decodeIfPresent(CGFloat.self, forKey: .glowRadius)
+            ?? 12
+        isBoss =
+            try container.decodeIfPresent(Bool.self, forKey: .isBoss) ?? false
+        introVerdict =
+            try container.decodeIfPresent(String.self, forKey: .introVerdict)
+            ?? "PROVE IT"
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(title, forKey: .title)
+        try container.encode(shape, forKey: .shape)
+        try container.encode(symbol, forKey: .symbol)
+        try container.encode(impactSymbols, forKey: .impactSymbols)
+        try container.encode(healthBonus, forKey: .healthBonus)
+        try container.encode(counterDelay, forKey: .counterDelay)
+        try container.encode(damageBonus, forKey: .damageBonus)
+        try container.encode(styleBonus, forKey: .styleBonus)
+        try container.encode(tintHex, forKey: .tintHex)
+        try container.encode(brokenHex, forKey: .brokenHex)
+        try container.encode(scale, forKey: .scale)
+        try container.encode(glowRadius, forKey: .glowRadius)
+        try container.encode(isBoss, forKey: .isBoss)
+        try container.encode(introVerdict, forKey: .introVerdict)
     }
 }
 
@@ -1070,10 +1194,9 @@ struct EnemyCatalog {
     private static let defaultDefinition = EnemyDefinition(
         id: "grunt",
         title: "GRUNT",
-        idleAsset: "enemy_grunt_idle",
-        hitFrames: [
-            "enemy_grunt_hit1", "enemy_grunt_hit2", "enemy_grunt_hit3",
-        ],
+        shape: "circle",
+        symbol: "slash.circle.fill",
+        impactSymbols: ["slash.circle", "sparkle", "burst.fill"],
         healthBonus: 0,
         counterDelay: 4,
         damageBonus: 0,
@@ -1091,11 +1214,9 @@ struct EnemyCatalog {
         "duelist": EnemyDefinition(
             id: "duelist",
             title: "DUELIST",
-            idleAsset: "enemy_duelist_idle",
-            hitFrames: [
-                "enemy_duelist_hit1", "enemy_duelist_hit2",
-                "enemy_duelist_hit3",
-            ],
+            shape: "diamond",
+            symbol: "bolt.fill",
+            impactSymbols: ["bolt", "bolt.fill", "sparkles"],
             healthBonus: 12,
             counterDelay: 2,
             damageBonus: 3,
@@ -1110,10 +1231,9 @@ struct EnemyCatalog {
         "brute": EnemyDefinition(
             id: "brute",
             title: "BRUTE",
-            idleAsset: "enemy_brute_idle",
-            hitFrames: [
-                "enemy_brute_hit1", "enemy_brute_hit2", "enemy_brute_hit3",
-            ],
+            shape: "hexagon",
+            symbol: "flame.fill",
+            impactSymbols: ["flame", "flame.fill", "burst.fill"],
             healthBonus: 45,
             counterDelay: 4,
             damageBonus: 8,
@@ -1128,10 +1248,9 @@ struct EnemyCatalog {
         "judge": EnemyDefinition(
             id: "judge",
             title: "JUDGE",
-            idleAsset: "enemy_judge_idle",
-            hitFrames: [
-                "enemy_judge_hit1", "enemy_judge_hit2", "enemy_judge_hit3",
-            ],
+            shape: "ring",
+            symbol: "eye.fill",
+            impactSymbols: ["eye", "eye.fill", "crown.fill"],
             healthBonus: 80,
             counterDelay: 3,
             damageBonus: 10,
@@ -1157,8 +1276,10 @@ enum EnemyType: String, CaseIterable, Equatable, Codable {
     }
 
     var title: String { definition.title }
-    var idleAsset: String { definition.idleAsset }
-    var hitFrames: [String] { definition.hitFrames }
+    var idleAsset: String { definition.idleState }
+    var hitFrames: [String] { definition.hitStates }
+    var shape: String { definition.shape }
+    var symbol: String { definition.symbol }
     var healthBonus: Int { definition.healthBonus }
     var counterDelay: Int { definition.counterDelay }
     var damageBonus: Int { definition.damageBonus }

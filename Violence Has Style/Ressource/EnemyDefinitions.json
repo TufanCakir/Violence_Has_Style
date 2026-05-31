@@ -1,12 +1,13 @@
 [
     {
         "id": "grunt",
-        "title": "GRUNT",
-        "idleAsset": "enemy_grunt_idle",
-        "hitFrames": [
-            "enemy_grunt_hit1",
-            "enemy_grunt_hit2",
-            "enemy_grunt_hit3"
+        "title": "STYLE ECHO",
+        "shape": "circle",
+        "symbol": "slash.circle.fill",
+        "impactSymbols": [
+            "slash.circle",
+            "sparkle",
+            "burst.fill"
         ],
         "healthBonus": 0,
         "counterDelay": 4,
@@ -21,12 +22,13 @@
     },
     {
         "id": "duelist",
-        "title": "DUELIST",
-        "idleAsset": "enemy_duelist_idle",
-        "hitFrames": [
-            "enemy_duelist_hit1",
-            "enemy_duelist_hit2",
-            "enemy_duelist_hit3"
+        "title": "NEON DUEL",
+        "shape": "diamond",
+        "symbol": "bolt.fill",
+        "impactSymbols": [
+            "bolt",
+            "bolt.fill",
+            "sparkles"
         ],
         "healthBonus": 12,
         "counterDelay": 2,
@@ -41,12 +43,13 @@
     },
     {
         "id": "brute",
-        "title": "BRUTE",
-        "idleAsset": "enemy_brute_idle",
-        "hitFrames": [
-            "enemy_brute_hit1",
-            "enemy_brute_hit2",
-            "enemy_brute_hit3"
+        "title": "REAPER MASS",
+        "shape": "hexagon",
+        "symbol": "flame.fill",
+        "impactSymbols": [
+            "flame",
+            "flame.fill",
+            "burst.fill"
         ],
         "healthBonus": 45,
         "counterDelay": 4,
@@ -61,12 +64,13 @@
     },
     {
         "id": "judge",
-        "title": "JUDGE",
-        "idleAsset": "enemy_judge_idle",
-        "hitFrames": [
-            "enemy_judge_hit1",
-            "enemy_judge_hit2",
-            "enemy_judge_hit3"
+        "title": "THE STYLE JUDGE",
+        "shape": "ring",
+        "symbol": "eye.fill",
+        "impactSymbols": [
+            "eye",
+            "eye.fill",
+            "crown.fill"
         ],
         "healthBonus": 80,
         "counterDelay": 3,

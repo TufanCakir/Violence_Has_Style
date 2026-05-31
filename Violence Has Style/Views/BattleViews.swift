@@ -82,11 +82,10 @@ private struct BattleArenaView: View {
 
                 Spacer()
 
-                FighterSprite(
-                    assetName: game.enemyFrame,
-                    fallbackTitle: game.isEnemyBroken ? "BROKEN" : "ENEMY",
-                    tint: game.flashHit ? .red : game.currentEnemy.tint,
-                    isEnemy: true
+                EnemyShapeSprite(
+                    enemy: game.currentEnemy,
+                    isBroken: game.isEnemyBroken,
+                    isHit: game.flashHit
                 )
                 .frame(width: 140, height: 220)
                 .scaleEffect(enemyScale)

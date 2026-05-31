@@ -203,13 +203,13 @@
                 &failures
             )
             record(
-                EnemyType.grunt.idleAsset == "enemy_grunt_idle",
-                "grunt idle asset should come from enemy definition",
+                EnemyType.grunt.idleAsset == "grunt_shape_idle",
+                "grunt idle state should come from enemy definition",
                 &failures
             )
             record(
-                EnemyType.judge.hitFrames.contains("enemy_judge_hit3"),
-                "judge hit frames should come from enemy definition",
+                EnemyType.judge.hitFrames.contains("crown.fill"),
+                "judge impact symbols should come from enemy definition",
                 &failures
             )
 
