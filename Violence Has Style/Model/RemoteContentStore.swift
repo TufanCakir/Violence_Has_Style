@@ -24,6 +24,8 @@ final class RemoteContentStore {
     private(set) var themeDefinitions: [ThemeDefinition] = []
     private(set) var stylePassDefinitions: [StylePassDefinition] = []
     private(set) var premiumStoreProducts: [PremiumStoreProduct] = []
+    private(set) var styleAwakeningDefinitions: [StyleAwakeningDefinition] =
+        StyleAwakeningDefinition.fallback
     private(set) var uiConfig = UIConfig.fallback
     private(set) var gameConfig = GameConfig.fallback
     private(set) var isOnline = false
@@ -137,6 +139,10 @@ final class RemoteContentStore {
             for: "premiumStore",
             baseURL: Self.manifestURL
         )
+        let styleAwakeningsURL = manifest.dataURL(
+            for: "styleAwakenings",
+            baseURL: Self.manifestURL
+        )
 
         async let enemies: [EnemyDefinition]? = loadJSON(from: enemyURL)
         async let levels: [LevelDefinition]? = loadJSON(from: levelURL)
@@ -153,6 +159,8 @@ final class RemoteContentStore {
         )
         async let premiumStore: [PremiumStoreProduct]? =
             loadOptionalPremiumStore(from: premiumStoreURL)
+        async let styleAwakenings: [StyleAwakeningDefinition]? =
+            loadOptionalStyleAwakenings(from: styleAwakeningsURL)
         let loadedConfig: GameConfig? = await loadJSON(from: configURL)
 
         guard let loadedEnemies = await enemies, !loadedEnemies.isEmpty,
@@ -165,6 +173,7 @@ final class RemoteContentStore {
             let loadedStylePasses = await stylePasses,
             let loadedUIConfig = await loadedUIConfigTask,
             let loadedPremiumStore = await premiumStore,
+            let loadedStyleAwakenings = await styleAwakenings,
             let loadedConfig
         else {
             resetRemoteContent(status: "REMOTE DATA REQUIRED")
@@ -186,6 +195,9 @@ final class RemoteContentStore {
         themeDefinitions = loadedThemes
         stylePassDefinitions = loadedStylePasses
         premiumStoreProducts = loadedPremiumStore
+        styleAwakeningDefinitions =
+            loadedStyleAwakenings.isEmpty
+            ? StyleAwakeningDefinition.fallback : loadedStyleAwakenings
         uiConfig = loadedUIConfig
         gameConfig = loadedConfig
         isOnline = true
@@ -307,6 +319,18 @@ final class RemoteContentStore {
         return await loadJSON(from: url) ?? []
     }
 
+    private func loadOptionalStyleAwakenings(
+        from url: URL?
+    ) async -> [StyleAwakeningDefinition]? {
+        guard let url else {
+            return StyleAwakeningDefinition.fallback
+        }
+
+        let awakenings: [StyleAwakeningDefinition]? = await loadJSON(from: url)
+        return awakenings?.isEmpty == false
+            ? awakenings : StyleAwakeningDefinition.fallback
+    }
+
     private func resetRemoteContent(status: String) {
         enemyDefinitions = [:]
         levelDefinitions = []
@@ -318,6 +342,7 @@ final class RemoteContentStore {
         themeDefinitions = []
         stylePassDefinitions = []
         premiumStoreProducts = []
+        styleAwakeningDefinitions = StyleAwakeningDefinition.fallback
         uiConfig = .fallback
         gameConfig = .fallback
         assetsBaseURL = nil

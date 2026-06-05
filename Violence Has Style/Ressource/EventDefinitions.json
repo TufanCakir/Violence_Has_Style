@@ -2,17 +2,14 @@
     {
         "id": "blood_moon",
         "title": "BLOOD MOON",
-        "startsAt": "2026-05-01T00:00:00Z",
-        "endsAt": "2026-07-01T00:00:00Z",
-
+        "startsAt": "01.05.2026 00:00",
+        "endsAt": "01.07.2026 00:00",
         "currencyId": "blood_shards",
         "currencyTitle": "BLOOD SHARDS",
         "currencySymbol": "drop.fill",
-
         "themeColorHex": "#FF1744",
         "currencyPerFinisher": 12,
         "styleGodBonus": 8,
-
         "shopItems": [
             {
                 "id": "rose_blood_aura",
@@ -33,6 +30,15 @@
                 "colorHex": "#7CFFCE"
             },
             {
+                "id": "red_moon_coins",
+                "title": "RED MOON COINS",
+                "description": "Farmable coin bundle",
+                "cost": 65,
+                "kind": "currency",
+                "value": "coins_600",
+                "colorHex": "#FFCC33"
+            },
+            {
                 "id": "gold_reaper_title",
                 "title": "GOLD REAPER TITLE",
                 "description": "Event title for stylish finishers",
@@ -40,6 +46,129 @@
                 "kind": "title",
                 "value": "gold_reaper",
                 "colorHex": "#FFCC33"
+            }
+        ]
+    },
+    {
+        "id": "neon_rush",
+        "title": "NEON RUSH",
+        "startsAt": "01.05.2026 00:00",
+        "endsAt": "01.07.2026 00:00",
+        "currencyId": "neon_sparks",
+        "currencyTitle": "NEON SPARKS",
+        "currencySymbol": "bolt.fill",
+        "themeColorHex": "#20D9FF",
+        "currencyPerFinisher": 10,
+        "styleGodBonus": 12,
+        "shopItems": [
+            {
+                "id": "neon_spark_paint",
+                "title": "NEON SPARK PAINT",
+                "description": "Cyan paint trails for fast Style farming",
+                "cost": 35,
+                "kind": "paint_cosmetic",
+                "value": "neon_spark",
+                "colorHex": "#20D9FF"
+            },
+            {
+                "id": "rush_title",
+                "title": "RUSH TITLE",
+                "description": "Title for quick clears",
+                "cost": 50,
+                "kind": "title",
+                "value": "rush_stylist",
+                "colorHex": "#FFFFFF"
+            },
+            {
+                "id": "neon_crystals_small",
+                "title": "NEON CRYSTALS",
+                "description": "Farmable crystal bundle",
+                "cost": 90,
+                "kind": "currency",
+                "value": "crystals_35",
+                "colorHex": "#7CFFCE"
+            }
+        ]
+    },
+    {
+        "id": "void_week",
+        "title": "VOID WEEK",
+        "startsAt": "01.05.2026 00:00",
+        "endsAt": "01.07.2026 00:00",
+        "currencyId": "void_marks",
+        "currencyTitle": "VOID MARKS",
+        "currencySymbol": "moon.stars.fill",
+        "themeColorHex": "#9B5CFF",
+        "currencyPerFinisher": 14,
+        "styleGodBonus": 10,
+        "shopItems": [
+            {
+                "id": "void_mark_aura",
+                "title": "VOID MARK AURA",
+                "description": "Void aura cosmetic",
+                "cost": 45,
+                "kind": "style_cosmetic",
+                "value": "void_mark",
+                "colorHex": "#9B5CFF"
+            },
+            {
+                "id": "empty_room_paint",
+                "title": "EMPTY ROOM PAINT",
+                "description": "Dark violet paint FX",
+                "cost": 70,
+                "kind": "paint_cosmetic",
+                "value": "empty_room",
+                "colorHex": "#4B4DFF"
+            },
+            {
+                "id": "void_coin_cache",
+                "title": "VOID COIN CACHE",
+                "description": "Farmable coin cache",
+                "cost": 85,
+                "kind": "currency",
+                "value": "coins_900",
+                "colorHex": "#FFCC33"
+            }
+        ]
+    },
+    {
+        "id": "chaos_trial",
+        "title": "CHAOS TRIAL",
+        "startsAt": "01.05.2026 00:00",
+        "endsAt": "01.07.2026 00:00",
+        "currencyId": "chaos_tokens",
+        "currencyTitle": "CHAOS TOKENS",
+        "currencySymbol": "flame.fill",
+        "themeColorHex": "#FF9F1A",
+        "currencyPerFinisher": 16,
+        "styleGodBonus": 14,
+        "shopItems": [
+            {
+                "id": "chaos_burst_paint",
+                "title": "CHAOS BURST PAINT",
+                "description": "Orange burst paint cosmetic",
+                "cost": 60,
+                "kind": "paint_cosmetic",
+                "value": "chaos_burst",
+                "colorHex": "#FF9F1A"
+            },
+            {
+                "id": "loud_title",
+                "title": "LOUD TITLE",
+                "description": "Title for Chaos Trial clears",
+                "cost": 80,
+                "kind": "title",
+                "value": "make_it_loud",
+                "colorHex": "#FF1744"
+            },
+            {
+                "id": "chaos_crystal_cache",
+                "title": "CHAOS CRYSTAL CACHE",
+                "description": "Farmable crystal cache",
+                "cost": 120,
+                "kind": "currency",
+                "value": "crystals_60",
+                "colorHex": "#20D9FF"
             }
         ]
     }

@@ -9,31 +9,131 @@
             {
                 "id": "gold_pass_coins_01",
                 "title": "COIN DROP",
-                "description": "Style Pass coin reward",
+                "description": "Free Style Pass coin reward",
                 "requiredPoints": 50,
                 "rewardType": "coins",
                 "rewardValue": "250",
-                "colorHex": "#FFCC33"
+                "colorHex": "#FFCC33",
+                "isPremium": false
+            },
+            {
+                "id": "gold_pass_paint_01",
+                "title": "RED STARTER PAINT",
+                "description": "Free starter paint cosmetic",
+                "requiredPoints": 85,
+                "rewardType": "paintFx",
+                "rewardValue": "red_starter_paint",
+                "colorHex": "#FF1744",
+                "isPremium": false
+            },
+            {
+                "id": "gold_pass_crystals_free_01",
+                "title": "CRYSTAL CHIP",
+                "description": "Free crystal reward",
+                "requiredPoints": 110,
+                "rewardType": "crystals",
+                "rewardValue": "10",
+                "colorHex": "#7CFFCE",
+                "isPremium": false
+            },
+            {
+                "id": "gold_pass_title_free_01",
+                "title": "STREET STYLIST",
+                "description": "Free title reward",
+                "requiredPoints": 160,
+                "rewardType": "title",
+                "rewardValue": "street_stylist",
+                "colorHex": "#FFFFFF",
+                "isPremium": false
+            },
+            {
+                "id": "gold_pass_coins_02",
+                "title": "COIN CACHE",
+                "description": "Free coin cache",
+                "requiredPoints": 210,
+                "rewardType": "coins",
+                "rewardValue": "500",
+                "colorHex": "#FFCC33",
+                "isPremium": false
             },
             {
                 "id": "gold_pass_crystals_01",
                 "title": "CRYSTAL CUT",
-                "description": "Style Pass crystal reward",
-                "requiredPoints": 120,
+                "description": "Premium Style Pass crystal reward",
+                "requiredPoints": 250,
                 "rewardType": "crystals",
                 "rewardValue": "25",
                 "colorHex": "#7CFFCE",
                 "isPremium": true
             },
             {
+                "id": "gold_pass_paint_free_02",
+                "title": "CYAN SLASH PAINT",
+                "description": "Free paint FX reward",
+                "requiredPoints": 320,
+                "rewardType": "paintFx",
+                "rewardValue": "cyan_slash_paint",
+                "colorHex": "#20D9FF",
+                "isPremium": false
+            },
+            {
                 "id": "gold_pass_theme_01",
                 "title": "STYLE PASS GOLD THEME",
-                "description": "Exclusive background theme",
-                "requiredPoints": 250,
+                "description": "Exclusive premium background theme",
+                "requiredPoints": 420,
                 "rewardType": "theme",
                 "rewardValue": "style_pass_gold",
                 "colorHex": "#FFCC33",
                 "isPremium": true
+            }
+        ]
+    },
+    {
+        "id": "neon_free_pass_01",
+        "title": "NEON FARM PASS",
+        "startsAt": "2026-06-05T00:00:00Z",
+        "endsAt": "2026-07-15T00:00:00Z",
+        "themeColorHex": "#20D9FF",
+        "rewards": [
+            {
+                "id": "neon_pass_coins_01",
+                "title": "NEON COINS",
+                "description": "Free farm coins",
+                "requiredPoints": 40,
+                "rewardType": "coins",
+                "rewardValue": "200",
+                "colorHex": "#FFCC33",
+                "isPremium": false
+            },
+            {
+                "id": "neon_pass_paint_01",
+                "title": "NEON LINE PAINT",
+                "description": "Free neon paint cosmetic",
+                "requiredPoints": 100,
+                "rewardType": "paintFx",
+                "rewardValue": "neon_line_paint",
+                "colorHex": "#20D9FF",
+                "isPremium": false
+            },
+            {
+                "id": "neon_pass_crystals_01",
+                "title": "SPARK CRYSTALS",
+                "description": "Free crystals",
+                "requiredPoints": 170,
+                "rewardType": "crystals",
+                "rewardValue": "15",
+                "colorHex": "#7CFFCE",
+                "isPremium": false
+            },
+            {
+                "id": "neon_pass_title_01",
+                "title": "NEON FARMER",
+                "description": "Free event title",
+                "requiredPoints": 260,
+                "rewardType": "title",
+                "rewardValue": "neon_farmer",
+                "colorHex": "#FFFFFF",
+                "isPremium": false
             }
         ]
     }

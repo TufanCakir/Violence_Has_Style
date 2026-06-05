@@ -11,6 +11,7 @@ struct RootView<Content: View>: View {
     let theme: ThemeDefinition
     let styleRank: StyleRank
     let currencies: [HeaderCurrencyDisplay]
+    let currencyInfoRows: [HeaderCurrencyDisplay]
     let footerTabs: [FooterTabDefinition]
     let selectedScreen: GameScreen
     let selectScreen: (GameScreen) -> Void
@@ -26,7 +27,8 @@ struct RootView<Content: View>: View {
                 GlobalHeaderView(
                     theme: theme,
                     styleRank: styleRank,
-                    currencies: currencies
+                    currencies: currencies,
+                    currencyInfoRows: currencyInfoRows
                 )
             }
 
@@ -69,6 +71,9 @@ private struct GlobalHeaderView: View {
     let theme: ThemeDefinition
     let styleRank: StyleRank
     let currencies: [HeaderCurrencyDisplay]
+    let currencyInfoRows: [HeaderCurrencyDisplay]
+
+    @State private var isShowingCurrencyInfo = false
 
     var body: some View {
         HStack(spacing: 10) {
@@ -93,6 +98,17 @@ private struct GlobalHeaderView: View {
                     symbol: currency.symbol
                 )
             }
+
+            Button {
+                isShowingCurrencyInfo = true
+            } label: {
+                Image(systemName: "info.circle.fill")
+                    .font(.system(size: 18, weight: .black))
+                    .foregroundStyle(theme.accentColor)
+                    .frame(width: 30, height: 30)
+                    .contentShape(Circle())
+            }
+            .buttonStyle(.plain)
         }
         .frame(height: 56)
         .padding(.horizontal, 14)
@@ -102,6 +118,115 @@ private struct GlobalHeaderView: View {
                 .fill(.white.opacity(0.12))
                 .frame(height: 1)
         }
+        .sheet(isPresented: $isShowingCurrencyInfo) {
+            CurrencyInfoSheetView(
+                theme: theme,
+                styleRank: styleRank,
+                currencies: currencyInfoRows
+            )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+        }
+    }
+}
+
+private struct CurrencyInfoSheetView: View {
+    let theme: ThemeDefinition
+    let styleRank: StyleRank
+    let currencies: [HeaderCurrencyDisplay]
+
+    var body: some View {
+        ZStack {
+            ThemeBackgroundView()
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("CURRENCIES")
+                        .font(
+                            .system(size: 24, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(.white)
+
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("STYLE RANK")
+                                .font(
+                                    .system(
+                                        size: 10,
+                                        weight: .black,
+                                        design: .monospaced
+                                    )
+                                )
+                                .foregroundStyle(.white.opacity(0.5))
+
+                            Text(styleRank.title)
+                                .font(
+                                    .system(
+                                        size: 22,
+                                        weight: .black,
+                                        design: .rounded
+                                    )
+                                )
+                                .foregroundStyle(styleRank.color)
+                        }
+
+                        Spacer()
+                    }
+                    .padding(14)
+                    .background(theme.panelColor.opacity(0.66))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(styleRank.color.opacity(0.55), lineWidth: 1)
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                    ForEach(currencies) { currency in
+                        CurrencyInfoRowView(theme: theme, currency: currency)
+                    }
+
+                }
+                .padding(24)
+            }
+        }
+    }
+}
+
+private struct CurrencyInfoRowView: View {
+    let theme: ThemeDefinition
+    let currency: HeaderCurrencyDisplay
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: currency.symbol)
+                .font(.system(size: 20, weight: .black))
+                .foregroundStyle(currency.color)
+                .frame(width: 30)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(currency.title)
+                    .font(.system(size: 14, weight: .black, design: .rounded))
+                    .foregroundStyle(.white)
+
+                Text(currency.id.uppercased())
+                    .font(
+                        .system(size: 9, weight: .black, design: .monospaced)
+                    )
+                    .foregroundStyle(.white.opacity(0.44))
+            }
+
+            Spacer()
+
+            Text("\(currency.value)")
+                .font(.system(size: 18, weight: .black, design: .rounded))
+                .foregroundStyle(currency.color)
+        }
+        .padding(13)
+        .background(theme.panelColor.opacity(0.58))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(currency.color.opacity(0.42), lineWidth: 1)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }
 

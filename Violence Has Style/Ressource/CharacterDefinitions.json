@@ -6,7 +6,13 @@
         "attackFrames": [
             "character_vhs_attack1",
             "character_vhs_attack2",
-            "character_vhs_attack3"
+            "character_vhs_attack3",
+            "character_vhs_attack4",
+            "character_vhs_attack5",
+            "character_vhs_attack6",
+            "character_vhs_attack7",
+            "character_vhs_attack8",
+            "character_vhs_attack9"
         ],
         "maxHP": 100,
         "styleGainBonus": 0,

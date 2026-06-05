@@ -46,6 +46,10 @@
         {
             "id": "premiumStore",
             "url": "PremiumStoreDefinitions.json"
+        },
+        {
+            "id": "styleAwakenings",
+            "url": "StyleAwakeningDefinitions.json"
         }
     ],
     "assets": [
@@ -68,6 +72,30 @@
         {
             "id": "character_vhs_attack3",
             "url": "character_vhs_attack3.png"
+        },
+        {
+            "id": "character_vhs_attack4",
+            "url": "character_vhs_attack4.png"
+        },
+        {
+            "id": "character_vhs_attack5",
+            "url": "character_vhs_attack5.png"
+        },
+        {
+            "id": "character_vhs_attack6",
+            "url": "character_vhs_attack6.png"
+        },
+        {
+            "id": "character_vhs_attack7",
+            "url": "character_vhs_attack7.png"
+        },
+        {
+            "id": "character_vhs_attack8",
+            "url": "character_vhs_attack8.png"
+        },
+        {
+            "id": "character_vhs_attack9",
+            "url": "character_vhs_attack9.png"
         },
         {
             "id": "character_blood_saint_idle",

@@ -590,10 +590,12 @@ struct StoryModeView: View {
 }
 
 struct EventModeView: View {
-    let event: EventDefinition?
-    let balance: Int
-    let startEventRun: () -> Void
-    let openShop: () -> Void
+    let events: [EventDefinition]
+    let selectedEventId: String?
+    let balanceForEvent: (EventDefinition) -> Int
+    let selectEvent: (EventDefinition) -> Void
+    let startEventRun: (EventDefinition) -> Void
+    let openShop: (EventDefinition) -> Void
     let back: () -> Void
 
     var body: some View {
@@ -614,34 +616,7 @@ struct EventModeView: View {
                     BackButton(action: back)
                 }
 
-                if let event {
-                    Text(event.title)
-                        .font(
-                            .system(size: 34, weight: .black, design: .rounded)
-                        )
-                        .foregroundStyle(event.themeColor)
-
-                    Text("\(balance) \(event.currencyTitle)")
-                        .font(
-                            .system(
-                                size: 12,
-                                weight: .black,
-                                design: .monospaced
-                            )
-                        )
-                        .foregroundStyle(.white.opacity(0.72))
-
-                    MenuActionButton(
-                        title: "START EVENT RUN",
-                        color: event.themeColor,
-                        action: startEventRun
-                    )
-                    MenuActionButton(
-                        title: "EVENT SHOP",
-                        color: .white,
-                        action: openShop
-                    )
-                } else {
+                if events.isEmpty {
                     Text("NO ACTIVE EVENT")
                         .font(
                             .system(
@@ -651,12 +626,200 @@ struct EventModeView: View {
                             )
                         )
                         .foregroundStyle(.white.opacity(0.6))
+                } else {
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            ForEach(events) { event in
+                                EventSelectionCard(
+                                    event: event,
+                                    balance: balanceForEvent(event),
+                                    isSelected: selectedEventId == event.id,
+                                    selectEvent: { selectEvent(event) },
+                                    startEventRun: { startEventRun(event) },
+                                    openShop: { openShop(event) }
+                                )
+                            }
+                        }
+                    }
                 }
 
                 Spacer()
             }
             .padding(24)
         }
+    }
+}
+
+private struct EventSelectionCard: View {
+    let event: EventDefinition
+    let balance: Int
+    let isSelected: Bool
+    let selectEvent: () -> Void
+    let startEventRun: () -> Void
+    let openShop: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Button(action: selectEvent) {
+                HStack(spacing: 10) {
+                    Image(systemName: event.currencySymbol ?? "sparkles")
+                        .font(.system(size: 21, weight: .black))
+                        .foregroundStyle(event.themeColor)
+                        .frame(width: 28)
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        HStack(spacing: 8) {
+                            Text(event.title)
+                                .font(
+                                    .system(
+                                        size: 18,
+                                        weight: .black,
+                                        design: .rounded
+                                    )
+                                )
+                                .foregroundStyle(.white)
+
+                            Text(statusText)
+                                .font(
+                                    .system(
+                                        size: 9,
+                                        weight: .black,
+                                        design: .monospaced
+                                    )
+                                )
+                                .foregroundStyle(event.themeColor)
+                        }
+
+                        Text("\(balance) \(event.currencyTitle)")
+                            .font(
+                                .system(
+                                    size: 10,
+                                    weight: .black,
+                                    design: .monospaced
+                                )
+                            )
+                            .foregroundStyle(.white.opacity(0.6))
+                    }
+
+                    Spacer()
+
+                    if isSelected {
+                        Text("SELECTED")
+                            .font(
+                                .system(
+                                    size: 9,
+                                    weight: .black,
+                                    design: .monospaced
+                                )
+                            )
+                            .foregroundStyle(event.themeColor)
+                    }
+                }
+            }
+            .buttonStyle(.plain)
+
+            EventCountdownView(event: event)
+
+            HStack(spacing: 10) {
+                Button(action: startEventRun) {
+                    Text(event.isActive ? "START RUN" : "COMING SOON")
+                        .font(
+                            .system(
+                                size: 11,
+                                weight: .black,
+                                design: .monospaced
+                            )
+                        )
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 38)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(event.themeColor)
+                .disabled(!event.isActive)
+
+                Button(action: openShop) {
+                    Text("SHOP")
+                        .font(
+                            .system(
+                                size: 11,
+                                weight: .black,
+                                design: .monospaced
+                            )
+                        )
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 38)
+                }
+                .buttonStyle(.bordered)
+                .tint(.white)
+            }
+        }
+        .padding(12)
+        .background(ThemeManager.shared.currentTheme.panelColor.opacity(0.58))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(
+                    isSelected ? event.themeColor : .white.opacity(0.15),
+                    lineWidth: 1
+                )
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private var statusText: String {
+        if event.isActive {
+            return "ACTIVE"
+        }
+
+        if event.isUpcoming {
+            return "UPCOMING"
+        }
+
+        return "ENDED"
+    }
+}
+
+private struct EventCountdownView: View {
+    let event: EventDefinition
+
+    var body: some View {
+        HStack {
+            Image(systemName: "timer")
+
+            Text(labelText)
+
+            Spacer()
+
+            Text(countdownText)
+        }
+        .font(.system(size: 12, weight: .black, design: .monospaced))
+        .foregroundStyle(.white)
+        .padding(12)
+        .background(ThemeManager.shared.currentTheme.panelColor.opacity(0.55))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(event.themeColor.opacity(0.7), lineWidth: 1)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private var countdownText: String {
+        let targetDate = event.isUpcoming ? event.startsAtDate : event.endsAtDate
+        guard let targetDate else { return event.endsAt }
+
+        let remaining = max(0, Int(targetDate.timeIntervalSince(Date())))
+        let days = remaining / 86_400
+        let hours = (remaining % 86_400) / 3_600
+        let minutes = (remaining % 3_600) / 60
+
+        if days > 0 {
+            return "\(days)D \(hours)H"
+        }
+
+        return "\(hours)H \(minutes)M"
+    }
+
+    private var labelText: String {
+        event.isUpcoming ? "STARTS IN" : "ENDS IN"
     }
 }
 
@@ -1073,6 +1236,8 @@ struct SettingsView: View {
     @Binding var musicVolume: Double
 
     let openThemeSelection: () -> Void
+    let openMusicSelection: () -> Void
+    let openPaintSelection: () -> Void
     let resetGalleryData: () -> Void
     let back: () -> Void
 
@@ -1139,39 +1304,26 @@ struct SettingsView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
                 Button(action: openThemeSelection) {
-                    HStack {
-                        Image(systemName: "paintpalette.fill")
-                            .frame(width: 24)
-
-                        Text("THEME SELECT")
-                            .font(
-                                .system(
-                                    size: 13,
-                                    weight: .black,
-                                    design: .monospaced
-                                )
-                            )
-
-                        Spacer()
-
-                        Image(systemName: "chevron.right")
-                    }
-                    .foregroundStyle(.white)
-                    .padding(12)
-                    .background(
-                        ThemeManager.shared.currentTheme.panelColor.opacity(
-                            0.56
-                        )
+                    SettingsNavigationRow(
+                        title: "THEME SELECT",
+                        symbol: "paintpalette.fill"
                     )
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(
-                                ThemeManager.shared.currentTheme.primaryColor
-                                    .opacity(0.5),
-                                lineWidth: 1
-                            )
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
+                .buttonStyle(.plain)
+
+                Button(action: openMusicSelection) {
+                    SettingsNavigationRow(
+                        title: "MUSIC SELECT",
+                        symbol: "music.note.list"
+                    )
+                }
+                .buttonStyle(.plain)
+
+                Button(action: openPaintSelection) {
+                    SettingsNavigationRow(
+                        title: "PAINT FX SELECT",
+                        symbol: "paintbrush.pointed.fill"
+                    )
                 }
                 .buttonStyle(.plain)
 
@@ -1270,6 +1422,38 @@ struct BackButton: View {
         }
         .buttonStyle(.bordered)
         .tint(.white)
+    }
+}
+
+struct SettingsNavigationRow: View {
+    let title: String
+    let symbol: String
+
+    var body: some View {
+        HStack {
+            Image(systemName: symbol)
+                .frame(width: 24)
+
+            Text(title)
+                .font(
+                    .system(size: 13, weight: .black, design: .monospaced)
+                )
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+        }
+        .foregroundStyle(.white)
+        .padding(12)
+        .background(ThemeManager.shared.currentTheme.panelColor.opacity(0.56))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(
+                    ThemeManager.shared.currentTheme.primaryColor.opacity(0.5),
+                    lineWidth: 1
+                )
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }
 

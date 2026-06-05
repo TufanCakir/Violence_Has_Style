@@ -43,7 +43,8 @@ final class MusicManager {
         mode: RunMode?,
         isEnabled: Bool,
         volume: Double,
-        ownedUnlockIds: [String]
+        ownedUnlockIds: [String],
+        preferredTrackId: String = ""
     ) {
         currentMode = mode
 
@@ -52,10 +53,17 @@ final class MusicManager {
             return
         }
 
-        let tracks = MusicCatalog.shared.playlist(
+        var tracks = MusicCatalog.shared.playlist(
             for: mode,
             ownedUnlockIds: ownedUnlockIds
         )
+        if !preferredTrackId.isEmpty,
+            let selectedTrack = tracks.first(where: {
+                $0.id == preferredTrackId
+            })
+        {
+            tracks = [selectedTrack]
+        }
         let playlistIds = tracks.map(\.id)
 
         if playlistIds == currentPlaylistIds, let player {

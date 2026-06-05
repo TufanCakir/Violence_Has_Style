@@ -22,6 +22,8 @@ enum GameScreen {
     case stylePasses
     case premiumStore
     case themeSelection
+    case musicSelection
+    case paintSelection
     case settings
 }
 
@@ -54,6 +56,10 @@ extension GameScreen {
             self = .premiumStore
         case "themeSelection":
             self = .themeSelection
+        case "musicSelection":
+            self = .musicSelection
+        case "paintSelection":
+            self = .paintSelection
         case "settings":
             self = .settings
         default:
@@ -162,6 +168,119 @@ struct HeaderCurrencyDisplay: Identifiable {
     let color: Color
 }
 
+struct StyleAwakeningDefinition: Codable, Equatable, Identifiable {
+    let id: String
+    let styleId: String
+    let title: String
+    let verdict: String
+    let awakeningAsset: String?
+    let paintColorHex: String?
+    let secondaryPaintColorHex: String?
+    let styleGain: Int
+    let burstCountBonus: Int
+    let shake: Double
+
+    var style: CombatStyle? {
+        CombatStyle(remoteId: styleId)
+    }
+
+    var paintColor: Color? {
+        guard let paintColorHex else { return nil }
+        return Color(hex: paintColorHex)
+    }
+
+    var secondaryPaintColor: Color? {
+        guard let secondaryPaintColorHex else { return nil }
+        return Color(hex: secondaryPaintColorHex)
+    }
+
+    static let fallback: [StyleAwakeningDefinition] = [
+        StyleAwakeningDefinition(
+            id: "killer_awake",
+            styleId: "killer",
+            title: "KILLER AWAKENING",
+            verdict: "SHOW SPEED",
+            awakeningAsset: "character_vhs_attack1",
+            paintColorHex: "#FF1744",
+            secondaryPaintColorHex: "#20D9FF",
+            styleGain: 8,
+            burstCountBonus: 1,
+            shake: 8
+        ),
+        StyleAwakeningDefinition(
+            id: "reaper_awake",
+            styleId: "reaper",
+            title: "REAPER AWAKENING",
+            verdict: "MAKE IT HEAVY",
+            awakeningAsset: "character_vhs_attack2",
+            paintColorHex: "#9B5CFF",
+            secondaryPaintColorHex: "#FF1744",
+            styleGain: 6,
+            burstCountBonus: 0,
+            shake: 14
+        ),
+        StyleAwakeningDefinition(
+            id: "phantom_awake",
+            styleId: "phantom",
+            title: "PHANTOM AWAKENING",
+            verdict: "VANISH",
+            awakeningAsset: "character_vhs_attack3",
+            paintColorHex: "#7CFFCE",
+            secondaryPaintColorHex: "#9B5CFF",
+            styleGain: 10,
+            burstCountBonus: 1,
+            shake: 6
+        ),
+        StyleAwakeningDefinition(
+            id: "blood_awake",
+            styleId: "blood",
+            title: "BLOOD AWAKENING",
+            verdict: "BLEED BEAUTIFUL",
+            awakeningAsset: "character_vhs_attack3",
+            paintColorHex: "#FF1744",
+            secondaryPaintColorHex: "#FFFFFF",
+            styleGain: 12,
+            burstCountBonus: 2,
+            shake: 12
+        ),
+        StyleAwakeningDefinition(
+            id: "void_awake",
+            styleId: "void",
+            title: "VOID AWAKENING",
+            verdict: "EMPTY THE ROOM",
+            awakeningAsset: "character_vhs_attack9",
+            paintColorHex: "#4B4DFF",
+            secondaryPaintColorHex: "#7CFFCE",
+            styleGain: 11,
+            burstCountBonus: 1,
+            shake: 7
+        ),
+        StyleAwakeningDefinition(
+            id: "chaos_awake",
+            styleId: "chaos",
+            title: "CHAOS AWAKENING",
+            verdict: "MAKE IT LOUD",
+            awakeningAsset: "character_vhs_attack1",
+            paintColorHex: "#FFCC33",
+            secondaryPaintColorHex: "#FF1744",
+            styleGain: 5,
+            burstCountBonus: 3,
+            shake: 18
+        ),
+    ]
+}
+
+enum StyleAwakeningCatalog {
+    static var awakenings: [StyleAwakeningDefinition] {
+        let loaded = RemoteContentStore.shared.styleAwakeningDefinitions
+        return loaded.isEmpty ? StyleAwakeningDefinition.fallback : loaded
+    }
+
+    static func awakening(for style: CombatStyle) -> StyleAwakeningDefinition? {
+        awakenings.first { $0.style == style }
+    }
+}
+
 enum RunMode: String {
     case story
     case event
@@ -169,119 +288,198 @@ enum RunMode: String {
     case style
 }
 
-enum StyleRank: Equatable {
-    case pathetic
-    case savage
-    case brutal
-    case styleGod
+struct StyleRank: Equatable {
+    private let definition: StyleRankDefinition
 
     init(style: Int) {
-        switch style {
-        case 90...:
-            self = .styleGod
-        case 65...:
-            self = .brutal
-        case 35...:
-            self = .savage
-        default:
-            self = .pathetic
-        }
+        definition = Self.definition(forStyle: style)
     }
 
     init(score: Int) {
-        switch score {
-        case 3...:
-            self = .styleGod
-        case 2:
-            self = .brutal
-        case 1:
-            self = .savage
-        default:
-            self = .pathetic
-        }
+        definition = Self.definition(forScore: score)
+    }
+
+    private init(definition: StyleRankDefinition) {
+        self.definition = definition
     }
 
     var title: String {
-        switch self {
-        case .pathetic:
-            return "D"
-        case .savage:
-            return "SAVAGE"
-        case .brutal:
-            return "BRUTAL"
-        case .styleGod:
-            return "STYLE GOD"
-        }
+        definition.title
     }
 
     var verdict: String {
-        switch self {
-        case .pathetic:
-            return "PATHETIC"
-        case .savage:
-            return "IMPRESSIVE"
-        case .brutal:
-            return "BEAUTIFUL"
-        case .styleGod:
-            return "STYLE GOD"
-        }
+        definition.verdict
     }
 
     var color: Color {
-        switch self {
-        case .pathetic:
-            return .gray
-        case .savage:
-            return .red
-        case .brutal:
-            return .orange
-        case .styleGod:
-            return .cyan
-        }
+        definition.color
     }
 
     var playerTint: Color {
-        switch self {
-        case .pathetic:
-            return .cyan
-        case .savage:
-            return .red
-        case .brutal:
-            return .orange
-        case .styleGod:
-            return .white
-        }
+        definition.playerTint
     }
 
     var damage: Int {
-        switch self {
-        case .pathetic:
-            return 10
-        case .savage:
-            return 14
-        case .brutal:
-            return 18
-        case .styleGod:
-            return 26
-        }
+        definition.damage
     }
 
     var canFinish: Bool {
-        self == .brutal || self == .styleGod
+        definition.canFinish
     }
 
     var score: Int {
-        switch self {
-        case .pathetic:
-            return 0
-        case .savage:
-            return 1
-        case .brutal:
-            return 2
-        case .styleGod:
-            return 3
-        }
+        definition.score
     }
+
+    static var pathetic: StyleRank {
+        StyleRank(definition: definition(id: "d"))
+    }
+
+    static var savage: StyleRank {
+        StyleRank(definition: definition(id: "s"))
+    }
+
+    static var brutal: StyleRank {
+        StyleRank(definition: definition(id: "ss"))
+    }
+
+    static var styleGod: StyleRank {
+        StyleRank(definition: definition(id: "style_god"))
+    }
+
+    private static var definitions: [StyleRankDefinition] {
+        let ranks = RemoteContentStore.shared.gameConfig.styleRanks
+        return ranks.isEmpty ? StyleRankDefinition.fallback : ranks
+    }
+
+    private static func definition(forStyle style: Int) -> StyleRankDefinition {
+        definitions
+            .sorted { $0.minStyle < $1.minStyle }
+            .last { style >= $0.minStyle } ?? StyleRankDefinition.fallback[0]
+    }
+
+    private static func definition(forScore score: Int) -> StyleRankDefinition {
+        definitions
+            .sorted { $0.score < $1.score }
+            .last { score >= $0.score } ?? StyleRankDefinition.fallback[0]
+    }
+
+    private static func definition(id: String) -> StyleRankDefinition {
+        definitions.first { $0.id == id }
+            ?? StyleRankDefinition.fallback.first { $0.id == id }
+            ?? StyleRankDefinition.fallback[0]
+    }
+}
+
+struct StyleRankDefinition: Codable, Equatable, Identifiable {
+    let id: String
+    let title: String
+    let verdict: String
+    let minStyle: Int
+    let score: Int
+    let colorHex: String
+    let playerTintHex: String
+    let damage: Int
+    let canFinish: Bool
+
+    var color: Color {
+        Color(hex: colorHex)
+    }
+
+    var playerTint: Color {
+        Color(hex: playerTintHex)
+    }
+
+    static let fallback: [StyleRankDefinition] = [
+        StyleRankDefinition(
+            id: "d",
+            title: "D",
+            verdict: "PATHETIC",
+            minStyle: 0,
+            score: 0,
+            colorHex: "#8A8A8A",
+            playerTintHex: "#20D9FF",
+            damage: 10,
+            canFinish: false
+        ),
+        StyleRankDefinition(
+            id: "c",
+            title: "C",
+            verdict: "WARMING UP",
+            minStyle: 20,
+            score: 1,
+            colorHex: "#FFFFFF",
+            playerTintHex: "#FFFFFF",
+            damage: 12,
+            canFinish: false
+        ),
+        StyleRankDefinition(
+            id: "b",
+            title: "B",
+            verdict: "CLEAN",
+            minStyle: 35,
+            score: 2,
+            colorHex: "#7CFFCE",
+            playerTintHex: "#7CFFCE",
+            damage: 14,
+            canFinish: false
+        ),
+        StyleRankDefinition(
+            id: "a",
+            title: "A",
+            verdict: "SHARP",
+            minStyle: 50,
+            score: 3,
+            colorHex: "#20D9FF",
+            playerTintHex: "#20D9FF",
+            damage: 17,
+            canFinish: true
+        ),
+        StyleRankDefinition(
+            id: "s",
+            title: "S",
+            verdict: "SAVAGE",
+            minStyle: 65,
+            score: 4,
+            colorHex: "#FF1744",
+            playerTintHex: "#FF1744",
+            damage: 20,
+            canFinish: true
+        ),
+        StyleRankDefinition(
+            id: "ss",
+            title: "SS",
+            verdict: "BRUTAL",
+            minStyle: 78,
+            score: 5,
+            colorHex: "#FF9F1A",
+            playerTintHex: "#FF9F1A",
+            damage: 24,
+            canFinish: true
+        ),
+        StyleRankDefinition(
+            id: "sss",
+            title: "SSS",
+            verdict: "VIOLENCE HAS STYLE",
+            minStyle: 88,
+            score: 6,
+            colorHex: "#9B5CFF",
+            playerTintHex: "#FFFFFF",
+            damage: 30,
+            canFinish: true
+        ),
+        StyleRankDefinition(
+            id: "style_god",
+            title: "STYLE GOD",
+            verdict: "STYLE GOD",
+            minStyle: 96,
+            score: 7,
+            colorHex: "#20D9FF",
+            playerTintHex: "#FFFFFF",
+            damage: 38,
+            canFinish: true
+        ),
+    ]
 }
 
 enum CombatStyle: CaseIterable, Equatable {
@@ -291,6 +489,42 @@ enum CombatStyle: CaseIterable, Equatable {
     case blood
     case void
     case chaos
+
+    init?(remoteId: String) {
+        switch remoteId {
+        case "killer":
+            self = .killer
+        case "reaper":
+            self = .reaper
+        case "phantom":
+            self = .phantom
+        case "blood":
+            self = .blood
+        case "void":
+            self = .void
+        case "chaos":
+            self = .chaos
+        default:
+            return nil
+        }
+    }
+
+    var remoteId: String {
+        switch self {
+        case .killer:
+            return "killer"
+        case .reaper:
+            return "reaper"
+        case .phantom:
+            return "phantom"
+        case .blood:
+            return "blood"
+        case .void:
+            return "void"
+        case .chaos:
+            return "chaos"
+        }
+    }
 
     var title: String {
         switch self {
@@ -794,9 +1028,8 @@ struct EventDefinition: Codable, Equatable, Identifiable {
     }
 
     var isActive: Bool {
-        let parser = ISO8601DateFormatter()
-        guard let start = parser.date(from: startsAt),
-            let end = parser.date(from: endsAt)
+        guard let start = EventDateParser.date(from: startsAt),
+            let end = EventDateParser.date(from: endsAt)
         else {
             return false
         }
@@ -805,8 +1038,36 @@ struct EventDefinition: Codable, Equatable, Identifiable {
         return start <= now && now <= end
     }
 
+    var startsAtDate: Date? {
+        EventDateParser.date(from: startsAt)
+    }
+
+    var endsAtDate: Date? {
+        EventDateParser.date(from: endsAt)
+    }
+
+    var isUpcoming: Bool {
+        guard let start = startsAtDate else { return false }
+        return Date() < start
+    }
+
     func currencyReward(for rank: StyleRank) -> Int {
         currencyPerFinisher + (rank == .styleGod ? styleGodBonus : 0)
+    }
+}
+
+enum EventDateParser {
+    private static let germanDateTimeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "de_DE")
+        formatter.timeZone = TimeZone(identifier: "Europe/Berlin")
+        formatter.dateFormat = "dd.MM.yyyy HH:mm"
+        return formatter
+    }()
+
+    static func date(from value: String) -> Date? {
+        germanDateTimeFormatter.date(from: value)
+            ?? ISO8601DateFormatter().date(from: value)
     }
 }
 
@@ -835,6 +1096,18 @@ struct EventCatalog {
 
     var activeEvent: EventDefinition? {
         events.first { $0.isActive }
+    }
+
+    var visibleEvents: [EventDefinition] {
+        events.sorted {
+            ($0.startsAtDate ?? .distantFuture)
+                < ($1.startsAtDate ?? .distantFuture)
+        }
+    }
+
+    func event(id: String?) -> EventDefinition? {
+        guard let id else { return nil }
+        return events.first { $0.id == id }
     }
 }
 
@@ -1081,6 +1354,7 @@ struct PremiumStoreCatalog {
 struct GameConfig: Codable, Equatable {
     let combat: CombatConfig
     let run: RunConfig
+    let styleRanks: [StyleRankDefinition]
 
     static let fallback = GameConfig(
         combat: CombatConfig(
@@ -1101,8 +1375,36 @@ struct GameConfig: Codable, Equatable {
             bossEveryXFights: 5,
             rewardChoices: 3,
             maxBloodCostReduction: 3
-        )
+        ),
+        styleRanks: StyleRankDefinition.fallback
     )
+
+    enum CodingKeys: String, CodingKey {
+        case combat
+        case run
+        case styleRanks
+    }
+
+    init(
+        combat: CombatConfig,
+        run: RunConfig,
+        styleRanks: [StyleRankDefinition]
+    ) {
+        self.combat = combat
+        self.run = run
+        self.styleRanks = styleRanks
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        combat = try container.decode(CombatConfig.self, forKey: .combat)
+        run = try container.decode(RunConfig.self, forKey: .run)
+        styleRanks =
+            try container.decodeIfPresent(
+                [StyleRankDefinition].self,
+                forKey: .styleRanks
+            ) ?? StyleRankDefinition.fallback
+    }
 }
 
 struct CombatConfig: Codable, Equatable {

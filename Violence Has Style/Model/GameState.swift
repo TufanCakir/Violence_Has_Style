@@ -43,10 +43,14 @@ final class GameState {
     var lastAttackFrame = ""
     var bossVerdict = "PATHETIC"
     var activeStyle: CombatStyle = .killer
+    var activeAwakening: StyleAwakeningDefinition? =
+        StyleAwakeningCatalog.awakening(for: .killer)
+    var selectedPaintFxId = ""
     var currentEnemy: EnemyType = .grunt
     var currentLevel: LevelDefinition = LevelCatalog.shared.level(for: 1)
     var runMode: RunMode = .style
     var storyChapterId: String?
+    var eventId: String?
     var isEnemyBroken = false
     var isChoosingReward = false
     var isGameOver = false
@@ -100,6 +104,7 @@ final class GameState {
         addStyle(for: nextFrame)
         addPaintStroke(for: attackFrameIndex)
         applyStyleCost()
+        bossVerdict = attackTitle(for: attackFrameIndex)
 
         if attackFrameIndex == playerAttackFrames.count - 1 {
             enemyHealth = max(
@@ -129,9 +134,26 @@ final class GameState {
         guard abs(width) > 28 else { return [] }
 
         activeStyle = width > 0 ? activeStyle.previous : activeStyle.next
-        bossVerdict = activeStyle.verdict
+        activeAwakening = StyleAwakeningCatalog.awakening(for: activeStyle)
+        bossVerdict = activeAwakening?.verdict ?? activeStyle.verdict
+        if let awakeningAsset = activeAwakening?.awakeningAsset,
+            !awakeningAsset.isEmpty
+        {
+            playerFrame = awakeningAsset
+        }
+        style = min(
+            maxStyle,
+            style + (activeAwakening?.styleGain ?? activeStyle.styleGain)
+        )
+        updateBestStyleRank()
         addStyleShiftStroke()
-        return tickEnemyAction()
+
+        let shake =
+            activeAwakening.map { CGFloat($0.shake) }
+            ?? activeStyle.impactShake
+        var events: [GameEvent] = [.screenShake(shake)]
+        events.append(contentsOf: tickEnemyAction())
+        return events
     }
 
     func chooseReward(_ reward: RunReward) -> [GameEvent] {
@@ -188,6 +210,7 @@ final class GameState {
         lastAttackFrame = ""
         bossVerdict = "PATHETIC"
         activeStyle = .killer
+        activeAwakening = StyleAwakeningCatalog.awakening(for: activeStyle)
         currentEnemy = .grunt
         currentLevel = LevelCatalog.shared.level(for: 1)
         isEnemyBroken = false
@@ -198,10 +221,16 @@ final class GameState {
         paintStrokes.removeAll()
     }
 
-    func startRun(mode: RunMode, storyChapter: StoryChapter? = nil) {
+    func startRun(
+        mode: RunMode,
+        storyChapter: StoryChapter? = nil,
+        event: EventDefinition? = nil
+    ) {
         runMode = mode
         storyChapterId = storyChapter?.id
+        eventId = event?.id
         restartRun()
+        eventId = event?.id
 
         if let storyChapter {
             fightLevel = max(1, storyChapter.startFight)
@@ -265,7 +294,9 @@ final class GameState {
             .finisherImpact,
         ]
 
-        if runMode == .event, let activeEvent = EventCatalog.shared.activeEvent
+        if runMode == .event,
+            let activeEvent = EventCatalog.shared.event(id: eventId)
+                ?? EventCatalog.shared.activeEvent
         {
             events.append(
                 .awardEventCurrency(
@@ -291,6 +322,10 @@ final class GameState {
         style = min(maxStyle, max(0, style + scaledGain))
         updateBestStyleRank()
         lastAttackFrame = frame
+    }
+
+    private func attackTitle(for index: Int) -> String {
+        "\(activeStyle.verb) \(index + 1)"
     }
 
     private func applyStyleCost() {
@@ -326,14 +361,16 @@ final class GameState {
             addBloodPaint(for: index)
         case .void:
             addPhantomPaint(for: index)
-            addStyleGodCrossStroke(color: activeStyle.tint.opacity(0.8))
+            addStyleGodCrossStroke(
+                color: activeSecondaryPaintColor.opacity(0.8)
+            )
         case .chaos:
             addBloodPaint(for: index)
             addReaperPaint(for: index)
         }
 
         if styleRank == .styleGod {
-            addStyleGodCrossStroke(color: activeStyle.tint)
+            addStyleGodCrossStroke(color: activeSecondaryPaintColor)
         }
 
         trimPaintStrokes()
@@ -341,7 +378,7 @@ final class GameState {
 
     private func addKillerPaint(for index: Int) {
 
-        for _ in 0..<activeStyle.paintBurstCount {
+        for _ in 0..<activePaintBurstCount {
 
             let fromLeft = Bool.random()
 
@@ -363,7 +400,7 @@ final class GameState {
                 endY: endY,
                 lineWidth: CGFloat(8 + styleRank.score * 4),
                 opacity: 0.62 + Double(styleRank.score) * 0.08,
-                color: activeStyle.paintColor
+                color: activePaintColor
             )
 
             paintStrokes.append(stroke)
@@ -388,14 +425,14 @@ final class GameState {
                     + fightLevel * 4
             ),
             opacity: 0.78 + Double(styleRank.score) * 0.05,
-            color: activeStyle.paintColor
+            color: activePaintColor
         )
         paintStrokes.append(stroke)
     }
 
     private func addPhantomPaint(for index: Int) {
 
-        for _ in 0..<activeStyle.paintBurstCount {
+        for _ in 0..<activePaintBurstCount {
 
             let vertical = Bool.random()
 
@@ -417,7 +454,7 @@ final class GameState {
                     endY: 1.1,
                     lineWidth: CGFloat(7 + styleRank.score * 3),
                     opacity: 0.5,
-                    color: activeStyle.paintColor
+                    color: activePaintColor
                 )
 
             } else {
@@ -436,7 +473,7 @@ final class GameState {
                     endY: y,
                     lineWidth: CGFloat(7 + styleRank.score * 3),
                     opacity: 0.5,
-                    color: activeStyle.paintColor
+                    color: activePaintColor
                 )
             }
 
@@ -447,9 +484,9 @@ final class GameState {
     private func addBloodPaint(for index: Int) {
         let centerX: CGFloat = 0.64
         let centerY: CGFloat = 0.42
-        for burst in 0..<activeStyle.paintBurstCount {
+        for burst in 0..<activePaintBurstCount {
             let angle =
-                CGFloat(burst) / CGFloat(activeStyle.paintBurstCount) * .pi * 2
+                CGFloat(burst) / CGFloat(activePaintBurstCount) * .pi * 2
             let radius = CGFloat(
                 0.18
                     + Double(styleRank.score) * 0.08
@@ -467,7 +504,7 @@ final class GameState {
                 endY: centerY + sin(angle) * radius * 1.45,
                 lineWidth: CGFloat(12 + styleRank.score * 6),
                 opacity: 0.66 + Double(styleRank.score) * 0.08,
-                color: activeStyle.paintColor
+                color: activePaintColor
             )
             paintStrokes.append(stroke)
         }
@@ -518,9 +555,9 @@ final class GameState {
             control2Y: 0.18,
             endX: 0.82,
             endY: 0.5,
-            lineWidth: 18,
+            lineWidth: 18 + CGFloat(activeAwakening?.burstCountBonus ?? 0) * 4,
             opacity: 0.68,
-            color: activeStyle.tint
+            color: activeSecondaryPaintColor
         )
 
         paintStrokes.append(stroke)
@@ -544,6 +581,35 @@ final class GameState {
         activeStyle == .reaper || activeStyle == .chaos ? reaperDamageBonus : 0
     }
 
+    private var activePaintColor: Color {
+        if let paintFxColor {
+            return paintFxColor
+        }
+
+        return activeAwakening?.paintColor ?? activeStyle.paintColor
+    }
+
+    private var activeSecondaryPaintColor: Color {
+        activeAwakening?.secondaryPaintColor ?? activeStyle.tint
+    }
+
+    private var activePaintBurstCount: Int {
+        let paintFxBonus = selectedPaintFxId.isEmpty ? 0 : 1
+        return max(
+            1,
+            activeStyle.paintBurstCount
+                + (activeAwakening?.burstCountBonus ?? 0) + paintFxBonus
+        )
+    }
+
+    private var paintFxColor: Color? {
+        guard !selectedPaintFxId.isEmpty else { return nil }
+
+        return PremiumStoreCatalog.shared.products.first {
+            $0.unlockType == "paintFx" && $0.unlockValue == selectedPaintFxId
+        }?.color
+    }
+
     private var nextEnemyHealth: Int {
         RemoteContentStore.shared.gameConfig.combat.baseEnemyHealth + fightLevel
             * RemoteContentStore.shared.gameConfig.combat.enemyHealthPerFight
@@ -564,7 +630,7 @@ final class GameState {
         }
 
         if index == 2 {
-            return activeStyle.tint.opacity(0.82)
+            return activeSecondaryPaintColor.opacity(0.82)
         }
 
         if index == 1 && styleRank.score >= 2 {

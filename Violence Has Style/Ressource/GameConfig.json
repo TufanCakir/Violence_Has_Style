@@ -17,5 +17,95 @@
         "bossEveryXFights": 5,
         "rewardChoices": 3,
         "maxBloodCostReduction": 3
-    }
+    },
+    "styleRanks": [
+        {
+            "id": "d",
+            "title": "D",
+            "verdict": "PATHETIC",
+            "minStyle": 0,
+            "score": 0,
+            "colorHex": "#8A8A8A",
+            "playerTintHex": "#20D9FF",
+            "damage": 10,
+            "canFinish": false
+        },
+        {
+            "id": "c",
+            "title": "C",
+            "verdict": "WARMING UP",
+            "minStyle": 20,
+            "score": 1,
+            "colorHex": "#FFFFFF",
+            "playerTintHex": "#FFFFFF",
+            "damage": 12,
+            "canFinish": false
+        },
+        {
+            "id": "b",
+            "title": "B",
+            "verdict": "CLEAN",
+            "minStyle": 35,
+            "score": 2,
+            "colorHex": "#7CFFCE",
+            "playerTintHex": "#7CFFCE",
+            "damage": 14,
+            "canFinish": false
+        },
+        {
+            "id": "a",
+            "title": "A",
+            "verdict": "SHARP",
+            "minStyle": 50,
+            "score": 3,
+            "colorHex": "#20D9FF",
+            "playerTintHex": "#20D9FF",
+            "damage": 17,
+            "canFinish": true
+        },
+        {
+            "id": "s",
+            "title": "S",
+            "verdict": "SAVAGE",
+            "minStyle": 65,
+            "score": 4,
+            "colorHex": "#FF1744",
+            "playerTintHex": "#FF1744",
+            "damage": 20,
+            "canFinish": true
+        },
+        {
+            "id": "ss",
+            "title": "SS",
+            "verdict": "BRUTAL",
+            "minStyle": 78,
+            "score": 5,
+            "colorHex": "#FF9F1A",
+            "playerTintHex": "#FF9F1A",
+            "damage": 24,
+            "canFinish": true
+        },
+        {
+            "id": "sss",
+            "title": "SSS",
+            "verdict": "VIOLENCE HAS STYLE",
+            "minStyle": 88,
+            "score": 6,
+            "colorHex": "#9B5CFF",
+            "playerTintHex": "#FFFFFF",
+            "damage": 30,
+            "canFinish": true
+        },
+        {
+            "id": "style_god",
+            "title": "STYLE GOD",
+            "verdict": "STYLE GOD",
+            "minStyle": 96,
+            "score": 7,
+            "colorHex": "#20D9FF",
+            "playerTintHex": "#FFFFFF",
+            "damage": 38,
+            "canFinish": true
+        }
+    ]
 }

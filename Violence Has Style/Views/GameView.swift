@@ -27,14 +27,20 @@ struct GameView: View {
     @State private var isRemoteContentLoading = true
     @State private var isRemoteContentReady = false
     @State private var remoteContentStatus = "CONNECTING TO STYLE SERVER"
+    @State private var selectedEventId: String?
     @AppStorage("settingsScreenShakeEnabled") private var isScreenShakeEnabled =
         true
     @AppStorage("settingsFlashFXEnabled") private var isFlashFXEnabled = true
     @AppStorage("settingsMusicEnabled") private var isMusicEnabled = true
     @AppStorage("settingsMusicVolume") private var musicVolume = 0.72
+    @AppStorage("settingsSelectedMusicTrackId") private
+        var selectedMusicTrackId =
+        ""
+    @AppStorage("settingsSelectedPaintFxId") private var selectedPaintFxId = ""
 
     private var activeEvent: EventDefinition? {
-        EventCatalog.shared.activeEvent
+        EventCatalog.shared.event(id: selectedEventId)
+            ?? EventCatalog.shared.activeEvent
     }
 
     private var progress: PlayerProgress {
@@ -80,6 +86,7 @@ struct GameView: View {
             theme: ThemeManager.shared.currentTheme,
             styleRank: headerStyleRank,
             currencies: headerCurrencies,
+            currencyInfoRows: currencyInfoRows,
             footerTabs: RemoteContentStore.shared.uiConfig.footerTabs,
             selectedScreen: currentScreen,
             selectScreen: selectFooterScreen,
@@ -102,6 +109,7 @@ struct GameView: View {
         )
         .onAppear {
             styleGodPulse = true
+            game.selectedPaintFxId = selectedPaintFxId
             MusicManager.shared.configure(
                 isEnabled: isMusicEnabled,
                 volume: musicVolume
@@ -138,6 +146,12 @@ struct GameView: View {
                 isEnabled: isMusicEnabled,
                 volume: volume
             )
+        }
+        .onChange(of: selectedMusicTrackId) { _, _ in
+            startMusicPlaylist(mode: currentScreen == .run ? game.runMode : nil)
+        }
+        .onChange(of: selectedPaintFxId) { _, value in
+            game.selectedPaintFxId = value
         }
         .onAppear {
 
@@ -185,10 +199,20 @@ struct GameView: View {
             )
         case .eventMode:
             EventModeView(
-                event: activeEvent,
-                balance: activeEventBalance,
-                startEventRun: { startRun(mode: .event) },
-                openShop: { currentScreen = .eventShop },
+                events: EventCatalog.shared.visibleEvents,
+                selectedEventId: activeEvent?.id,
+                balanceForEvent: eventBalance,
+                selectEvent: { event in
+                    selectedEventId = event.id
+                },
+                startEventRun: { event in
+                    selectedEventId = event.id
+                    startRun(mode: .event, event: event)
+                },
+                openShop: { event in
+                    selectedEventId = event.id
+                    currentScreen = .eventShop
+                },
                 back: { currentScreen = .menu }
             )
         case .endlessMode:
@@ -229,7 +253,7 @@ struct GameView: View {
                     wallet(for: $0.currencyId).purchasedItemIds
                 } ?? [],
                 buyItem: buyEventItem,
-                back: { currentScreen = .menu }
+                back: { currentScreen = .eventMode }
             )
         case .stylePasses:
             StylePassView(
@@ -255,6 +279,8 @@ struct GameView: View {
                 isMusicEnabled: $isMusicEnabled,
                 musicVolume: $musicVolume,
                 openThemeSelection: { currentScreen = .themeSelection },
+                openMusicSelection: { currentScreen = .musicSelection },
+                openPaintSelection: { currentScreen = .paintSelection },
                 resetGalleryData: resetGalleryData,
                 back: { currentScreen = .menu }
             )
@@ -265,6 +291,29 @@ struct GameView: View {
                 ownedThemeIds: progress.ownedThemeIds,
                 selectTheme: { theme in
                     ThemeManager.shared.selectTheme(theme)
+                },
+                back: { currentScreen = .settings }
+            )
+        case .musicSelection:
+            MusicSelectionView(
+                tracks: MusicCatalog.shared.tracks,
+                selectedTrackId: selectedMusicTrackId,
+                ownedMusicPackIds: progress.ownedMusicPackIds,
+                selectTrack: { trackId in
+                    selectedMusicTrackId = trackId
+                },
+                back: { currentScreen = .settings }
+            )
+        case .paintSelection:
+            PaintSelectionView(
+                products: PremiumStoreCatalog.shared.products.filter {
+                    $0.unlockType == "paintFx"
+                },
+                selectedPaintFxId: selectedPaintFxId,
+                ownedPaintFxIds: progress.ownedPaintFxIds,
+                selectPaintFx: { paintFxId in
+                    selectedPaintFxId = paintFxId
+                    game.selectedPaintFxId = paintFxId
                 },
                 back: { currentScreen = .settings }
             )
@@ -330,7 +379,11 @@ struct GameView: View {
     private var activeEventBalance: Int {
         guard let activeEvent else { return 0 }
 
-        return wallet(for: activeEvent.currencyId).balance
+        return eventBalance(for: activeEvent)
+    }
+
+    private func eventBalance(for event: EventDefinition) -> Int {
+        wallet(for: event.currencyId).balance
     }
 
     private var headerStyleRank: StyleRank {
@@ -378,6 +431,22 @@ struct GameView: View {
             default:
                 return nil
             }
+        }
+    }
+
+    private var currencyInfoRows: [HeaderCurrencyDisplay] {
+        headerCurrencies + eventCurrencyInfoRows
+    }
+
+    private var eventCurrencyInfoRows: [HeaderCurrencyDisplay] {
+        EventCatalog.shared.visibleEvents.map { event in
+            HeaderCurrencyDisplay(
+                id: event.currencyId,
+                title: event.currencyTitle,
+                symbol: event.currencySymbol ?? "sparkles",
+                value: eventBalance(for: event),
+                color: event.themeColor
+            )
         }
     }
 
@@ -446,8 +515,12 @@ struct GameView: View {
         brokenPulse = false
     }
 
-    private func startRun(mode: RunMode, storyChapter: StoryChapter? = nil) {
-        game.startRun(mode: mode, storyChapter: storyChapter)
+    private func startRun(
+        mode: RunMode,
+        storyChapter: StoryChapter? = nil,
+        event: EventDefinition? = nil
+    ) {
+        game.startRun(mode: mode, storyChapter: storyChapter, event: event)
         screenShakeOffset = .zero
         damageFlashOpacity = 0
         finisherFlashOpacity = 0
@@ -521,6 +594,14 @@ struct GameView: View {
             !progress.ownedThemeIds.contains(reward.rewardValue)
         {
             progress.ownedThemeIds.append(reward.rewardValue)
+        } else if reward.rewardType == "paintFx",
+            !progress.ownedPaintFxIds.contains(reward.rewardValue)
+        {
+            progress.ownedPaintFxIds.append(reward.rewardValue)
+        } else if reward.rewardType == "title",
+            !progress.ownedTitleIds.contains(reward.rewardValue)
+        {
+            progress.ownedTitleIds.append(reward.rewardValue)
         }
 
         try? modelContext.save()
@@ -545,8 +626,38 @@ struct GameView: View {
 
         wallet.balance -= item.cost
         wallet.purchasedItemIds.append(item.id)
+        applyEventShopUnlock(item)
 
         try? modelContext.save()
+    }
+
+    private func applyEventShopUnlock(_ item: EventShopItem) {
+        switch item.kind {
+        case "paint_cosmetic":
+            appendUnique(item.value, to: &progress.ownedPaintFxIds)
+        case "title":
+            appendUnique(item.value, to: &progress.ownedTitleIds)
+        case "style_cosmetic":
+            appendUnique(item.value, to: &progress.ownedTitleIds)
+        case "currency":
+            applyCurrencyBundle(item.value)
+        default:
+            break
+        }
+    }
+
+    private func applyCurrencyBundle(_ value: String) {
+        let parts = value.split(separator: "_")
+        guard parts.count == 2, let amount = Int(parts[1]) else { return }
+
+        switch parts[0] {
+        case "coins":
+            progress.coins += amount
+        case "crystals":
+            progress.crystals += amount
+        default:
+            break
+        }
     }
 
     private func addEventCurrency(
@@ -747,7 +858,8 @@ struct GameView: View {
             mode: mode,
             isEnabled: isMusicEnabled,
             volume: musicVolume,
-            ownedUnlockIds: progress.ownedMusicPackIds
+            ownedUnlockIds: progress.ownedMusicPackIds,
+            preferredTrackId: selectedMusicTrackId
         )
     }
 
