@@ -1,0 +1,62 @@
+[
+    {
+        "id": "welcome_style_gift",
+        "title": "WELCOME GIFT",
+        "message": "A starter gift for new stylists.",
+        "startsAt": null,
+        "endsAt": null,
+        "themeColorHex": "#FF1744",
+        "rewards": [
+            {
+                "id": "welcome_coins",
+                "title": "COINS",
+                "description": "Starter coins",
+                "rewardType": "coins",
+                "rewardValue": "coins",
+                "amount": 500,
+                "colorHex": "#FFCC33",
+                "symbol": "circle.hexagongrid.fill"
+            },
+            {
+                "id": "welcome_style_points",
+                "title": "STYLE POINTS",
+                "description": "Starter Style Pass points",
+                "rewardType": "stylePassPoints",
+                "rewardValue": "stylePassPoints",
+                "amount": 120,
+                "colorHex": "#FF1744",
+                "symbol": "bolt.fill"
+            }
+        ]
+    },
+    {
+        "id": "launch_gift",
+        "title": "LAUNCH GIFT",
+        "message": "Limited launch gift for early players.",
+        "startsAt": "11.06.2026 00:00",
+        "endsAt": "30.06.2026 23:59",
+        "themeColorHex": "#FFCC33",
+        "rewards": [
+            {
+                "id": "launch_crystals",
+                "title": "CRYSTALS",
+                "description": "Launch crystals",
+                "rewardType": "crystals",
+                "rewardValue": "crystals",
+                "amount": 25,
+                "colorHex": "#7CFFCE",
+                "symbol": "diamond.fill"
+            },
+            {
+                "id": "launch_title",
+                "title": "LAUNCH STYLIST",
+                "description": "Limited title",
+                "rewardType": "title",
+                "rewardValue": "launch_stylist",
+                "amount": 1,
+                "colorHex": "#FFFFFF",
+                "symbol": "crown.fill"
+            }
+        ]
+    }
+]

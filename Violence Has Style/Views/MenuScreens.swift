@@ -211,6 +211,147 @@ struct OnlineRequiredView: View {
     }
 }
 
+struct RemoteLoadingView: View {
+    let isLoading: Bool
+    let status: String
+    let progress: Double
+    let loadedItems: Int
+    let totalItems: Int
+    let downloadedBytes: Int
+    let estimatedTotalBytes: Int
+    let retry: () -> Void
+
+    var body: some View {
+        ZStack {
+            ThemeBackgroundView()
+
+            VStack(spacing: 18) {
+                Spacer()
+
+                VStack(spacing: 0) {
+                    Text("REMOTE")
+                        .font(
+                            .system(size: 40, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(.white)
+
+                    Text("STYLE LOAD")
+                        .font(
+                            .system(size: 38, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(
+                            ThemeManager.shared.currentTheme.primaryColor
+                        )
+                }
+
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text(
+                            isLoading
+                                ? "DOWNLOADING GAME DATA" : "ONLINE REQUIRED"
+                        )
+                        .font(
+                            .system(
+                                size: 13,
+                                weight: .black,
+                                design: .monospaced
+                            )
+                        )
+                        .foregroundStyle(.white.opacity(0.78))
+
+                        Spacer()
+
+                        Text("\(Int(progress * 100))%")
+                            .font(
+                                .system(
+                                    size: 13,
+                                    weight: .black,
+                                    design: .monospaced
+                                )
+                            )
+                            .foregroundStyle(
+                                ThemeManager.shared.currentTheme.accentColor
+                            )
+                    }
+
+                    ProgressView(value: progress)
+                        .tint(ThemeManager.shared.currentTheme.primaryColor)
+
+                    HStack {
+                        Text("\(loadedItems)/\(max(1, totalItems)) FILES")
+                        Spacer()
+                        Text(
+                            "\(megabytes(downloadedBytes)) / \(megabytes(estimatedTotalBytes)) MB"
+                        )
+                    }
+                    .font(
+                        .system(size: 10, weight: .black, design: .monospaced)
+                    )
+                    .foregroundStyle(.white.opacity(0.56))
+
+                    Text(status)
+                        .font(
+                            .system(
+                                size: 10,
+                                weight: .black,
+                                design: .monospaced
+                            )
+                        )
+                        .foregroundStyle(
+                            ThemeManager.shared.currentTheme.secondaryColor
+                        )
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.7)
+
+                    Text(
+                        "Events, themes, music, characters and shop data are loaded from the remote server before gameplay starts."
+                    )
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.62))
+                    .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(18)
+                .background(
+                    ThemeManager.shared.currentTheme.panelColor.opacity(0.66)
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(
+                            ThemeManager.shared.currentTheme.primaryColor
+                                .opacity(0.46),
+                            lineWidth: 1
+                        )
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                if !isLoading {
+                    Button(action: retry) {
+                        Text("RETRY DOWNLOAD")
+                            .font(
+                                .system(
+                                    size: 15,
+                                    weight: .black,
+                                    design: .rounded
+                                )
+                            )
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(ThemeManager.shared.currentTheme.primaryColor)
+                }
+
+                Spacer()
+            }
+            .padding(28)
+        }
+    }
+
+    private func megabytes(_ bytes: Int) -> String {
+        String(format: "%.1f", Double(bytes) / 1_000_000)
+    }
+}
+
 struct OfflineView: View {
     var body: some View {
         ZStack {
@@ -250,6 +391,7 @@ struct MainMenuView: View {
     let openStyleMode: () -> Void
     let openGallery: () -> Void
     let openStylePasses: () -> Void
+    let openGiftBox: () -> Void
     let openSettings: () -> Void
 
     var body: some View {
@@ -306,6 +448,11 @@ struct MainMenuView: View {
                         title: "STYLE PASS",
                         color: .yellow,
                         action: openStylePasses
+                    )
+                    MenuActionButton(
+                        title: "GIFT BOX",
+                        color: .mint,
+                        action: openGiftBox
                     )
                     MenuActionButton(
                         title: "SETTINGS",
@@ -803,7 +950,8 @@ private struct EventCountdownView: View {
     }
 
     private var countdownText: String {
-        let targetDate = event.isUpcoming ? event.startsAtDate : event.endsAtDate
+        let targetDate =
+            event.isUpcoming ? event.startsAtDate : event.endsAtDate
         guard let targetDate else { return event.endsAt }
 
         let remaining = max(0, Int(targetDate.timeIntervalSince(Date())))

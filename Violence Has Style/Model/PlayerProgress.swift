@@ -27,6 +27,9 @@ final class PlayerProgress {
     var ownedPaintFxIds: [String] = []
     var ownedTitleIds: [String] = []
     var ownedPremiumPassIds: [String] = []
+    var claimedGiftIds: [String] = []
+    var claimedLoginRewardKeys: [String] = []
+    var dailyLoginStreaks: [String] = []
 
     init() {}
 }

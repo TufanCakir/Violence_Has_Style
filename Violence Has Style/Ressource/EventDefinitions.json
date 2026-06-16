@@ -171,5 +171,128 @@
                 "colorHex": "#20D9FF"
             }
         ]
+    },
+    {
+        "id": "launch_event",
+        "title": "LAUNCH EVENT",
+        "startsAt": "01.05.2026 00:00",
+        "endsAt": "01.07.2026 00:00",
+        "currencyId": "launch_tokens",
+        "currencyTitle": "LAUNCH TOKENS",
+        "currencySymbol": "gift.fill",
+        "themeColorHex": "#FFCC33",
+        "currencyPerFinisher": 20,
+        "styleGodBonus": 20,
+        "shopItems": [
+            {
+                "id": "launch_red_paint",
+                "title": "LAUNCH RED PAINT",
+                "description": "Limited launch paint FX",
+                "cost": 60,
+                "kind": "paint_cosmetic",
+                "value": "launch_red_paint",
+                "colorHex": "#FF1744"
+            },
+            {
+                "id": "launch_stylist_title",
+                "title": "LAUNCH STYLIST",
+                "description": "Limited launch title",
+                "cost": 90,
+                "kind": "title",
+                "value": "launch_stylist",
+                "colorHex": "#FFFFFF"
+            },
+            {
+                "id": "launch_crystal_pack",
+                "title": "LAUNCH CRYSTALS",
+                "description": "Launch crystal bundle",
+                "cost": 120,
+                "kind": "currency",
+                "value": "crystals_75",
+                "colorHex": "#20D9FF"
+            }
+        ]
+    },
+    {
+        "id": "style_festival",
+        "title": "STYLE FESTIVAL",
+        "startsAt": "01.05.2026 00:00",
+        "endsAt": "01.07.2026 00:00",
+        "currencyId": "style_tickets",
+        "currencyTitle": "STYLE TICKETS",
+        "currencySymbol": "ticket.fill",
+        "themeColorHex": "#7CFFCE",
+        "currencyPerFinisher": 18,
+        "styleGodBonus": 18,
+        "shopItems": [
+            {
+                "id": "festival_theme_ticket",
+                "title": "FESTIVAL THEME",
+                "description": "Green cyan festival background theme",
+                "cost": 140,
+                "kind": "theme",
+                "value": "style_festival_theme",
+                "colorHex": "#7CFFCE"
+            },
+            {
+                "id": "festival_paint_fx",
+                "title": "FESTIVAL PAINT",
+                "description": "Bright festival paint FX",
+                "cost": 80,
+                "kind": "paint_cosmetic",
+                "value": "festival_paint",
+                "colorHex": "#7CFFCE"
+            },
+            {
+                "id": "festival_coin_box",
+                "title": "FESTIVAL COINS",
+                "description": "Farmable coin reward",
+                "cost": 95,
+                "kind": "currency",
+                "value": "coins_1200",
+                "colorHex": "#FFCC33"
+            }
+        ]
+    },
+    {
+        "id": "freeze_frame",
+        "title": "FREEZE FRAME",
+        "startsAt": "01.05.2026 00:00",
+        "endsAt": "01.07.2026 00:00",
+        "currencyId": "frame_shards",
+        "currencyTitle": "FRAME SHARDS",
+        "currencySymbol": "pause.circle.fill",
+        "themeColorHex": "#FFFFFF",
+        "currencyPerFinisher": 15,
+        "styleGodBonus": 25,
+        "shopItems": [
+            {
+                "id": "freeze_noir_theme",
+                "title": "FREEZE NOIR THEME",
+                "description": "Stop motion inspired theme",
+                "cost": 150,
+                "kind": "theme",
+                "value": "freeze_noir_theme",
+                "colorHex": "#FFFFFF"
+            },
+            {
+                "id": "frame_cut_paint",
+                "title": "FRAME CUT PAINT",
+                "description": "White cut paint FX",
+                "cost": 75,
+                "kind": "paint_cosmetic",
+                "value": "frame_cut_paint",
+                "colorHex": "#FFFFFF"
+            },
+            {
+                "id": "freeze_crystal_cache",
+                "title": "FREEZE CRYSTALS",
+                "description": "Farmable crystal cache",
+                "cost": 130,
+                "kind": "currency",
+                "value": "crystals_90",
+                "colorHex": "#20D9FF"
+            }
+        ]
     }
 ]

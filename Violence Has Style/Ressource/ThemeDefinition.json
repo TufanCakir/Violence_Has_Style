@@ -70,5 +70,53 @@
         "textHex": "#FFFFFF",
         "symbol": "star.circle.fill",
         "isStylePassExclusive": true
+    },
+    {
+        "id": "launch_theme",
+        "title": "LAUNCH THEME",
+        "primaryHex": "#FFCC33",
+        "secondaryHex": "#FF1744",
+        "accentHex": "#FFFFFF",
+        "backgroundHex": "#080604",
+        "panelHex": "#1A1206",
+        "textHex": "#FFFFFF",
+        "symbol": "gift.fill",
+        "isStylePassExclusive": true
+    },
+    {
+        "id": "launch_noir",
+        "title": "LAUNCH NOIR",
+        "primaryHex": "#FFFFFF",
+        "secondaryHex": "#FF1744",
+        "accentHex": "#FFCC33",
+        "backgroundHex": "#040404",
+        "panelHex": "#101010",
+        "textHex": "#FFFFFF",
+        "symbol": "pause.circle.fill",
+        "isStylePassExclusive": true
+    },
+    {
+        "id": "style_festival_theme",
+        "title": "STYLE FESTIVAL",
+        "primaryHex": "#7CFFCE",
+        "secondaryHex": "#20D9FF",
+        "accentHex": "#FFFFFF",
+        "backgroundHex": "#020806",
+        "panelHex": "#071A15",
+        "textHex": "#FFFFFF",
+        "symbol": "sparkles",
+        "isStylePassExclusive": true
+    },
+    {
+        "id": "freeze_noir_theme",
+        "title": "FREEZE NOIR",
+        "primaryHex": "#FFFFFF",
+        "secondaryHex": "#20D9FF",
+        "accentHex": "#FF1744",
+        "backgroundHex": "#030507",
+        "panelHex": "#0B1117",
+        "textHex": "#FFFFFF",
+        "symbol": "pause.circle.fill",
+        "isStylePassExclusive": true
     }
 ]

@@ -136,5 +136,94 @@
                 "isPremium": false
             }
         ]
+    },
+    {
+        "id": "launch_pass_01",
+        "title": "LAUNCH PASS",
+        "startsAt": "2026-06-11T00:00:00Z",
+        "endsAt": "2026-06-30T23:59:00Z",
+        "themeColorHex": "#FFCC33",
+        "rewards": [
+            {
+                "id": "launch_pass_coins_01",
+                "title": "LAUNCH COINS",
+                "description": "Free launch coins",
+                "requiredPoints": 40,
+                "rewardType": "coins",
+                "rewardValue": "600",
+                "colorHex": "#FFCC33",
+                "isPremium": false
+            },
+            {
+                "id": "launch_pass_style_points_01",
+                "title": "STYLE BOOST",
+                "description": "Free Style Pass points",
+                "requiredPoints": 90,
+                "rewardType": "stylePassPoints",
+                "rewardValue": "150",
+                "colorHex": "#FF1744",
+                "isPremium": false
+            },
+            {
+                "id": "launch_pass_paint_01",
+                "title": "LAUNCH PAINT",
+                "description": "Limited launch paint FX",
+                "requiredPoints": 150,
+                "rewardType": "paintFx",
+                "rewardValue": "launch_red_paint",
+                "colorHex": "#FF1744",
+                "isPremium": false
+            },
+            {
+                "id": "launch_pass_paint_02",
+                "title": "GOLD IMPACT PAINT",
+                "description": "Free launch gold paint FX",
+                "requiredPoints": 190,
+                "rewardType": "paintFx",
+                "rewardValue": "launch_gold_paint",
+                "colorHex": "#FFCC33",
+                "isPremium": false
+            },
+            {
+                "id": "launch_pass_theme_free_01",
+                "title": "LAUNCH NOIR THEME",
+                "description": "Free launch background theme",
+                "requiredPoints": 220,
+                "rewardType": "theme",
+                "rewardValue": "launch_noir",
+                "colorHex": "#FFFFFF",
+                "isPremium": false
+            },
+            {
+                "id": "launch_pass_paint_03",
+                "title": "CYAN IMPACT PAINT",
+                "description": "Free launch cyan paint FX",
+                "requiredPoints": 240,
+                "rewardType": "paintFx",
+                "rewardValue": "launch_cyan_paint",
+                "colorHex": "#20D9FF",
+                "isPremium": false
+            },
+            {
+                "id": "launch_pass_theme_01",
+                "title": "LAUNCH THEME",
+                "description": "Premium launch theme",
+                "requiredPoints": 260,
+                "rewardType": "theme",
+                "rewardValue": "launch_theme",
+                "colorHex": "#FFCC33",
+                "isPremium": true
+            },
+            {
+                "id": "launch_pass_theme_free_02",
+                "title": "STYLE FESTIVAL THEME",
+                "description": "Free festival theme reward",
+                "requiredPoints": 340,
+                "rewardType": "theme",
+                "rewardValue": "style_festival_theme",
+                "colorHex": "#7CFFCE",
+                "isPremium": false
+            }
+        ]
     }
 ]

@@ -1,0 +1,128 @@
+[
+    {
+        "id": "daily_style_loop",
+        "title": "DAILY STYLE",
+        "subtitle": "Daily rewards loop forever.",
+        "kind": "dailyLoop",
+        "startsAt": null,
+        "endsAt": null,
+        "themeColorHex": "#20D9FF",
+        "rewards": [
+            {
+                "day": 1,
+                "reward": {
+                    "id": "daily_coins_01",
+                    "title": "COIN HIT",
+                    "description": "Daily coins",
+                    "rewardType": "coins",
+                    "rewardValue": "coins",
+                    "amount": 150,
+                    "colorHex": "#FFCC33",
+                    "symbol": "circle.hexagongrid.fill"
+                }
+            },
+            {
+                "day": 2,
+                "reward": {
+                    "id": "daily_style_points_01",
+                    "title": "STYLE POINTS",
+                    "description": "Daily Style Pass points",
+                    "rewardType": "stylePassPoints",
+                    "rewardValue": "stylePassPoints",
+                    "amount": 60,
+                    "colorHex": "#FF1744",
+                    "symbol": "bolt.fill"
+                }
+            },
+            {
+                "day": 3,
+                "reward": {
+                    "id": "daily_crystals_01",
+                    "title": "CRYSTAL CHIP",
+                    "description": "Daily crystals",
+                    "rewardType": "crystals",
+                    "rewardValue": "crystals",
+                    "amount": 5,
+                    "colorHex": "#7CFFCE",
+                    "symbol": "diamond.fill"
+                }
+            },
+            {
+                "day": 4,
+                "reward": {
+                    "id": "daily_paint_01",
+                    "title": "RED DAILY PAINT",
+                    "description": "Daily paint cosmetic",
+                    "rewardType": "paintFx",
+                    "rewardValue": "daily_red_paint",
+                    "amount": 1,
+                    "colorHex": "#FF1744",
+                    "symbol": "paintbrush.fill"
+                }
+            },
+            {
+                "day": 5,
+                "reward": {
+                    "id": "daily_theme_01",
+                    "title": "DAILY NOIR THEME",
+                    "description": "Daily loop theme",
+                    "rewardType": "theme",
+                    "rewardValue": "daily_noir",
+                    "amount": 1,
+                    "colorHex": "#FFFFFF",
+                    "symbol": "slash.circle.fill"
+                }
+            }
+        ]
+    },
+    {
+        "id": "launch_login_bonus",
+        "title": "LAUNCH LOGIN BONUS",
+        "subtitle": "Limited launch login rewards.",
+        "kind": "eventLogin",
+        "startsAt": "11.06.2026 00:00",
+        "endsAt": "30.06.2026 23:59",
+        "themeColorHex": "#FFCC33",
+        "rewards": [
+            {
+                "day": 1,
+                "reward": {
+                    "id": "launch_login_coins",
+                    "title": "LAUNCH COINS",
+                    "description": "Launch event coins",
+                    "rewardType": "coins",
+                    "rewardValue": "coins",
+                    "amount": 1000,
+                    "colorHex": "#FFCC33",
+                    "symbol": "circle.hexagongrid.fill"
+                }
+            },
+            {
+                "day": 2,
+                "reward": {
+                    "id": "launch_login_music",
+                    "title": "LAUNCH MUSIC PACK",
+                    "description": "Launch music unlock",
+                    "rewardType": "musicPack",
+                    "rewardValue": "launch_music_pack",
+                    "amount": 1,
+                    "colorHex": "#20D9FF",
+                    "symbol": "music.note"
+                }
+            },
+            {
+                "day": 3,
+                "reward": {
+                    "id": "launch_login_theme",
+                    "title": "LAUNCH THEME",
+                    "description": "Limited launch theme",
+                    "rewardType": "theme",
+                    "rewardValue": "launch_theme",
+                    "amount": 1,
+                    "colorHex": "#FF1744",
+                    "symbol": "gift.fill"
+                }
+            }
+        ]
+    }
+]

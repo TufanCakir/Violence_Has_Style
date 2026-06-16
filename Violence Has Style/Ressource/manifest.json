@@ -12,6 +12,10 @@
             "url": "EnemyDefinitions.json"
         },
         {
+            "id": "enemyAvatars",
+            "url": "EnemyAvatarDefinitions.json"
+        },
+        {
             "id": "levels",
             "url": "LevelDefinitions.json"
         },
@@ -50,6 +54,14 @@
         {
             "id": "styleAwakenings",
             "url": "StyleAwakeningDefinitions.json"
+        },
+        {
+            "id": "dailyLogins",
+            "url": "DailyLoginDefinitions.json"
+        },
+        {
+            "id": "gifts",
+            "url": "GiftDefinitions.json"
         }
     ],
     "assets": [

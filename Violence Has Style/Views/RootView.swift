@@ -79,25 +79,21 @@ private struct GlobalHeaderView: View {
         HStack(spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(styleRank.title)
-                    .font(.system(size: 16, weight: .black, design: .rounded))
+                    .font(.system(size: 15, weight: .black, design: .rounded))
                     .foregroundStyle(styleRank.color)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.55)
 
                 Text("STYLE RANK")
                     .font(.system(size: 8, weight: .black, design: .monospaced))
                     .foregroundStyle(.white.opacity(0.45))
+                    .lineLimit(1)
             }
+            .frame(minWidth: 86, maxWidth: 116, alignment: .leading)
 
             Spacer(minLength: 8)
 
-            ForEach(currencies) { currency in
-                HeaderCurrencyView(
-                    title: currency.title,
-                    value: currency.value,
-                    color: currency.color,
-                    symbol: currency.symbol
-                )
-            }
+            HeaderCurrencyGridView(currencies: currencies)
 
             Button {
                 isShowingCurrencyInfo = true
@@ -110,7 +106,7 @@ private struct GlobalHeaderView: View {
             }
             .buttonStyle(.plain)
         }
-        .frame(height: 56)
+        .frame(height: 62)
         .padding(.horizontal, 14)
         .background(theme.panelColor.opacity(0.94))
         .overlay(alignment: .bottom) {
@@ -127,6 +123,35 @@ private struct GlobalHeaderView: View {
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
+    }
+}
+
+private struct HeaderCurrencyGridView: View {
+    let currencies: [HeaderCurrencyDisplay]
+
+    var body: some View {
+        VStack(spacing: 4) {
+            ForEach(0..<2, id: \.self) { row in
+                HStack(spacing: 8) {
+                    ForEach(0..<2, id: \.self) { column in
+                        let index = row * 2 + column
+
+                        if index < currencies.count {
+                            HeaderCurrencyView(
+                                title: currencies[index].title,
+                                value: currencies[index].value,
+                                color: currencies[index].color,
+                                symbol: currencies[index].symbol
+                            )
+                        } else {
+                            Color.clear
+                                .frame(width: 76, height: 24)
+                        }
+                    }
+                }
+            }
+        }
+        .frame(width: 160, alignment: .trailing)
     }
 }
 
@@ -237,27 +262,27 @@ private struct HeaderCurrencyView: View {
     let symbol: String
 
     var body: some View {
-        VStack(alignment: .trailing, spacing: 2) {
-            HStack(spacing: 4) {
-                Image(systemName: symbol)
-                    .font(.system(size: 15, weight: .black))
-                    .foregroundStyle(color)
-                    .frame(width: 18, height: 18)
+        HStack(spacing: 4) {
+            Image(systemName: symbol)
+                .font(.system(size: 12, weight: .black))
+                .foregroundStyle(color)
+                .frame(width: 14, height: 14)
 
+            VStack(alignment: .leading, spacing: 0) {
                 Text("\(value)")
-                    .font(.system(size: 14, weight: .black, design: .rounded))
+                    .font(.system(size: 12, weight: .black, design: .rounded))
                     .foregroundStyle(color)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-            }
+                    .minimumScaleFactor(0.55)
 
-            Text(title)
-                .font(.system(size: 8, weight: .black, design: .monospaced))
-                .foregroundStyle(.white.opacity(0.48))
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
+                Text(title)
+                    .font(.system(size: 6, weight: .black, design: .monospaced))
+                    .foregroundStyle(.white.opacity(0.48))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.45)
+            }
         }
-        .frame(minWidth: 58, alignment: .trailing)
+        .frame(width: 76, height: 24, alignment: .leading)
     }
 }
 

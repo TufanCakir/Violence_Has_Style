@@ -21,6 +21,7 @@ enum GameScreen {
     case eventShop
     case stylePasses
     case premiumStore
+    case giftBox
     case themeSelection
     case musicSelection
     case paintSelection
@@ -54,6 +55,8 @@ extension GameScreen {
             self = .stylePasses
         case "premiumStore":
             self = .premiumStore
+        case "giftBox":
+            self = .giftBox
         case "themeSelection":
             self = .themeSelection
         case "musicSelection":

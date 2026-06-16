@@ -9,6 +9,70 @@ import Foundation
 import Observation
 import SwiftUI
 
+enum EnemyIntent: String, Codable, Equatable, CaseIterable {
+    case open
+    case block
+    case counter
+    case rage
+
+    var title: String {
+        switch self {
+        case .open:
+            return "OPEN"
+        case .block:
+            return "BLOCK"
+        case .counter:
+            return "COUNTER"
+        case .rage:
+            return "RAGE"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .open:
+            return "scope"
+        case .block:
+            return "shield.fill"
+        case .counter:
+            return "arrow.triangle.2.circlepath"
+        case .rage:
+            return "flame.fill"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .open:
+            return .green
+        case .block:
+            return .cyan
+        case .counter:
+            return .purple
+        case .rage:
+            return .red
+        }
+    }
+
+    var hint: String {
+        switch self {
+        case .open:
+            return "TAP"
+        case .block:
+            return "SWITCH REAPER"
+        case .counter:
+            return "SWITCH PHANTOM"
+        case .rage:
+            return "BLOOD TAP"
+        }
+    }
+}
+
+private enum BattleInputKind {
+    case attack
+    case styleSwitch
+}
+
 @Observable
 final class GameState {
     var maxStyle: Int {
@@ -47,6 +111,13 @@ final class GameState {
         StyleAwakeningCatalog.awakening(for: .killer)
     var selectedPaintFxId = ""
     var currentEnemy: EnemyType = .grunt
+    var enemyIntent: EnemyIntent = .open
+    var intentTurnsRemaining = 2
+    var perfectChain = 0
+    var styleRushTurns = 0
+    var styleFreezeMeter = 0
+    var styleFreezeTurns = 0
+    var lastTimingVerdict = "READY"
     var currentLevel: LevelDefinition = LevelCatalog.shared.level(for: 1)
     var runMode: RunMode = .style
     var storyChapterId: String?
@@ -59,6 +130,18 @@ final class GameState {
 
     var styleRank: StyleRank {
         StyleRank(style: style)
+    }
+
+    var isStyleRushActive: Bool {
+        styleRushTurns > 0
+    }
+
+    var isStyleFreezeActive: Bool {
+        styleFreezeTurns > 0
+    }
+
+    var canActivateStyleFreeze: Bool {
+        styleFreezeMeter >= 100 && !isStyleFreezeActive && !isEnemyBroken
     }
 
     var playerIdleFrame: String {
@@ -105,12 +188,14 @@ final class GameState {
         addPaintStroke(for: attackFrameIndex)
         applyStyleCost()
         bossVerdict = attackTitle(for: attackFrameIndex)
+        events.append(contentsOf: resolveBattleInput(.attack))
 
         if attackFrameIndex == playerAttackFrames.count - 1 {
             enemyHealth = max(
                 0,
                 enemyHealth - activeStyle.damage(for: styleRank)
                     - styleDamageBonus - currentCharacter.damageBonus
+                    - styleRushDamageBonus
             )
             events.append(.sound("hit"))
             events.append(.screenShake(activeStyle.impactShake))
@@ -152,6 +237,7 @@ final class GameState {
             activeAwakening.map { CGFloat($0.shake) }
             ?? activeStyle.impactShake
         var events: [GameEvent] = [.screenShake(shake)]
+        events.append(contentsOf: resolveBattleInput(.styleSwitch))
         events.append(contentsOf: tickEnemyAction())
         return events
     }
@@ -175,6 +261,13 @@ final class GameState {
         enemyHealth = enemyMaxHealth
         enemyFrame = currentEnemy.idleAsset
         enemyActionCountdown = counterDelay
+        enemyIntent = startingIntent
+        intentTurnsRemaining = 2
+        perfectChain = 0
+        styleRushTurns = 0
+        lastTimingVerdict = "READY"
+        styleFreezeMeter = 0
+        styleFreezeTurns = 0
         style = min(maxStyle, styleStartBonus)
         updateBestStyleRank()
         bossVerdict = "\(currentLevel.title): \(currentLevel.moodText)"
@@ -205,6 +298,13 @@ final class GameState {
         combo = 0
         enemyActionCountdown =
             RemoteContentStore.shared.gameConfig.combat.enemyCounterStart
+        enemyIntent = .open
+        intentTurnsRemaining = 2
+        perfectChain = 0
+        styleRushTurns = 0
+        lastTimingVerdict = "READY"
+        styleFreezeMeter = 0
+        styleFreezeTurns = 0
         attackFrameIndex = 0
         flashHit = false
         lastAttackFrame = ""
@@ -239,6 +339,7 @@ final class GameState {
             enemyMaxHealth = nextEnemyHealth
             enemyHealth = enemyMaxHealth
             enemyFrame = currentEnemy.idleAsset
+            enemyIntent = startingIntent
             bossVerdict = storyChapter.introText
         }
     }
@@ -314,14 +415,28 @@ final class GameState {
             activeStyle.styleGain + styleGainBonus + attackFrameIndex * 4
         let variationBonus = frame == lastAttackFrame ? -5 : 7
         let comboBonus = min(combo / 3, 8)
+        let rushBonus = isStyleRushActive ? 12 : 0
         let rawGain =
             baseGain + variationBonus + comboBonus + currentEnemy.styleBonus
+            + rushBonus
         let scaledGain = Int(
             (Double(rawGain) * currentLevel.styleMultiplier).rounded()
         )
         style = min(maxStyle, max(0, style + scaledGain))
+        styleFreezeMeter = min(100, styleFreezeMeter + max(2, scaledGain / 4))
         updateBestStyleRank()
         lastAttackFrame = frame
+    }
+
+    func activateStyleFreeze() -> [GameEvent] {
+        guard canActivateStyleFreeze else { return [] }
+
+        styleFreezeMeter = 0
+        styleFreezeTurns = 3
+        lastTimingVerdict = "STYLE FREEZE"
+        bossVerdict = "STYLE FREEZE"
+        addStyleGodCrossStroke(color: .white.opacity(0.9))
+        return [.sound("freeze"), .screenShake(16)]
     }
 
     private func attackTitle(for index: Int) -> String {
@@ -581,6 +696,10 @@ final class GameState {
         activeStyle == .reaper || activeStyle == .chaos ? reaperDamageBonus : 0
     }
 
+    private var styleRushDamageBonus: Int {
+        isStyleRushActive ? 8 + perfectChain * 2 : 0
+    }
+
     private var activePaintColor: Color {
         if let paintFxColor {
             return paintFxColor
@@ -669,10 +788,22 @@ final class GameState {
         guard !isEnemyBroken, !isChoosingReward, !isGameOver else { return [] }
 
         enemyActionCountdown -= 1
+        intentTurnsRemaining -= 1
+        if styleFreezeTurns > 0 {
+            styleFreezeTurns -= 1
+            enemyActionCountdown += 1
+            lastTimingVerdict = "TIME CUT"
+            return []
+        }
         if enemyActionCountdown <= 0 {
             let events = enemyCounterattack()
             enemyActionCountdown = counterDelay
+            advanceEnemyIntent()
             return events
+        }
+
+        if intentTurnsRemaining <= 0 {
+            advanceEnemyIntent()
         }
 
         return []
@@ -694,6 +825,7 @@ final class GameState {
             )
             updateBestStyleRank()
             bossVerdict = "CLEAN DODGE"
+            lastTimingVerdict = "CLEAN DODGE"
             addStyleShiftStroke()
             return []
         }
@@ -712,6 +844,8 @@ final class GameState {
                 - RemoteContentStore.shared.gameConfig.combat.enemyStylePenalty
         )
         bossVerdict = "TOO SLOW"
+        lastTimingVerdict = "TOO SLOW"
+        perfectChain = 0
         flashHit.toggle()
 
         var events: [GameEvent] = [.sound("player_hit"), .playerHitImpact]
@@ -735,6 +869,112 @@ final class GameState {
         }
 
         return false
+    }
+
+    private func resolveBattleInput(_ input: BattleInputKind) -> [GameEvent] {
+        guard !isEnemyBroken, !isChoosingReward, !isGameOver else { return [] }
+
+        var events: [GameEvent] = []
+
+        if isPerfectInput(input) {
+            perfectChain += 1
+            let perfectBonus = 18 + min(perfectChain, 5) * 4
+            combo += 1
+            maxCombo = max(maxCombo, combo)
+            style = min(maxStyle, style + perfectBonus)
+            styleFreezeMeter = min(100, styleFreezeMeter + 18)
+            updateBestStyleRank()
+            lastTimingVerdict =
+                perfectChain >= 3
+                ? "STYLE RUSH" : "PERFECT \(enemyIntent.title)"
+            bossVerdict = lastTimingVerdict
+            addStyleGodCrossStroke(color: enemyIntent.color.opacity(0.88))
+            events.append(.sound("perfect"))
+            events.append(.screenShake(perfectChain >= 3 ? 14 : 7))
+
+            if perfectChain >= 3 {
+                styleRushTurns = 3
+            }
+        } else {
+            applyIntentMistake(input)
+        }
+
+        if styleRushTurns > 0 {
+            styleRushTurns -= 1
+        }
+
+        advanceEnemyIntent()
+        return events
+    }
+
+    private func isPerfectInput(_ input: BattleInputKind) -> Bool {
+        switch enemyIntent {
+        case .open:
+            return input == .attack
+        case .block:
+            return input == .styleSwitch
+                && (activeStyle == .reaper || activeStyle == .chaos)
+        case .counter:
+            return input == .styleSwitch
+                && (activeStyle == .phantom || activeStyle == .void)
+        case .rage:
+            return input == .attack
+                && (activeStyle == .blood || activeStyle == .chaos)
+        }
+    }
+
+    private func applyIntentMistake(_ input: BattleInputKind) {
+        perfectChain = 0
+
+        switch enemyIntent {
+        case .open:
+            lastTimingVerdict =
+                input == .styleSwitch ? "MISSED OPENING" : "GOOD"
+            bossVerdict = lastTimingVerdict
+        case .block:
+            lastTimingVerdict = "BLOCKED"
+            bossVerdict = "BLOCKED"
+            combo = 0
+            style = max(0, style - 8)
+        case .counter:
+            lastTimingVerdict = "COUNTER PRIMED"
+            bossVerdict = "COUNTER PRIMED"
+            combo = 0
+            enemyActionCountdown = min(enemyActionCountdown, 1)
+        case .rage:
+            lastTimingVerdict = "RAGE BUILDS"
+            bossVerdict = "RAGE BUILDS"
+            style = max(0, style - 4)
+            enemyActionCountdown = min(enemyActionCountdown, 2)
+        }
+    }
+
+    private func advanceEnemyIntent() {
+        let rotation = enemyIntentRotation
+        guard !rotation.isEmpty else { return }
+
+        let seed =
+            fightLevel + combo + attackFrameIndex + enemyActionCountdown
+            + perfectChain
+        enemyIntent = rotation[seed % rotation.count]
+        intentTurnsRemaining = isStyleRushActive ? 1 : 2
+    }
+
+    private var startingIntent: EnemyIntent {
+        currentEnemy == .duelist ? .counter : .open
+    }
+
+    private var enemyIntentRotation: [EnemyIntent] {
+        switch currentEnemy {
+        case .grunt:
+            return [.open, .block, .open, .rage]
+        case .duelist:
+            return [.counter, .open, .counter, .block]
+        case .brute:
+            return [.block, .rage, .block, .open]
+        case .judge:
+            return [.counter, .block, .rage, .open]
+        }
     }
 }
 

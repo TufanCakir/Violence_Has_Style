@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import Observation
 
+@Observable
 final class RemoteContentStore {
     static let shared = RemoteContentStore()
 
@@ -24,12 +26,22 @@ final class RemoteContentStore {
     private(set) var themeDefinitions: [ThemeDefinition] = []
     private(set) var stylePassDefinitions: [StylePassDefinition] = []
     private(set) var premiumStoreProducts: [PremiumStoreProduct] = []
+    private(set) var enemyAvatarDefinitions: [EnemyAvatarDefinition] =
+        EnemyAvatarDefinition.fallback
+    private(set) var loginCampaignDefinitions: [LoginCampaignDefinition] =
+        LoginCampaignDefinition.fallback
+    private(set) var giftDefinitions: [GiftDefinition] = GiftDefinition.fallback
     private(set) var styleAwakeningDefinitions: [StyleAwakeningDefinition] =
         StyleAwakeningDefinition.fallback
     private(set) var uiConfig = UIConfig.fallback
     private(set) var gameConfig = GameConfig.fallback
     private(set) var isOnline = false
     private(set) var statusMessage = "CONNECTING TO STYLE SERVER"
+    private(set) var loadingProgress = 0.0
+    private(set) var loadedItemCount = 0
+    private(set) var totalItemCount = 1
+    private(set) var downloadedBytes = 0
+    private(set) var totalBytes = 0
 
     private var assetsBaseURL: URL?
     private var musicBaseURL: URL?
@@ -53,6 +65,8 @@ final class RemoteContentStore {
 
     @MainActor
     func refresh() async {
+        beginLoading(totalItems: 15, status: "LOADING MANIFEST")
+
         guard
             let manifest: RemoteManifest = await loadJSON(
                 from: Self.manifestURL
@@ -61,6 +75,7 @@ final class RemoteContentStore {
             resetRemoteContent(status: "MANIFEST REQUIRED")
             return
         }
+        advanceLoading(status: "MANIFEST LOADED")
 
         assetsBaseURL = resolvedURL(
             manifest.assetsBaseURL
@@ -139,6 +154,18 @@ final class RemoteContentStore {
             for: "premiumStore",
             baseURL: Self.manifestURL
         )
+        let enemyAvatarURL = manifest.dataURL(
+            for: "enemyAvatars",
+            baseURL: Self.manifestURL
+        )
+        let loginCampaignURL = manifest.dataURL(
+            for: "dailyLogins",
+            baseURL: Self.manifestURL
+        )
+        let giftURL = manifest.dataURL(
+            for: "gifts",
+            baseURL: Self.manifestURL
+        )
         let styleAwakeningsURL = manifest.dataURL(
             for: "styleAwakenings",
             baseURL: Self.manifestURL
@@ -159,6 +186,12 @@ final class RemoteContentStore {
         )
         async let premiumStore: [PremiumStoreProduct]? =
             loadOptionalPremiumStore(from: premiumStoreURL)
+        async let enemyAvatars: [EnemyAvatarDefinition]? =
+            loadOptionalEnemyAvatars(from: enemyAvatarURL)
+        async let loginCampaigns: [LoginCampaignDefinition]? =
+            loadOptionalLoginCampaigns(from: loginCampaignURL)
+        async let gifts: [GiftDefinition]? =
+            loadOptionalGifts(from: giftURL)
         async let styleAwakenings: [StyleAwakeningDefinition]? =
             loadOptionalStyleAwakenings(from: styleAwakeningsURL)
         let loadedConfig: GameConfig? = await loadJSON(from: configURL)
@@ -173,6 +206,9 @@ final class RemoteContentStore {
             let loadedStylePasses = await stylePasses,
             let loadedUIConfig = await loadedUIConfigTask,
             let loadedPremiumStore = await premiumStore,
+            let loadedEnemyAvatars = await enemyAvatars,
+            let loadedLoginCampaigns = await loginCampaigns,
+            let loadedGifts = await gifts,
             let loadedStyleAwakenings = await styleAwakenings,
             let loadedConfig
         else {
@@ -195,6 +231,14 @@ final class RemoteContentStore {
         themeDefinitions = loadedThemes
         stylePassDefinitions = loadedStylePasses
         premiumStoreProducts = loadedPremiumStore
+        enemyAvatarDefinitions =
+            loadedEnemyAvatars.isEmpty
+            ? EnemyAvatarDefinition.fallback : loadedEnemyAvatars
+        loginCampaignDefinitions =
+            loadedLoginCampaigns.isEmpty
+            ? LoginCampaignDefinition.fallback : loadedLoginCampaigns
+        giftDefinitions =
+            loadedGifts.isEmpty ? GiftDefinition.fallback : loadedGifts
         styleAwakeningDefinitions =
             loadedStyleAwakenings.isEmpty
             ? StyleAwakeningDefinition.fallback : loadedStyleAwakenings
@@ -202,6 +246,7 @@ final class RemoteContentStore {
         gameConfig = loadedConfig
         isOnline = true
         statusMessage = "REMOTE STYLE LOADED"
+        finishLoading(status: "REMOTE STYLE LOADED")
     }
 
     func assetURL(named name: String, fileExtension: String = "png") -> URL {
@@ -237,6 +282,10 @@ final class RemoteContentStore {
     }
 
     func warmStartupMedia() async {
+        await MainActor.run {
+            beginLoading(totalItems: 4, status: "CACHING STARTUP MEDIA")
+        }
+
         let startupAssetIds = Set(
             CharacterCatalog.shared.defaultCharacter.attackFrames
                 + [CharacterCatalog.shared.defaultCharacter.idleAsset]
@@ -253,6 +302,10 @@ final class RemoteContentStore {
             + Array(startupMusicURLs)
 
         await warmURLs(urls)
+
+        await MainActor.run {
+            finishLoading(status: "STARTUP MEDIA READY")
+        }
     }
 
     func warmAllRemoteMediaInBackground() {
@@ -270,12 +323,24 @@ final class RemoteContentStore {
             urls
             .filter { warmedURLStrings.insert($0.absoluteString).inserted }
 
+        await MainActor.run {
+            totalItemCount = max(totalItemCount, loadedItemCount + urls.count)
+            totalBytes = max(totalBytes, urls.count * 600_000)
+        }
+
         await withTaskGroup(of: Void.self) { group in
             for url in urls.prefix(8) {
                 group.addTask {
                     var request = URLRequest(url: url)
                     request.cachePolicy = .returnCacheDataElseLoad
-                    _ = try? await self.urlSession.data(for: request)
+                    if let (data, _) = try? await self.urlSession.data(
+                        for: request
+                    ) {
+                        await MainActor.run {
+                            self.downloadedBytes += data.count
+                            self.advanceLoading(status: "CACHING MEDIA")
+                        }
+                    }
                 }
             }
         }
@@ -295,7 +360,12 @@ final class RemoteContentStore {
                 return nil
             }
 
-            return try JSONDecoder().decode(T.self, from: data)
+            let decoded = try JSONDecoder().decode(T.self, from: data)
+            await MainActor.run {
+                downloadedBytes += data.count
+                advanceLoading(status: "LOADED \(url.lastPathComponent)")
+            }
+            return decoded
         } catch {
             return nil
         }
@@ -317,6 +387,39 @@ final class RemoteContentStore {
         }
 
         return await loadJSON(from: url) ?? []
+    }
+
+    private func loadOptionalEnemyAvatars(
+        from url: URL?
+    ) async -> [EnemyAvatarDefinition]? {
+        guard let url else {
+            return EnemyAvatarDefinition.fallback
+        }
+
+        let avatars: [EnemyAvatarDefinition]? = await loadJSON(from: url)
+        return avatars?.isEmpty == false
+            ? avatars : EnemyAvatarDefinition.fallback
+    }
+
+    private func loadOptionalLoginCampaigns(
+        from url: URL?
+    ) async -> [LoginCampaignDefinition]? {
+        guard let url else {
+            return LoginCampaignDefinition.fallback
+        }
+
+        let campaigns: [LoginCampaignDefinition]? = await loadJSON(from: url)
+        return campaigns?.isEmpty == false
+            ? campaigns : LoginCampaignDefinition.fallback
+    }
+
+    private func loadOptionalGifts(from url: URL?) async -> [GiftDefinition]? {
+        guard let url else {
+            return GiftDefinition.fallback
+        }
+
+        let gifts: [GiftDefinition]? = await loadJSON(from: url)
+        return gifts?.isEmpty == false ? gifts : GiftDefinition.fallback
     }
 
     private func loadOptionalStyleAwakenings(
@@ -342,6 +445,9 @@ final class RemoteContentStore {
         themeDefinitions = []
         stylePassDefinitions = []
         premiumStoreProducts = []
+        enemyAvatarDefinitions = EnemyAvatarDefinition.fallback
+        loginCampaignDefinitions = LoginCampaignDefinition.fallback
+        giftDefinitions = GiftDefinition.fallback
         styleAwakeningDefinitions = StyleAwakeningDefinition.fallback
         uiConfig = .fallback
         gameConfig = .fallback
@@ -350,6 +456,38 @@ final class RemoteContentStore {
         assetURLs = [:]
         musicURLs = [:]
         isOnline = false
+        statusMessage = status
+        loadingProgress = 0
+        loadedItemCount = 0
+        totalItemCount = 1
+        downloadedBytes = 0
+        totalBytes = 0
+    }
+
+    @MainActor
+    private func beginLoading(totalItems: Int, status: String) {
+        loadedItemCount = 0
+        totalItemCount = max(1, totalItems)
+        downloadedBytes = 0
+        totalBytes = max(totalBytes, totalItems * 45_000)
+        loadingProgress = 0
+        statusMessage = status
+    }
+
+    @MainActor
+    private func advanceLoading(status: String) {
+        loadedItemCount = min(totalItemCount, loadedItemCount + 1)
+        loadingProgress = min(
+            0.98,
+            Double(loadedItemCount) / Double(totalItemCount)
+        )
+        statusMessage = status
+    }
+
+    @MainActor
+    private func finishLoading(status: String) {
+        loadedItemCount = max(loadedItemCount, totalItemCount)
+        loadingProgress = 1
         statusMessage = status
     }
 

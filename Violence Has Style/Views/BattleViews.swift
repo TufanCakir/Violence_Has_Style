@@ -12,12 +12,14 @@ struct BattleSceneView: View {
     let screenShakeOffset: CGSize
     let brokenPulse: Bool
     let styleGodPulse: Bool
+    let activateStyleFreeze: () -> Void
     let exit: () -> Void
 
     var body: some View {
         VStack(spacing: 18) {
             BattleHUDView(
                 game: game,
+                activateStyleFreeze: activateStyleFreeze,
                 exit: exit
             )
 
@@ -82,28 +84,39 @@ private struct BattleArenaView: View {
 
                 Spacer()
 
-                EnemyShapeSprite(
-                    enemy: game.currentEnemy,
-                    isBroken: game.isEnemyBroken,
-                    isHit: game.flashHit
-                )
-                .frame(width: 140, height: 220)
-                .scaleEffect(enemyScale)
-                .offset(x: game.flashHit ? 14 : 0)
-                .shadow(
-                    color: game.currentEnemy.tint.opacity(
-                        game.currentEnemy.isBoss ? 0.95 : 0.6
-                    ),
-                    radius: game.currentEnemy.glowRadius
-                )
-                .animation(.snappy(duration: 0.08), value: game.flashHit)
-                .animation(.snappy(duration: 0.2), value: game.isEnemyBroken)
-                .animation(
-                    .easeInOut(duration: 0.58).repeatForever(
-                        autoreverses: true
-                    ),
-                    value: styleGodPulse
-                )
+                VStack(spacing: 8) {
+                    EnemyIntentBadgeView(
+                        intent: game.enemyIntent,
+                        chain: game.perfectChain,
+                        isStyleRushActive: game.isStyleRushActive
+                    )
+
+                    EnemyAvatarBattleSprite(
+                        enemy: game.currentEnemy,
+                        isBroken: game.isEnemyBroken,
+                        isHit: game.flashHit
+                    )
+                    .frame(width: 140, height: 220)
+                    .scaleEffect(enemyScale)
+                    .offset(x: game.flashHit ? 14 : 0)
+                    .shadow(
+                        color: game.currentEnemy.tint.opacity(
+                            game.currentEnemy.isBoss ? 0.95 : 0.6
+                        ),
+                        radius: game.currentEnemy.glowRadius
+                    )
+                    .animation(.snappy(duration: 0.08), value: game.flashHit)
+                    .animation(
+                        .snappy(duration: 0.2),
+                        value: game.isEnemyBroken
+                    )
+                    .animation(
+                        .easeInOut(duration: 0.58).repeatForever(
+                            autoreverses: true
+                        ),
+                        value: styleGodPulse
+                    )
+                }
             }
             .padding(.horizontal, 24)
 
@@ -156,6 +169,7 @@ private struct BattleArenaView: View {
 
 private struct BattleHUDView: View {
     let game: GameState
+    let activateStyleFreeze: () -> Void
     let exit: () -> Void
 
     var body: some View {
@@ -232,6 +246,48 @@ private struct BattleHUDView: View {
                         )
                         .foregroundStyle(game.currentEnemy.tint.opacity(0.9))
 
+                    Text(game.lastTimingVerdict)
+                        .font(
+                            .system(
+                                size: 10,
+                                weight: .black,
+                                design: .monospaced
+                            )
+                        )
+                        .foregroundStyle(
+                            game.isStyleRushActive
+                                ? .yellow : game.enemyIntent.color
+                        )
+
+                    Button {
+                        activateStyleFreeze()
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "pause.circle.fill")
+                            Text(
+                                game.isStyleFreezeActive
+                                    ? "TIME CUT"
+                                    : "FREEZE \(game.styleFreezeMeter)%"
+                            )
+                        }
+                        .font(
+                            .system(size: 10, weight: .black, design: .rounded)
+                        )
+                        .foregroundStyle(
+                            game.canActivateStyleFreeze
+                                ? .black : .white.opacity(0.55)
+                        )
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            game.canActivateStyleFreeze
+                                ? Color.white : Color.white.opacity(0.12)
+                        )
+                        .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(!game.canActivateStyleFreeze)
+
                     Button("EXIT") {
                         exit()
                     }
@@ -268,6 +324,51 @@ private struct BattleHUDView: View {
                 BattleHealthBarView(game: game)
             }
         }
+    }
+}
+
+private struct EnemyIntentBadgeView: View {
+    let intent: EnemyIntent
+    let chain: Int
+    let isStyleRushActive: Bool
+
+    var body: some View {
+        VStack(spacing: 3) {
+            HStack(spacing: 6) {
+                Image(systemName: intent.symbol)
+                    .font(.system(size: 12, weight: .black))
+
+                Text(isStyleRushActive ? "STYLE RUSH" : intent.title)
+                    .font(.system(size: 13, weight: .black, design: .rounded))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.65)
+            }
+
+            HStack(spacing: 6) {
+                Text(intent.hint)
+                Text("CHAIN \(chain)")
+            }
+            .font(.system(size: 8, weight: .black, design: .monospaced))
+            .opacity(0.72)
+        }
+        .foregroundStyle(isStyleRushActive ? .yellow : intent.color)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 7)
+        .background(.black.opacity(0.52))
+        .overlay {
+            Capsule()
+                .stroke(
+                    (isStyleRushActive ? Color.yellow : intent.color)
+                        .opacity(0.78),
+                    lineWidth: 1
+                )
+        }
+        .clipShape(Capsule())
+        .shadow(
+            color: (isStyleRushActive ? Color.yellow : intent.color)
+                .opacity(0.55),
+            radius: 10
+        )
     }
 }
 

@@ -15,6 +15,7 @@ struct GameView: View {
     @Query private var progressEntries: [PlayerProgress]
     @Query private var wallets: [EventWallet]
     @State private var network = NetworkMonitor.shared
+    @State private var remoteContentStore = RemoteContentStore.shared
     @State private var currentScreen: GameScreen = .title
     @State private var game = GameState()
     @State private var screenShakeOffset = CGSize.zero
@@ -28,6 +29,7 @@ struct GameView: View {
     @State private var isRemoteContentReady = false
     @State private var remoteContentStatus = "CONNECTING TO STYLE SERVER"
     @State private var selectedEventId: String?
+    @State private var isDailyLoginPopupDismissed = false
     @AppStorage("settingsScreenShakeEnabled") private var isScreenShakeEnabled =
         true
     @AppStorage("settingsFlashFXEnabled") private var isFlashFXEnabled = true
@@ -75,6 +77,9 @@ struct GameView: View {
             screenShakeOffset: screenShakeOffset,
             brokenPulse: brokenPulse,
             styleGodPulse: styleGodPulse,
+            activateStyleFreeze: {
+                handleEvents(game.activateStyleFreeze())
+            },
             exit: {
                 currentScreen = .menu
             }
@@ -96,6 +101,7 @@ struct GameView: View {
         }
         .overlay { flashOverlay }
         .overlay { runOverlay }
+        .overlay { dailyLoginOverlay }
         .overlay { connectionOverlay }
         .contentShape(Rectangle())
         .onTapGesture {
@@ -186,6 +192,7 @@ struct GameView: View {
                 openStyleMode: { currentScreen = .styleLab },
                 openGallery: { currentScreen = .gallery },
                 openStylePasses: { currentScreen = .stylePasses },
+                openGiftBox: { currentScreen = .giftBox },
                 openSettings: { currentScreen = .settings }
             )
         case .storyMode:
@@ -270,6 +277,13 @@ struct GameView: View {
                 purchasedProductIds: progress.purchasedPremiumProductIds,
                 unlockProduct: unlockPremiumProduct,
                 restoreProducts: restorePremiumProducts,
+                back: { currentScreen = .menu }
+            )
+        case .giftBox:
+            GiftBoxView(
+                gifts: GiftCatalog.shared.activeGifts,
+                claimedGiftIds: progress.claimedGiftIds,
+                claimGift: claimGift,
                 back: { currentScreen = .menu }
             )
         case .settings:
@@ -364,13 +378,41 @@ struct GameView: View {
         if !network.isConnected {
             OfflineView()
         } else if isRemoteContentLoading || !isRemoteContentReady {
-            OnlineRequiredView(
+            RemoteLoadingView(
                 isLoading: isRemoteContentLoading,
-                status: remoteContentStatus,
+                status: remoteContentStore.statusMessage,
+                progress: remoteContentStore.loadingProgress,
+                loadedItems: remoteContentStore.loadedItemCount,
+                totalItems: remoteContentStore.totalItemCount,
+                downloadedBytes: remoteContentStore.downloadedBytes,
+                estimatedTotalBytes: remoteContentStore.totalBytes,
                 retry: {
                     Task {
                         await refreshRemoteContent()
                     }
+                }
+            )
+        }
+    }
+
+    @ViewBuilder
+    private var dailyLoginOverlay: some View {
+        if currentScreen == .menu,
+            !isDailyLoginPopupDismissed,
+            let login = nextDailyLoginClaim
+        {
+            DailyLoginPopupView(
+                campaign: login.campaign,
+                todayReward: login.reward,
+                claimedRewardKeys: progress.claimedLoginRewardKeys,
+                claim: {
+                    claimDailyLogin(
+                        campaign: login.campaign,
+                        reward: login.reward
+                    )
+                },
+                close: {
+                    isDailyLoginPopupDismissed = true
                 }
             )
         }
@@ -486,17 +528,15 @@ struct GameView: View {
         isRemoteContentLoading = true
         remoteContentStatus = "CONNECTING TO STYLE SERVER"
 
-        await RemoteContentStore.shared.refresh()
-        isRemoteContentReady = RemoteContentStore.shared.isOnline
-        remoteContentStatus = RemoteContentStore.shared.statusMessage
+        await remoteContentStore.refresh()
+        isRemoteContentReady = remoteContentStore.isOnline
+        remoteContentStatus = remoteContentStore.statusMessage
 
         if isRemoteContentReady {
             game.refreshDataDefinitions()
+            await remoteContentStore.warmStartupMedia()
             startMusicPlaylist()
-            Task {
-                await RemoteContentStore.shared.warmStartupMedia()
-                RemoteContentStore.shared.warmAllRemoteMediaInBackground()
-            }
+            remoteContentStore.warmAllRemoteMediaInBackground()
             remoteContentRefreshID = UUID()
         }
 
@@ -566,6 +606,115 @@ struct GameView: View {
         }
     }
 
+    private func claimDailyLogin(
+        campaign: LoginCampaignDefinition,
+        reward: LoginRewardDefinition
+    ) {
+        let key = loginClaimKey(campaignId: campaign.id)
+        guard !progress.claimedLoginRewardKeys.contains(key) else {
+            isDailyLoginPopupDismissed = true
+            return
+        }
+
+        grantReward(reward.reward)
+        progress.claimedLoginRewardKeys.append(key)
+
+        if campaign.isDailyLoop {
+            let streakKey =
+                "\(campaign.id):\(dailyLoopStreak(for: campaign) + 1)"
+            progress.dailyLoginStreaks.removeAll {
+                $0.hasPrefix("\(campaign.id):")
+            }
+            progress.dailyLoginStreaks.append(streakKey)
+        }
+
+        isDailyLoginPopupDismissed = true
+        try? modelContext.save()
+    }
+
+    private func claimGift(_ gift: GiftDefinition) {
+        guard gift.isActive, !progress.claimedGiftIds.contains(gift.id) else {
+            return
+        }
+
+        for reward in gift.rewards {
+            grantReward(reward)
+        }
+
+        progress.claimedGiftIds.append(gift.id)
+        try? modelContext.save()
+    }
+
+    private func grantReward(_ reward: RewardGrant) {
+        switch reward.rewardType {
+        case "coins":
+            progress.coins += max(0, reward.amount)
+        case "crystals":
+            progress.crystals += max(0, reward.amount)
+        case "stylePassPoints":
+            progress.stylePassPoints += max(0, reward.amount)
+        case "theme":
+            appendUnique(reward.rewardValue, to: &progress.ownedThemeIds)
+        case "musicPack":
+            appendUnique(reward.rewardValue, to: &progress.ownedMusicPackIds)
+        case "paintFx":
+            appendUnique(reward.rewardValue, to: &progress.ownedPaintFxIds)
+        case "title", "style":
+            appendUnique(reward.rewardValue, to: &progress.ownedTitleIds)
+        case "premiumPass":
+            appendUnique(reward.rewardValue, to: &progress.ownedPremiumPassIds)
+        default:
+            break
+        }
+    }
+
+    private var nextDailyLoginClaim:
+        (campaign: LoginCampaignDefinition, reward: LoginRewardDefinition)?
+    {
+        for campaign in LoginCampaignCatalog.shared.activeCampaigns {
+            let key = loginClaimKey(campaignId: campaign.id)
+            guard !progress.claimedLoginRewardKeys.contains(key) else {
+                continue
+            }
+
+            if campaign.isDailyLoop {
+                guard
+                    let reward = campaign.reward(
+                        for: dailyLoopStreak(for: campaign)
+                    )
+                else {
+                    continue
+                }
+                return (campaign, reward)
+            }
+
+            if let reward = campaign.eventRewardForToday() {
+                return (campaign, reward)
+            }
+        }
+
+        return nil
+    }
+
+    private func dailyLoopStreak(for campaign: LoginCampaignDefinition) -> Int {
+        progress.dailyLoginStreaks.first {
+            $0.hasPrefix("\(campaign.id):")
+        }
+        .flatMap { Int($0.split(separator: ":").last ?? "0") } ?? 0
+    }
+
+    private func loginClaimKey(campaignId: String) -> String {
+        "\(campaignId):\(Self.dayKeyFormatter.string(from: Date()))"
+    }
+
+    private static let dayKeyFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "de_DE")
+        formatter.timeZone = TimeZone(identifier: "Europe/Berlin")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }()
+
     private func claimStylePassReward(_ reward: StylePassReward) {
         guard
             let pass = StylePassCatalog.shared.activePasses.first(where: {
@@ -590,6 +739,10 @@ struct GameView: View {
             let value = Int(reward.rewardValue)
         {
             progress.crystals += value
+        } else if reward.rewardType == "stylePassPoints",
+            let value = Int(reward.rewardValue)
+        {
+            progress.stylePassPoints += value
         } else if reward.rewardType == "theme",
             !progress.ownedThemeIds.contains(reward.rewardValue)
         {
@@ -633,6 +786,8 @@ struct GameView: View {
 
     private func applyEventShopUnlock(_ item: EventShopItem) {
         switch item.kind {
+        case "theme":
+            appendUnique(item.value, to: &progress.ownedThemeIds)
         case "paint_cosmetic":
             appendUnique(item.value, to: &progress.ownedPaintFxIds)
         case "title":

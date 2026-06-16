@@ -34,5 +34,53 @@
         "introText": "Be beautiful or be forgotten.",
         "rewardText": "Trial cleared.",
         "colorHex": "#FF9F1A"
+    },
+    {
+        "id": "chapter_04",
+        "title": "CHAPTER 04",
+        "subtitle": "BLOOD ROOFTOP RAIN",
+        "requiredChapter": 3,
+        "startFight": 7,
+        "targetFights": 4,
+        "levelId": "blood_rooftop",
+        "introText": "The roof wants a cleaner cut.",
+        "rewardText": "Rooftop cleared.",
+        "colorHex": "#FF1744"
+    },
+    {
+        "id": "chapter_05",
+        "title": "CHAPTER 05",
+        "subtitle": "NEON CHURCH OF STYLE",
+        "requiredChapter": 4,
+        "startFight": 10,
+        "targetFights": 5,
+        "levelId": "neon_church",
+        "introText": "Every light is watching your timing.",
+        "rewardText": "Neon Church cleared.",
+        "colorHex": "#20D9FF"
+    },
+    {
+        "id": "chapter_06",
+        "title": "CHAPTER 06",
+        "subtitle": "FREEZE FRAME CUT",
+        "requiredChapter": 5,
+        "startFight": 14,
+        "targetFights": 5,
+        "levelId": "static_subway",
+        "introText": "Stop the moment before it stops you.",
+        "rewardText": "Frame Cut cleared.",
+        "colorHex": "#FFFFFF"
+    },
+    {
+        "id": "chapter_07",
+        "title": "CHAPTER 07",
+        "subtitle": "THE JUDGE SMILES",
+        "requiredChapter": 6,
+        "startFight": 18,
+        "targetFights": 6,
+        "levelId": "judge_arena",
+        "introText": "The Judge only respects perfect chains.",
+        "rewardText": "The Judge smiled.",
+        "colorHex": "#FFCC33"
     }
 ]
