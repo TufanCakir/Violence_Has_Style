@@ -194,25 +194,56 @@ final class RemoteContentStore {
             loadOptionalGifts(from: giftURL)
         async let styleAwakenings: [StyleAwakeningDefinition]? =
             loadOptionalStyleAwakenings(from: styleAwakeningsURL)
-        let loadedConfig: GameConfig? = await loadJSON(from: configURL)
+        let remoteConfig: GameConfig? = await loadJSON(from: configURL)
 
-        guard let loadedEnemies = await enemies, !loadedEnemies.isEmpty,
-            let loadedLevels = await levels, !loadedLevels.isEmpty,
-            let loadedCharacters = await characters, !loadedCharacters.isEmpty,
-            let loadedRewards = await rewards, !loadedRewards.isEmpty,
-            let loadedEvents = await events,
-            let loadedStory = await story, !loadedStory.isEmpty,
-            let loadedThemes = await themes, !loadedThemes.isEmpty,
-            let loadedStylePasses = await stylePasses,
-            let loadedUIConfig = await loadedUIConfigTask,
-            let loadedPremiumStore = await premiumStore,
-            let loadedEnemyAvatars = await enemyAvatars,
-            let loadedLoginCampaigns = await loginCampaigns,
-            let loadedGifts = await gifts,
-            let loadedStyleAwakenings = await styleAwakenings,
-            let loadedConfig
+        let loadedEnemies =
+            await enemies
+            ?? fallbackEnemyDefinitions
+        let loadedLevels =
+            await levels
+            ?? loadBundledJSON("LevelDefinitions", fallback: [])
+        let loadedCharacters =
+            await characters
+            ?? loadBundledJSON("CharacterDefinitions", fallback: [])
+        let loadedRewards =
+            await rewards
+            ?? loadBundledJSON("RewardDefinitions", fallback: [])
+        let loadedEvents =
+            await events
+            ?? loadBundledJSON("EventDefinitions", fallback: [])
+        let loadedStory =
+            await story
+            ?? loadBundledJSON("StoryDefinitions", fallback: [])
+        let loadedThemes =
+            await themes
+            ?? loadBundledJSON(
+                "ThemeDefinition",
+                fallback: ThemeDefinition.fallbackThemes
+            )
+        let loadedStylePasses =
+            await stylePasses
+            ?? loadBundledJSON("StylePassDefinitions", fallback: [])
+        let loadedUIConfig = await loadedUIConfigTask ?? .fallback
+        let loadedPremiumStore = await premiumStore ?? []
+        let loadedEnemyAvatars =
+            await enemyAvatars
+            ?? EnemyAvatarDefinition.fallback
+        let loadedLoginCampaigns =
+            await loginCampaigns
+            ?? LoginCampaignDefinition.fallback
+        let loadedGifts = await gifts ?? GiftDefinition.fallback
+        let loadedStyleAwakenings =
+            await styleAwakenings
+            ?? StyleAwakeningDefinition.fallback
+        let loadedConfig =
+            remoteConfig
+            ?? loadBundledJSON("GameConfig", fallback: GameConfig.fallback)
+
+        guard !loadedEnemies.isEmpty, !loadedLevels.isEmpty,
+            !loadedCharacters.isEmpty, !loadedRewards.isEmpty,
+            !loadedStory.isEmpty, !loadedThemes.isEmpty
         else {
-            resetRemoteContent(status: "REMOTE DATA REQUIRED")
+            resetRemoteContent(status: "CONTENT FILES MISSING")
             return
         }
 
@@ -245,8 +276,8 @@ final class RemoteContentStore {
         uiConfig = loadedUIConfig
         gameConfig = loadedConfig
         isOnline = true
-        statusMessage = "REMOTE STYLE LOADED"
-        finishLoading(status: "REMOTE STYLE LOADED")
+        statusMessage = "GAME CONTENT READY"
+        finishLoading(status: "GAME CONTENT READY")
     }
 
     func assetURL(named name: String, fileExtension: String = "png") -> URL {
@@ -369,6 +400,31 @@ final class RemoteContentStore {
         } catch {
             return nil
         }
+    }
+
+    private func loadBundledJSON<T: Decodable>(
+        _ resourceName: String,
+        fallback: T
+    ) -> T {
+        guard
+            let url = Bundle.main.url(
+                forResource: resourceName,
+                withExtension: "json"
+            )
+        else {
+            return fallback
+        }
+
+        do {
+            let data = try Data(contentsOf: url)
+            return try JSONDecoder().decode(T.self, from: data)
+        } catch {
+            return fallback
+        }
+    }
+
+    private var fallbackEnemyDefinitions: [EnemyDefinition] {
+        EnemyType.allCases.map { EnemyCatalog.shared.definition(for: $0) }
     }
 
     private func loadOptionalUIConfig(from url: URL?) async -> UIConfig? {

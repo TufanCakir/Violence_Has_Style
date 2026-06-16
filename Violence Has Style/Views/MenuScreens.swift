@@ -228,16 +228,16 @@ struct RemoteLoadingView: View {
             VStack(spacing: 18) {
                 Spacer()
 
-                VStack(spacing: 0) {
-                    Text("REMOTE")
+                VStack(spacing: 4) {
+                    Text("SETTING UP")
                         .font(
-                            .system(size: 40, weight: .black, design: .rounded)
+                            .system(size: 28, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
 
-                    Text("STYLE LOAD")
+                    Text("VIOLENCE HAS STYLE")
                         .font(
-                            .system(size: 38, weight: .black, design: .rounded)
+                            .system(size: 26, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(
                             ThemeManager.shared.currentTheme.primaryColor
@@ -248,7 +248,8 @@ struct RemoteLoadingView: View {
                     HStack {
                         Text(
                             isLoading
-                                ? "DOWNLOADING GAME DATA" : "ONLINE REQUIRED"
+                                ? "LOADING EVENTS AND REWARDS"
+                                : "CONTENT UPDATE FAILED"
                         )
                         .font(
                             .system(
@@ -274,7 +275,7 @@ struct RemoteLoadingView: View {
                             )
                     }
 
-                    ProgressView(value: progress)
+                    ProgressView(value: min(1, max(0, progress)))
                         .tint(ThemeManager.shared.currentTheme.primaryColor)
 
                     HStack {
@@ -303,12 +304,12 @@ struct RemoteLoadingView: View {
                         .lineLimit(2)
                         .minimumScaleFactor(0.7)
 
-                    Text(
-                        "Events, themes, music, characters and shop data are loaded from the remote server before gameplay starts."
-                    )
-                    .font(.system(size: 12, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.62))
-                    .fixedSize(horizontal: false, vertical: true)
+                    Text(helpText)
+                        .font(
+                            .system(size: 12, weight: .bold, design: .rounded)
+                        )
+                        .foregroundStyle(.white.opacity(0.62))
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(18)
                 .background(
@@ -326,7 +327,7 @@ struct RemoteLoadingView: View {
 
                 if !isLoading {
                     Button(action: retry) {
-                        Text("RETRY DOWNLOAD")
+                        Text("TRY AGAIN")
                             .font(
                                 .system(
                                     size: 15,
@@ -349,6 +350,16 @@ struct RemoteLoadingView: View {
 
     private func megabytes(_ bytes: Int) -> String {
         String(format: "%.1f", Double(bytes) / 1_000_000)
+    }
+
+    private var helpText: String {
+        if isLoading {
+            return
+                "The game is getting the latest events, rewards and balance data. If one update file is missing, bundled content will be used so the game can still start."
+        }
+
+        return
+            "Your internet is connected, but the content update did not finish. Try again, or check that all JSON files are uploaded on the server."
     }
 }
 
