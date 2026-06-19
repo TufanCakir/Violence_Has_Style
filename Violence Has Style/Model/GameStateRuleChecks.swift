@@ -9,7 +9,9 @@
     import Foundation
 
     enum GameStateRuleChecks {
+
         static func runAll() -> [String] {
+
             var failures: [String] = []
 
             checkBasicAttackRules(&failures)
@@ -279,15 +281,23 @@
         private static func checkCharacterRules(_ failures: inout [String]) {
             let defaultCharacter = CharacterCatalog.shared.defaultCharacter
             record(
-                defaultCharacter.id == "vhs_blade",
-                "default character should be VHS Blade",
+                defaultCharacter.id == "vance",
+                "default character should be Vance",
                 &failures
             )
             record(
                 defaultCharacter.attackFrames == [
-                    "attack1", "attack2", "attack3",
+                    "character_vhs_attack1",
+                    "character_vhs_attack2",
+                    "character_vhs_attack3",
+                    "character_vhs_attack4",
+                    "character_vhs_attack5",
+                    "character_vhs_attack6",
+                    "character_vhs_attack7",
+                    "character_vhs_attack8",
+                    "character_vhs_attack9",
                 ],
-                "default character should use current player frames",
+                "default character should use the shared attack frames",
                 &failures
             )
 

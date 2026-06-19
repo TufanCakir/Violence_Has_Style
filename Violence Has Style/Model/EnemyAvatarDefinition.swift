@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct EnemyAvatarDefinition: Codable, Equatable, Identifiable {
+
     let id: String
     let title: String
     let bodyType: String

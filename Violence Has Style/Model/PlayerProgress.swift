@@ -9,6 +9,7 @@ import SwiftData
 
 @Model
 final class PlayerProgress {
+    
     var coins = 0
     var crystals = 0
     var bestFightsCleared = 0

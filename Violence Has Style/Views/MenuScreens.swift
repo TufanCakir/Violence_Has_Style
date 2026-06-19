@@ -8,9 +8,13 @@
 import SwiftUI
 
 struct TitleScreenView: View {
+
     let start: () -> Void
 
     var body: some View {
+        let theme = ThemeManager.shared.currentTheme
+        let typography = RemoteContentStore.shared.uiConfig.typography
+
         ZStack {
             titleBackground
 
@@ -23,20 +27,23 @@ struct TitleScreenView: View {
                 logo
                     .frame(maxWidth: 300)
                     .frame(height: 180)
-                    .shadow(color: .red.opacity(0.8), radius: 18)
+                    .shadow(
+                        color: theme.secondaryColor.opacity(0.8),
+                        radius: 18
+                    )
 
                 VStack(spacing: 2) {
                     Text("VIOLENCE")
                         .font(
-                            .system(size: 42, weight: .black, design: .rounded)
+                            .vhs(size: 42, weight: .black, design: .rounded)
                         )
-                        .foregroundStyle(.white)
+                        .foregroundStyle(typography.primaryTextColor)
 
                     Text("HAS STYLE")
                         .font(
-                            .system(size: 42, weight: .black, design: .rounded)
+                            .vhs(size: 42, weight: .black, design: .rounded)
                         )
-                        .foregroundStyle(.red)
+                        .foregroundStyle(typography.secondaryTextColor)
                 }
                 .tracking(1.2)
 
@@ -44,9 +51,9 @@ struct TitleScreenView: View {
 
                 Text("TAP TO START")
                     .font(
-                        .system(size: 13, weight: .black, design: .monospaced)
+                        .vhs(size: 13, weight: .black, design: .monospaced)
                     )
-                    .foregroundStyle(.white.opacity(0.74))
+                    .foregroundStyle(typography.mutedTextColor.opacity(0.9))
                     .tracking(1.4)
                     .padding(.bottom, 28)
             }
@@ -72,7 +79,13 @@ struct TitleScreenView: View {
     }
 
     private var logo: some View {
-        AsyncImage(url: RemoteContentStore.shared.assetURL(named: "logo_vhs")) {
+        let logoAssetId =
+            RemoteContentStore.shared.uiConfig.titleLogoAssetId
+            ?? "logo_vhs_purple"
+
+        return AsyncImage(
+            url: RemoteContentStore.shared.assetURL(named: logoAssetId)
+        ) {
             phase in
             if let image = phase.image {
                 image
@@ -81,18 +94,25 @@ struct TitleScreenView: View {
             } else {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(.red.opacity(0.8), lineWidth: 2)
+                        .stroke(
+                            ThemeManager.shared.currentTheme.secondaryColor
+                                .opacity(0.8),
+                            lineWidth: 2
+                        )
                         .background(
                             ThemeManager.shared.currentTheme.panelColor.opacity(
                                 0.42
                             )
                         )
 
-                    Text("VHS")
+                    Text("Violence Has Style")
                         .font(
-                            .system(size: 54, weight: .black, design: .rounded)
+                            .vhs(size: 54, weight: .black, design: .rounded)
                         )
-                        .foregroundStyle(.white)
+                        .foregroundStyle(
+                            RemoteContentStore.shared.uiConfig.typography
+                                .primaryTextColor
+                        )
                         .tracking(3)
                 }
             }
@@ -113,17 +133,17 @@ struct OnlineRequiredView: View {
                 Spacer()
 
                 Text("VIOLENCE")
-                    .font(.system(size: 40, weight: .black, design: .rounded))
+                    .font(.vhs(size: 40, weight: .black, design: .rounded))
                     .foregroundStyle(.white)
 
                 Text("HAS STYLE")
-                    .font(.system(size: 40, weight: .black, design: .rounded))
+                    .font(.vhs(size: 40, weight: .black, design: .rounded))
                     .foregroundStyle(.red)
 
                 VStack(spacing: 10) {
                     Text(isLoading ? "LOADING REMOTE GAME" : "ONLINE REQUIRED")
                         .font(
-                            .system(
+                            .vhs(
                                 size: 14,
                                 weight: .black,
                                 design: .monospaced
@@ -137,7 +157,7 @@ struct OnlineRequiredView: View {
                             : "This game needs WLAN or mobile data because gameplay data and media are loaded online."
                     )
                     .font(
-                        .system(
+                        .vhs(
                             size: 12,
                             weight: .bold,
                             design: .rounded
@@ -149,7 +169,7 @@ struct OnlineRequiredView: View {
 
                     Text(status)
                         .font(
-                            .system(
+                            .vhs(
                                 size: 10,
                                 weight: .black,
                                 design: .monospaced
@@ -180,7 +200,7 @@ struct OnlineRequiredView: View {
                     Button(action: retry) {
                         Text("RETRY CONNECTION")
                             .font(
-                                .system(
+                                .vhs(
                                     size: 15,
                                     weight: .black,
                                     design: .rounded
@@ -195,7 +215,7 @@ struct OnlineRequiredView: View {
 
                     Text("WLAN OR MOBILE DATA NEEDED")
                         .font(
-                            .system(
+                            .vhs(
                                 size: 10,
                                 weight: .black,
                                 design: .monospaced
@@ -231,13 +251,13 @@ struct RemoteLoadingView: View {
                 VStack(spacing: 4) {
                     Text("SETTING UP")
                         .font(
-                            .system(size: 28, weight: .black, design: .rounded)
+                            .vhs(size: 28, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
 
                     Text("VIOLENCE HAS STYLE")
                         .font(
-                            .system(size: 26, weight: .black, design: .rounded)
+                            .vhs(size: 26, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(
                             ThemeManager.shared.currentTheme.primaryColor
@@ -252,7 +272,7 @@ struct RemoteLoadingView: View {
                                 : "CONTENT UPDATE FAILED"
                         )
                         .font(
-                            .system(
+                            .vhs(
                                 size: 13,
                                 weight: .black,
                                 design: .monospaced
@@ -264,7 +284,7 @@ struct RemoteLoadingView: View {
 
                         Text("\(Int(progress * 100))%")
                             .font(
-                                .system(
+                                .vhs(
                                     size: 13,
                                     weight: .black,
                                     design: .monospaced
@@ -286,13 +306,13 @@ struct RemoteLoadingView: View {
                         )
                     }
                     .font(
-                        .system(size: 10, weight: .black, design: .monospaced)
+                        .vhs(size: 10, weight: .black, design: .monospaced)
                     )
                     .foregroundStyle(.white.opacity(0.56))
 
                     Text(status)
                         .font(
-                            .system(
+                            .vhs(
                                 size: 10,
                                 weight: .black,
                                 design: .monospaced
@@ -306,7 +326,7 @@ struct RemoteLoadingView: View {
 
                     Text(helpText)
                         .font(
-                            .system(size: 12, weight: .bold, design: .rounded)
+                            .vhs(size: 12, weight: .bold, design: .rounded)
                         )
                         .foregroundStyle(.white.opacity(0.62))
                         .fixedSize(horizontal: false, vertical: true)
@@ -329,7 +349,7 @@ struct RemoteLoadingView: View {
                     Button(action: retry) {
                         Text("TRY AGAIN")
                             .font(
-                                .system(
+                                .vhs(
                                     size: 15,
                                     weight: .black,
                                     design: .rounded
@@ -359,7 +379,7 @@ struct RemoteLoadingView: View {
         }
 
         return
-            "Your internet is connected, but the content update did not finish. Try again, or check that all JSON files are uploaded on the server."
+            "Your internet is connected, but the content update did not finish. Try again in a moment."
     }
 }
 
@@ -371,18 +391,18 @@ struct OfflineView: View {
 
             VStack(spacing: 16) {
                 Text("OFFLINE")
-                    .font(.system(size: 42, weight: .black, design: .rounded))
+                    .font(.vhs(size: 42, weight: .black, design: .rounded))
                     .foregroundStyle(.red)
 
                 Text("INTERNET REQUIRED")
                     .font(
-                        .system(size: 14, weight: .black, design: .monospaced)
+                        .vhs(size: 14, weight: .black, design: .monospaced)
                     )
                     .foregroundStyle(.white.opacity(0.78))
 
                 Text("WLAN OR MOBILE DATA")
                     .font(
-                        .system(size: 10, weight: .black, design: .monospaced)
+                        .vhs(size: 10, weight: .black, design: .monospaced)
                     )
                     .foregroundStyle(.white.opacity(0.52))
             }
@@ -403,9 +423,12 @@ struct MainMenuView: View {
     let openGallery: () -> Void
     let openStylePasses: () -> Void
     let openGiftBox: () -> Void
+    let backToTitle: () -> Void
     let openSettings: () -> Void
 
     var body: some View {
+        let theme = ThemeManager.shared.currentTheme
+
         ZStack {
             ThemeBackgroundView()
                 .ignoresSafeArea()
@@ -416,21 +439,21 @@ struct MainMenuView: View {
                 tint: presentedCharacter.tint,
                 isEnemy: false
             )
-            .frame(width: 260, height: 360)
-            .opacity(0.28)
-            .offset(x: 104, y: -12)
+            .frame(width: 220, height: 310)
+            .opacity(0.22)
+            .offset(x: 116, y: -4)
             .allowsHitTesting(false)
 
-            VStack(alignment: .leading, spacing: 14) {
-                VStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 10) {
+                VStack(spacing: 6) {
                     MenuActionButton(
                         title: "STORY MODE",
-                        color: .red,
+                        color: theme.primaryColor,
                         action: openStoryMode
                     )
                     MenuActionButton(
                         title: "ENDLESS MODE",
-                        color: .orange,
+                        color: theme.secondaryColor,
                         action: openEndlessMode
                     )
                     if let activeEvent {
@@ -442,32 +465,37 @@ struct MainMenuView: View {
                     }
                     MenuActionButton(
                         title: "STYLE MODE",
-                        color: .cyan,
+                        color: theme.accentColor,
                         action: openStyleMode
                     )
                     MenuActionButton(
                         title: "CHARACTER SELECT",
-                        color: .white,
+                        color: theme.primaryColor.opacity(0.88),
                         action: openCharacterSelect
                     )
                     MenuActionButton(
                         title: "GALLERY",
-                        color: .purple,
+                        color: theme.secondaryColor.opacity(0.9),
                         action: openGallery
                     )
                     MenuActionButton(
                         title: "STYLE PASS",
-                        color: .yellow,
+                        color: theme.accentColor.opacity(0.9),
                         action: openStylePasses
                     )
                     MenuActionButton(
                         title: "GIFT BOX",
-                        color: .mint,
+                        color: theme.secondaryColor.opacity(0.8),
                         action: openGiftBox
                     )
                     MenuActionButton(
+                        title: "TITLE SCREEN",
+                        color: theme.accentColor.opacity(0.75),
+                        action: backToTitle
+                    )
+                    MenuActionButton(
                         title: "SETTINGS",
-                        color: .orange,
+                        color: theme.primaryColor.opacity(0.75),
                         action: openSettings
                     )
                 }
@@ -476,14 +504,14 @@ struct MainMenuView: View {
 
                 Text("TAP ATTACK. SWIPE STYLE. KILL WITH STYLE.")
                     .font(
-                        .system(size: 10, weight: .black, design: .monospaced)
+                        .vhs(size: 10, weight: .black, design: .monospaced)
                     )
                     .foregroundStyle(.white.opacity(0.55))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 28)
-            .padding(.top, 30)
-            .padding(.bottom, 24)
+            .padding(.horizontal, 24)
+            .padding(.top, 18)
+            .padding(.bottom, 18)
         }
     }
 }
@@ -504,7 +532,7 @@ struct EventShopView: View {
                 HStack {
                     Text("EVENT SHOP")
                         .font(
-                            .system(size: 30, weight: .black, design: .rounded)
+                            .vhs(size: 30, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
 
@@ -517,13 +545,13 @@ struct EventShopView: View {
 
                     HStack(spacing: 6) {
                         Image(systemName: event.currencySymbol ?? "drop.fill")
-                            .font(.system(size: 18, weight: .black))
+                            .font(.vhs(size: 18, weight: .black))
                             .foregroundStyle(event.themeColor)
                             .frame(width: 20, height: 20)
 
                         Text("\(balance) \(event.currencyTitle)")
                             .font(
-                                .system(
+                                .vhs(
                                     size: 12,
                                     weight: .black,
                                     design: .monospaced
@@ -549,7 +577,7 @@ struct EventShopView: View {
                                     VStack(alignment: .leading, spacing: 5) {
                                         Text(item.title)
                                             .font(
-                                                .system(
+                                                .vhs(
                                                     size: 15,
                                                     weight: .black,
                                                     design: .rounded
@@ -559,7 +587,7 @@ struct EventShopView: View {
 
                                         Text(item.description)
                                             .font(
-                                                .system(
+                                                .vhs(
                                                     size: 10,
                                                     weight: .bold,
                                                     design: .monospaced
@@ -577,7 +605,7 @@ struct EventShopView: View {
                                             ? "OWNED" : "\(item.cost)"
                                     )
                                     .font(
-                                        .system(
+                                        .vhs(
                                             size: 11,
                                             weight: .black,
                                             design: .monospaced
@@ -616,7 +644,7 @@ struct EventShopView: View {
                 } else {
                     Text("NO ACTIVE EVENT")
                         .font(
-                            .system(
+                            .vhs(
                                 size: 14,
                                 weight: .black,
                                 design: .monospaced
@@ -639,15 +667,17 @@ struct StoryModeView: View {
     let back: () -> Void
 
     var body: some View {
+        let theme = ThemeManager.shared.currentTheme
+
         ZStack {
             ThemeBackgroundView()
                 .ignoresSafeArea()
 
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     Text("STORY MODE")
                         .font(
-                            .system(size: 30, weight: .black, design: .rounded)
+                            .vhs(size: 24, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
 
@@ -656,93 +686,118 @@ struct StoryModeView: View {
                     BackButton(action: back)
                 }
 
-                VStack(spacing: 10) {
-                    ForEach(chapters) { chapter in
-                        let isUnlocked =
-                            chapter.requiredChapter <= completedChapterCount
-                        Button {
-                            startChapter(chapter)
-                        } label: {
-                            VStack(alignment: .leading, spacing: 6) {
-                                HStack {
-                                    Text(chapter.title)
-                                        .font(
-                                            .system(
-                                                size: 17,
-                                                weight: .black,
-                                                design: .rounded
+                ScrollView(showsIndicators: false) {
+                    LazyVStack(spacing: 8) {
+                        ForEach(chapters) { chapter in
+                            let isUnlocked =
+                                chapter.requiredChapter <= completedChapterCount
+                            Button {
+                                startChapter(chapter)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 5) {
+                                    HStack(spacing: 8) {
+                                        Text(chapter.title)
+                                            .font(
+                                                .vhs(
+                                                    size: 15,
+                                                    weight: .black,
+                                                    design: .rounded
+                                                )
                                             )
-                                        )
-                                        .foregroundStyle(
-                                            isUnlocked ? chapter.color : .gray
-                                        )
+                                            .foregroundStyle(
+                                                isUnlocked
+                                                    ? chapter.color : .gray
+                                            )
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.7)
 
-                                    Spacer()
+                                        Spacer()
 
-                                    Text(isUnlocked ? "READY" : "LOCKED")
+                                        Text(isUnlocked ? "READY" : "LOCKED")
+                                            .font(
+                                                .vhs(
+                                                    size: 9,
+                                                    weight: .black,
+                                                    design: .monospaced
+                                                )
+                                            )
+                                            .foregroundStyle(
+                                                isUnlocked ? .white : .gray
+                                            )
+                                    }
+
+                                    Text(chapter.subtitle)
                                         .font(
-                                            .system(
+                                            .vhs(
                                                 size: 10,
-                                                weight: .black,
+                                                weight: .bold,
                                                 design: .monospaced
                                             )
                                         )
                                         .foregroundStyle(
-                                            isUnlocked ? .white : .gray
+                                            .white.opacity(
+                                                isUnlocked ? 0.68 : 0.35
+                                            )
+                                        )
+                                        .lineLimit(2)
+
+                                    HStack {
+                                        Text("\(chapter.targetFights) FIGHTS")
+                                            .font(
+                                                .vhs(
+                                                    size: 9,
+                                                    weight: .black,
+                                                    design: .monospaced
+                                                )
+                                            )
+                                            .foregroundStyle(
+                                                chapter.color.opacity(
+                                                    isUnlocked ? 0.8 : 0.35
+                                                )
+                                            )
+
+                                        Spacer()
+
+                                        Text("CH \(chapter.id.uppercased())")
+                                            .font(
+                                                .vhs(
+                                                    size: 8,
+                                                    weight: .black,
+                                                    design: .monospaced
+                                                )
+                                            )
+                                            .foregroundStyle(
+                                                theme.textColor.opacity(0.35)
+                                            )
+                                            .lineLimit(1)
+                                    }
+                                }
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 10)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(theme.panelColor.opacity(0.5))
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(
+                                            chapter.color.opacity(
+                                                isUnlocked ? 0.7 : 0.22
+                                            ),
+                                            lineWidth: 1
                                         )
                                 }
-
-                                Text(chapter.subtitle)
-                                    .font(
-                                        .system(
-                                            size: 11,
-                                            weight: .bold,
-                                            design: .monospaced
-                                        )
-                                    )
-                                    .foregroundStyle(
-                                        .white.opacity(isUnlocked ? 0.68 : 0.35)
-                                    )
-
-                                Text("\(chapter.targetFights) FIGHTS")
-                                    .font(
-                                        .system(
-                                            size: 10,
-                                            weight: .black,
-                                            design: .monospaced
-                                        )
-                                    )
-                                    .foregroundStyle(
-                                        chapter.color.opacity(
-                                            isUnlocked ? 0.8 : 0.35
-                                        )
-                                    )
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
                             }
-                            .padding(14)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(
-                                ThemeManager.shared.currentTheme.panelColor
-                                    .opacity(0.5)
-                            )
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(
-                                        chapter.color.opacity(
-                                            isUnlocked ? 0.7 : 0.22
-                                        ),
-                                        lineWidth: 1
-                                    )
-                            }
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .buttonStyle(.plain)
+                            .disabled(!isUnlocked)
                         }
-                        .buttonStyle(.plain)
-                        .disabled(!isUnlocked)
                     }
                 }
 
                 Spacer()
             }
-            .padding(24)
+            .padding(.horizontal, 20)
+            .padding(.top, 18)
+            .padding(.bottom, 14)
         }
     }
 }
@@ -765,7 +820,7 @@ struct EventModeView: View {
                 HStack {
                     Text("EVENT MODE")
                         .font(
-                            .system(size: 30, weight: .black, design: .rounded)
+                            .vhs(size: 30, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
 
@@ -777,7 +832,7 @@ struct EventModeView: View {
                 if events.isEmpty {
                     Text("NO ACTIVE EVENT")
                         .font(
-                            .system(
+                            .vhs(
                                 size: 14,
                                 weight: .black,
                                 design: .monospaced
@@ -821,7 +876,7 @@ private struct EventSelectionCard: View {
             Button(action: selectEvent) {
                 HStack(spacing: 10) {
                     Image(systemName: event.currencySymbol ?? "sparkles")
-                        .font(.system(size: 21, weight: .black))
+                        .font(.vhs(size: 21, weight: .black))
                         .foregroundStyle(event.themeColor)
                         .frame(width: 28)
 
@@ -829,7 +884,7 @@ private struct EventSelectionCard: View {
                         HStack(spacing: 8) {
                             Text(event.title)
                                 .font(
-                                    .system(
+                                    .vhs(
                                         size: 18,
                                         weight: .black,
                                         design: .rounded
@@ -839,7 +894,7 @@ private struct EventSelectionCard: View {
 
                             Text(statusText)
                                 .font(
-                                    .system(
+                                    .vhs(
                                         size: 9,
                                         weight: .black,
                                         design: .monospaced
@@ -850,7 +905,7 @@ private struct EventSelectionCard: View {
 
                         Text("\(balance) \(event.currencyTitle)")
                             .font(
-                                .system(
+                                .vhs(
                                     size: 10,
                                     weight: .black,
                                     design: .monospaced
@@ -864,7 +919,7 @@ private struct EventSelectionCard: View {
                     if isSelected {
                         Text("SELECTED")
                             .font(
-                                .system(
+                                .vhs(
                                     size: 9,
                                     weight: .black,
                                     design: .monospaced
@@ -882,7 +937,7 @@ private struct EventSelectionCard: View {
                 Button(action: startEventRun) {
                     Text(event.isActive ? "START RUN" : "COMING SOON")
                         .font(
-                            .system(
+                            .vhs(
                                 size: 11,
                                 weight: .black,
                                 design: .monospaced
@@ -898,7 +953,7 @@ private struct EventSelectionCard: View {
                 Button(action: openShop) {
                     Text("SHOP")
                         .font(
-                            .system(
+                            .vhs(
                                 size: 11,
                                 weight: .black,
                                 design: .monospaced
@@ -949,7 +1004,7 @@ private struct EventCountdownView: View {
 
             Text(countdownText)
         }
-        .font(.system(size: 12, weight: .black, design: .monospaced))
+        .font(.vhs(size: 12, weight: .black, design: .monospaced))
         .foregroundStyle(.white)
         .padding(12)
         .background(ThemeManager.shared.currentTheme.panelColor.opacity(0.55))
@@ -997,7 +1052,7 @@ struct EndlessModeView: View {
                 HStack {
                     Text("ENDLESS MODE")
                         .font(
-                            .system(size: 30, weight: .black, design: .rounded)
+                            .vhs(size: 30, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
 
@@ -1046,7 +1101,7 @@ struct StyleLabView: View {
                 HStack {
                     Text("STYLE LAB")
                         .font(
-                            .system(size: 30, weight: .black, design: .rounded)
+                            .vhs(size: 30, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
 
@@ -1060,7 +1115,7 @@ struct StyleLabView: View {
                         VStack(alignment: .leading, spacing: 5) {
                             Text(style.title)
                                 .font(
-                                    .system(
+                                    .vhs(
                                         size: 16,
                                         weight: .black,
                                         design: .rounded
@@ -1070,7 +1125,7 @@ struct StyleLabView: View {
 
                             Text(style.labDescription)
                                 .font(
-                                    .system(
+                                    .vhs(
                                         size: 11,
                                         weight: .bold,
                                         design: .monospaced
@@ -1115,7 +1170,7 @@ struct CharacterSelectView: View {
                 HStack {
                     Text("CHARACTER SELECT")
                         .font(
-                            .system(size: 26, weight: .black, design: .rounded)
+                            .vhs(size: 26, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
 
@@ -1145,7 +1200,7 @@ struct CharacterSelectView: View {
                                 VStack(alignment: .leading, spacing: 5) {
                                     Text(character.title)
                                         .font(
-                                            .system(
+                                            .vhs(
                                                 size: 16,
                                                 weight: .black,
                                                 design: .rounded
@@ -1155,7 +1210,7 @@ struct CharacterSelectView: View {
 
                                     Text(characterSummary(character))
                                         .font(
-                                            .system(
+                                            .vhs(
                                                 size: 10,
                                                 weight: .bold,
                                                 design: .monospaced
@@ -1169,7 +1224,7 @@ struct CharacterSelectView: View {
                                 if character.id == selectedCharacter.id {
                                     Text("SELECTED")
                                         .font(
-                                            .system(
+                                            .vhs(
                                                 size: 10,
                                                 weight: .black,
                                                 design: .monospaced
@@ -1230,7 +1285,7 @@ struct FightIntroView: View {
 
                 Text(enemy.isBoss ? "BOSS FIGHT" : "FIGHT \(fightLevel)")
                     .font(
-                        .system(
+                        .vhs(
                             size: enemy.isBoss ? 42 : 34,
                             weight: .black,
                             design: .rounded
@@ -1242,13 +1297,13 @@ struct FightIntroView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(level.title)
                         .font(
-                            .system(size: 18, weight: .black, design: .rounded)
+                            .vhs(size: 18, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(level.accentColor)
 
                     Text(level.moodText)
                         .font(
-                            .system(
+                            .vhs(
                                 size: 11,
                                 weight: .black,
                                 design: .monospaced
@@ -1274,7 +1329,7 @@ struct FightIntroView: View {
 
                 Text("TAP TO ENTER")
                     .font(
-                        .system(size: 12, weight: .black, design: .monospaced)
+                        .vhs(size: 12, weight: .black, design: .monospaced)
                     )
                     .foregroundStyle(.white.opacity(0.66))
                     .tracking(1.3)
@@ -1301,11 +1356,11 @@ struct FightIntroView: View {
     {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.system(size: 9, weight: .black, design: .monospaced))
+                .font(.vhs(size: 9, weight: .black, design: .monospaced))
                 .foregroundStyle(.white.opacity(0.5))
 
             Text(value)
-                .font(.system(size: 12, weight: .black, design: .rounded))
+                .font(.vhs(size: 12, weight: .black, design: .rounded))
                 .foregroundStyle(color)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
@@ -1338,7 +1393,7 @@ struct GalleryView: View {
                 HStack {
                     Text("GALLERY")
                         .font(
-                            .system(size: 30, weight: .black, design: .rounded)
+                            .vhs(size: 30, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
 
@@ -1423,7 +1478,7 @@ struct SettingsView: View {
                         HStack {
                             Text("MUSIC VOLUME")
                                 .font(
-                                    .system(
+                                    .vhs(
                                         size: 13,
                                         weight: .black,
                                         design: .monospaced
@@ -1435,7 +1490,7 @@ struct SettingsView: View {
 
                             Text("\(Int(musicVolume * 100))%")
                                 .font(
-                                    .system(
+                                    .vhs(
                                         size: 12,
                                         weight: .black,
                                         design: .monospaced
@@ -1487,10 +1542,10 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("APP STORE BUILD")
+                    Text("GAME INFO")
                         .font(
-                            .system(
-                                size: 12,
+                            .vhs(
+                                size: 11,
                                 weight: .black,
                                 design: .monospaced
                             )
@@ -1498,19 +1553,19 @@ struct SettingsView: View {
                         .foregroundStyle(.white.opacity(0.58))
 
                     SettingsInfoLine(
-                        title: "ONLINE GAME",
-                        value: "REMOTE CONTENT REQUIRED"
+                        title: "EVENTS",
+                        value: "NEW RUNS AND REWARDS"
                     )
                     SettingsInfoLine(
-                        title: "CONTENT",
-                        value: "JSON, THEMES, MUSIC, CHARACTERS"
+                        title: "DAILY LOGIN",
+                        value: "FREE REWARDS RETURN DAILY"
                     )
                     SettingsInfoLine(
-                        title: "PURCHASES",
-                        value: "COSMETICS ONLY"
+                        title: "STORE",
+                        value: "OPTIONAL STYLE ITEMS"
                     )
                 }
-                .padding(12)
+                .padding(10)
                 .background(
                     ThemeManager.shared.currentTheme.panelColor.opacity(0.48)
                 )
@@ -1523,7 +1578,7 @@ struct SettingsView: View {
                 Button(action: resetGalleryData) {
                     Text("RESET GALLERY DATA")
                         .font(
-                            .system(size: 12, weight: .black, design: .rounded)
+                            .vhs(size: 12, weight: .black, design: .rounded)
                         )
                         .frame(maxWidth: .infinity)
                         .frame(height: 40)
@@ -1549,13 +1604,15 @@ private struct MenuActionButton: View {
         Button(action: action) {
             HStack {
                 Text(title)
-                    .font(.system(size: 17, weight: .black, design: .rounded))
+                    .font(.vhs(size: 17, weight: .black, design: .rounded))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
 
                 Spacer()
             }
             .foregroundStyle(.white)
-            .padding(.horizontal, 16)
-            .frame(height: 54)
+            .padding(.horizontal, 14)
+            .frame(height: 42)
             .background(
                 ThemeManager.shared.currentTheme.panelColor.opacity(0.55)
             )
@@ -1575,7 +1632,7 @@ struct BackButton: View {
     var body: some View {
         Button(action: action) {
             Text("BACK")
-                .font(.system(size: 10, weight: .black, design: .monospaced))
+                .font(.vhs(size: 10, weight: .black, design: .monospaced))
                 .padding(.horizontal, 8)
                 .frame(height: 30)
         }
@@ -1595,7 +1652,7 @@ struct SettingsNavigationRow: View {
 
             Text(title)
                 .font(
-                    .system(size: 13, weight: .black, design: .monospaced)
+                    .vhs(size: 13, weight: .black, design: .monospaced)
                 )
 
             Spacer()
@@ -1623,7 +1680,7 @@ private struct SettingsToggle: View {
     var body: some View {
         Toggle(isOn: $isOn) {
             Text(title)
-                .font(.system(size: 13, weight: .black, design: .monospaced))
+                .font(.vhs(size: 13, weight: .black, design: .monospaced))
                 .foregroundStyle(.white.opacity(0.82))
         }
         .tint(.red)
@@ -1637,13 +1694,13 @@ private struct SettingsInfoLine: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             Text(title)
-                .font(.system(size: 11, weight: .black, design: .monospaced))
+                .font(.vhs(size: 11, weight: .black, design: .monospaced))
                 .foregroundStyle(.white.opacity(0.56))
 
             Spacer(minLength: 12)
 
             Text(value)
-                .font(.system(size: 11, weight: .black, design: .monospaced))
+                .font(.vhs(size: 11, weight: .black, design: .monospaced))
                 .foregroundStyle(ThemeManager.shared.currentTheme.accentColor)
                 .multilineTextAlignment(.trailing)
                 .lineLimit(2)
@@ -1659,7 +1716,7 @@ private struct GallerySection<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
-                .font(.system(size: 12, weight: .black, design: .monospaced))
+                .font(.vhs(size: 12, weight: .black, design: .monospaced))
                 .foregroundStyle(.white.opacity(0.58))
 
             content
@@ -1683,13 +1740,13 @@ private struct GalleryLine: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(.system(size: 11, weight: .black, design: .monospaced))
+                .font(.vhs(size: 11, weight: .black, design: .monospaced))
                 .foregroundStyle(.white.opacity(0.62))
 
             Spacer()
 
             Text(value)
-                .font(.system(size: 13, weight: .black, design: .rounded))
+                .font(.vhs(size: 13, weight: .black, design: .rounded))
                 .foregroundStyle(color)
         }
     }
@@ -1704,14 +1761,14 @@ private struct GalleryList: View {
             if items.isEmpty {
                 Text(emptyText)
                     .font(
-                        .system(size: 11, weight: .black, design: .monospaced)
+                        .vhs(size: 11, weight: .black, design: .monospaced)
                     )
                     .foregroundStyle(.white.opacity(0.48))
             } else {
                 ForEach(items, id: \.self) { item in
                     Text(item)
                         .font(
-                            .system(
+                            .vhs(
                                 size: 12,
                                 weight: .black,
                                 design: .monospaced

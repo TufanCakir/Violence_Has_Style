@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct MusicSelectionView: View {
+
     let tracks: [MusicTrack]
     let selectedTrackId: String
     let ownedMusicPackIds: [String]
@@ -22,7 +23,7 @@ struct MusicSelectionView: View {
                 HStack {
                     Text("MUSIC SELECT")
                         .font(
-                            .system(size: 24, weight: .black, design: .rounded)
+                            .vhs(size: 24, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
 
@@ -138,7 +139,7 @@ struct PaintSelectionView: View {
                 HStack {
                     Text("PAINT FX")
                         .font(
-                            .system(size: 24, weight: .black, design: .rounded)
+                            .vhs(size: 24, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
 
@@ -235,18 +236,18 @@ private struct CosmeticSelectionRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: symbol)
-                .font(.system(size: 21, weight: .black))
+                .font(.vhs(size: 21, weight: .black))
                 .foregroundStyle(color)
                 .frame(width: 30)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.system(size: 15, weight: .black, design: .rounded))
+                    .font(.vhs(size: 15, weight: .black, design: .rounded))
                     .foregroundStyle(.white)
 
                 Text(subtitle)
                     .font(
-                        .system(size: 9, weight: .black, design: .monospaced)
+                        .vhs(size: 9, weight: .black, design: .monospaced)
                     )
                     .foregroundStyle(.white.opacity(0.48))
             }
@@ -254,7 +255,7 @@ private struct CosmeticSelectionRow: View {
             Spacer()
 
             Text(stateText)
-                .font(.system(size: 10, weight: .black, design: .monospaced))
+                .font(.vhs(size: 10, weight: .black, design: .monospaced))
                 .foregroundStyle(isSelected ? color : .white.opacity(0.58))
         }
         .padding(13)

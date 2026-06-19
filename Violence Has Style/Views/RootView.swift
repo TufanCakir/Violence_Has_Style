@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct RootView<Content: View>: View {
+
     let theme: ThemeDefinition
     let styleRank: StyleRank
     let currencies: [HeaderCurrencyDisplay]
@@ -20,6 +21,8 @@ struct RootView<Content: View>: View {
     @ViewBuilder let content: Content
 
     var body: some View {
+        let typography = RemoteContentStore.shared.uiConfig.typography
+
         VStack(spacing: 0) {
 
             if showNavigation {
@@ -46,6 +49,8 @@ struct RootView<Content: View>: View {
             }
         }
         .background(theme.backgroundColor.ignoresSafeArea())
+        .font(.vhs(size: 14, weight: .regular))
+        .foregroundStyle(typography.primaryTextColor)
     }
 }
 
@@ -79,13 +84,13 @@ private struct GlobalHeaderView: View {
         HStack(spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(styleRank.title)
-                    .font(.system(size: 15, weight: .black, design: .rounded))
+                    .font(.vhs(size: 15, weight: .black, design: .rounded))
                     .foregroundStyle(styleRank.color)
                     .lineLimit(1)
                     .minimumScaleFactor(0.55)
 
                 Text("STYLE RANK")
-                    .font(.system(size: 8, weight: .black, design: .monospaced))
+                    .font(.vhs(size: 8, weight: .black, design: .monospaced))
                     .foregroundStyle(.white.opacity(0.45))
                     .lineLimit(1)
             }
@@ -99,7 +104,7 @@ private struct GlobalHeaderView: View {
                 isShowingCurrencyInfo = true
             } label: {
                 Image(systemName: "info.circle.fill")
-                    .font(.system(size: 18, weight: .black))
+                    .font(.vhs(size: 18, weight: .black))
                     .foregroundStyle(theme.accentColor)
                     .frame(width: 30, height: 30)
                     .contentShape(Circle())
@@ -168,7 +173,7 @@ private struct CurrencyInfoSheetView: View {
                 VStack(alignment: .leading, spacing: 14) {
                     Text("CURRENCIES")
                         .font(
-                            .system(size: 24, weight: .black, design: .rounded)
+                            .vhs(size: 24, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
 
@@ -176,7 +181,7 @@ private struct CurrencyInfoSheetView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("STYLE RANK")
                                 .font(
-                                    .system(
+                                    .vhs(
                                         size: 10,
                                         weight: .black,
                                         design: .monospaced
@@ -186,7 +191,7 @@ private struct CurrencyInfoSheetView: View {
 
                             Text(styleRank.title)
                                 .font(
-                                    .system(
+                                    .vhs(
                                         size: 22,
                                         weight: .black,
                                         design: .rounded
@@ -223,18 +228,18 @@ private struct CurrencyInfoRowView: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: currency.symbol)
-                .font(.system(size: 20, weight: .black))
+                .font(.vhs(size: 20, weight: .black))
                 .foregroundStyle(currency.color)
                 .frame(width: 30)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(currency.title)
-                    .font(.system(size: 14, weight: .black, design: .rounded))
+                    .font(.vhs(size: 14, weight: .black, design: .rounded))
                     .foregroundStyle(.white)
 
                 Text(currency.id.uppercased())
                     .font(
-                        .system(size: 9, weight: .black, design: .monospaced)
+                        .vhs(size: 9, weight: .black, design: .monospaced)
                     )
                     .foregroundStyle(.white.opacity(0.44))
             }
@@ -242,7 +247,7 @@ private struct CurrencyInfoRowView: View {
             Spacer()
 
             Text("\(currency.value)")
-                .font(.system(size: 18, weight: .black, design: .rounded))
+                .font(.vhs(size: 18, weight: .black, design: .rounded))
                 .foregroundStyle(currency.color)
         }
         .padding(13)
@@ -264,19 +269,19 @@ private struct HeaderCurrencyView: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: symbol)
-                .font(.system(size: 12, weight: .black))
+                .font(.vhs(size: 12, weight: .black))
                 .foregroundStyle(color)
                 .frame(width: 14, height: 14)
 
             VStack(alignment: .leading, spacing: 0) {
                 Text("\(value)")
-                    .font(.system(size: 12, weight: .black, design: .rounded))
+                    .font(.vhs(size: 12, weight: .black, design: .rounded))
                     .foregroundStyle(color)
                     .lineLimit(1)
                     .minimumScaleFactor(0.55)
 
                 Text(title)
-                    .font(.system(size: 6, weight: .black, design: .monospaced))
+                    .font(.vhs(size: 6, weight: .black, design: .monospaced))
                     .foregroundStyle(.white.opacity(0.48))
                     .lineLimit(1)
                     .minimumScaleFactor(0.45)
@@ -301,12 +306,12 @@ private struct GlobalFooterView: View {
                     } label: {
                         VStack(spacing: 4) {
                             Image(systemName: tab.symbol)
-                                .font(.system(size: 19, weight: .black))
+                                .font(.vhs(size: 19, weight: .black))
                                 .frame(width: 24, height: 24)
 
                             Text(tab.title)
                                 .font(
-                                    .system(
+                                    .vhs(
                                         size: 8,
                                         weight: .black,
                                         design: .monospaced

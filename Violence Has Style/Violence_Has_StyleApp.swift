@@ -11,6 +11,10 @@ import SwiftUI
 @main
 struct Violence_Has_StyleApp: App {
 
+    init() {
+        FontManager.registerBundledFonts()
+    }
+
     var body: some Scene {
         WindowGroup {
             GameView()

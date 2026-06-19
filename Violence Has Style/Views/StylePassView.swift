@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct StylePassView: View {
+
     let passes: [StylePassDefinition]
     let points: Int
     let unlockedRewardIds: [String]
@@ -24,7 +25,7 @@ struct StylePassView: View {
                     VStack(alignment: .leading, spacing: 3) {
                         Text("STYLE PASSES")
                             .font(
-                                .system(
+                                .vhs(
                                     size: 24,
                                     weight: .black,
                                     design: .rounded
@@ -36,7 +37,7 @@ struct StylePassView: View {
 
                         Text("\(points) STYLE POINTS")
                             .font(
-                                .system(
+                                .vhs(
                                     size: 11,
                                     weight: .black,
                                     design: .monospaced
@@ -58,7 +59,7 @@ struct StylePassView: View {
                             VStack(alignment: .leading, spacing: 10) {
                                 Text(pass.title)
                                     .font(
-                                        .system(
+                                        .vhs(
                                             size: 20,
                                             weight: .black,
                                             design: .rounded
@@ -87,7 +88,7 @@ struct StylePassView: View {
                                             ) {
                                                 Text(reward.title)
                                                     .font(
-                                                        .system(
+                                                        .vhs(
                                                             size: 14,
                                                             weight: .black,
                                                             design: .rounded
@@ -99,7 +100,7 @@ struct StylePassView: View {
 
                                                 Text(reward.description)
                                                     .font(
-                                                        .system(
+                                                        .vhs(
                                                             size: 10,
                                                             weight: .bold,
                                                             design: .monospaced
@@ -122,7 +123,7 @@ struct StylePassView: View {
                                                         : "\(reward.requiredPoints)"
                                             )
                                             .font(
-                                                .system(
+                                                .vhs(
                                                     size: 10,
                                                     weight: .black,
                                                     design: .monospaced

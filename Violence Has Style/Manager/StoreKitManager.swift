@@ -12,6 +12,7 @@ import StoreKit
 @MainActor
 @Observable
 final class StoreKitManager {
+
     static let shared = StoreKitManager()
 
     private(set) var productsById: [String: Product] = [:]

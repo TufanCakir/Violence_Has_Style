@@ -11,6 +11,7 @@ import Observation
 
 @Observable
 final class NetworkMonitor {
+    
     static let shared = NetworkMonitor()
 
     private let monitor = NWPathMonitor()

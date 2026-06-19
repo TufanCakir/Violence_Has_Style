@@ -12,6 +12,7 @@ import Observation
 @MainActor
 @Observable
 final class MusicManager {
+
     static let shared = MusicManager()
 
     private var player: AVQueuePlayer?

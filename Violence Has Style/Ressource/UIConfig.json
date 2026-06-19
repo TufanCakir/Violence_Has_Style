@@ -1,4 +1,12 @@
 {
+    "titleLogoAssetId": "logo_vhs_purple",
+    "appLogoAssetId": "logo_vhs_purple",
+    "typography": {
+        "fontName": "DEADLY KILLERS",
+        "primaryTextHex": "#FFFFFF",
+        "secondaryTextHex": "#C9B6FF",
+        "mutedTextHex": "#A79EB8"
+    },
     "footerTabs": [
         {
             "id": "story",

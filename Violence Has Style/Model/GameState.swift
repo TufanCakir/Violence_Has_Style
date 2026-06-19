@@ -10,6 +10,7 @@ import Observation
 import SwiftUI
 
 enum EnemyIntent: String, Codable, Equatable, CaseIterable {
+
     case open
     case block
     case counter

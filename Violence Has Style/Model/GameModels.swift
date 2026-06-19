@@ -72,10 +72,64 @@ extension GameScreen {
 }
 
 struct UIConfig: Codable, Equatable {
+
+    let titleLogoAssetId: String?
+    let appLogoAssetId: String?
+    let typography: TypographyDefinition
     let footerTabs: [FooterTabDefinition]
     let headerCurrencies: [HeaderCurrencyDefinition]
 
+    init(
+        titleLogoAssetId: String?,
+        appLogoAssetId: String?,
+        typography: TypographyDefinition,
+        footerTabs: [FooterTabDefinition],
+        headerCurrencies: [HeaderCurrencyDefinition]
+    ) {
+        self.titleLogoAssetId = titleLogoAssetId
+        self.appLogoAssetId = appLogoAssetId
+        self.typography = typography
+        self.footerTabs = footerTabs
+        self.headerCurrencies = headerCurrencies
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case titleLogoAssetId
+        case appLogoAssetId
+        case typography
+        case footerTabs
+        case headerCurrencies
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        titleLogoAssetId = try container.decodeIfPresent(
+            String.self,
+            forKey: .titleLogoAssetId
+        )
+        appLogoAssetId = try container.decodeIfPresent(
+            String.self,
+            forKey: .appLogoAssetId
+        )
+        typography =
+            try container.decodeIfPresent(
+                TypographyDefinition.self,
+                forKey: .typography
+            ) ?? .fallback
+        footerTabs = try container.decode(
+            [FooterTabDefinition].self,
+            forKey: .footerTabs
+        )
+        headerCurrencies = try container.decode(
+            [HeaderCurrencyDefinition].self,
+            forKey: .headerCurrencies
+        )
+    }
+
     static let fallback = UIConfig(
+        titleLogoAssetId: "logo_vhs_purple",
+        appLogoAssetId: "logo_vhs_purple",
+        typography: .fallback,
         footerTabs: [
             FooterTabDefinition(
                 id: "story",
@@ -133,6 +187,32 @@ struct UIConfig: Codable, Equatable {
                 colorHex: "#FF1744"
             ),
         ]
+    )
+}
+
+struct TypographyDefinition: Codable, Equatable {
+    let fontName: String?
+    let primaryTextHex: String
+    let secondaryTextHex: String
+    let mutedTextHex: String
+
+    var primaryTextColor: Color {
+        Color(hex: primaryTextHex)
+    }
+
+    var secondaryTextColor: Color {
+        Color(hex: secondaryTextHex)
+    }
+
+    var mutedTextColor: Color {
+        Color(hex: mutedTextHex)
+    }
+
+    static let fallback = TypographyDefinition(
+        fontName: FontManager.fallbackFontName,
+        primaryTextHex: "#FFFFFF",
+        secondaryTextHex: "#C9B6FF",
+        mutedTextHex: "#A79EB8"
     )
 }
 
@@ -1947,12 +2027,26 @@ struct CharacterCatalog {
     }
 
     var characters: [PlayerCharacter] {
-        RemoteContentStore.shared.characterDefinitions.isEmpty
-            ? localCharacters : RemoteContentStore.shared.characterDefinitions
+        let remoteCharacters = RemoteContentStore.shared.characterDefinitions
+
+        guard !remoteCharacters.isEmpty else {
+            return localCharacters
+        }
+
+        guard
+            remoteCharacters.contains(where: { $0.id == "vance" }) == false,
+            let localVance = localCharacters.first(where: { $0.id == "vance" })
+        else {
+            return remoteCharacters
+        }
+
+        return [localVance] + remoteCharacters
     }
 
     var defaultCharacter: PlayerCharacter {
-        characters.first ?? Self.fallbackCharacters[0]
+        characters.first { $0.id == "vance" }
+            ?? characters.first
+            ?? Self.fallbackCharacters[0]
     }
 
     func character(id: String) -> PlayerCharacter {
@@ -1979,6 +2073,28 @@ struct CharacterCatalog {
     }
 
     private static let fallbackCharacters: [PlayerCharacter] = [
+        PlayerCharacter(
+            id: "vance",
+            title: "VANCE",
+            idleAsset: "character_vance_idle",
+            attackFrames: [
+                "character_vhs_attack1",
+                "character_vhs_attack2",
+                "character_vhs_attack3",
+                "character_vhs_attack4",
+                "character_vhs_attack5",
+                "character_vhs_attack6",
+                "character_vhs_attack7",
+                "character_vhs_attack8",
+                "character_vhs_attack9",
+            ],
+            maxHP: 105,
+            styleGainBonus: 3,
+            damageBonus: 2,
+            bloodCostModifier: 0,
+            phantomDodgeBonus: 4,
+            tintHex: "#8F5CFF"
+        ),
         PlayerCharacter(
             id: "vhs_blade",
             title: "VHS BLADE",

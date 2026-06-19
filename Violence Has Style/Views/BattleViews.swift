@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct BattleSceneView: View {
+
     let game: GameState
     let screenShakeOffset: CGSize
     let brokenPulse: Bool
@@ -122,7 +123,7 @@ private struct BattleArenaView: View {
 
             if game.isEnemyBroken {
                 Text("BROKEN")
-                    .font(.system(size: 42, weight: .black, design: .rounded))
+                    .font(.vhs(size: 42, weight: .black, design: .rounded))
                     .foregroundStyle(game.currentEnemy.brokenColor)
                     .shadow(
                         color: game.currentEnemy.brokenColor.opacity(0.8),
@@ -178,14 +179,14 @@ private struct BattleHUDView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(game.styleRank.title)
                         .font(
-                            .system(size: 24, weight: .black, design: .rounded)
+                            .vhs(size: 24, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(game.styleRank.color)
                         .tracking(1.2)
 
                     Text("STYLE \(game.style)%")
                         .font(
-                            .system(
+                            .vhs(
                                 size: 11,
                                 weight: .black,
                                 design: .monospaced
@@ -199,14 +200,14 @@ private struct BattleHUDView: View {
                 VStack(alignment: .trailing, spacing: 4) {
                     Text(game.activeStyle.title)
                         .font(
-                            .system(size: 15, weight: .black, design: .rounded)
+                            .vhs(size: 15, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(game.activeStyle.tint)
                         .tracking(1)
 
                     Text("FIGHT \(game.fightLevel)  HP \(game.playerHealth)%")
                         .font(
-                            .system(
+                            .vhs(
                                 size: 11,
                                 weight: .black,
                                 design: .monospaced
@@ -216,7 +217,7 @@ private struct BattleHUDView: View {
 
                     Text(game.currentCharacter.title)
                         .font(
-                            .system(
+                            .vhs(
                                 size: 10,
                                 weight: .black,
                                 design: .monospaced
@@ -228,7 +229,7 @@ private struct BattleHUDView: View {
 
                     Text("ENEMY IN \(game.enemyActionCountdown)")
                         .font(
-                            .system(
+                            .vhs(
                                 size: 10,
                                 weight: .black,
                                 design: .monospaced
@@ -238,7 +239,7 @@ private struct BattleHUDView: View {
 
                     Text(game.currentEnemy.title)
                         .font(
-                            .system(
+                            .vhs(
                                 size: 11,
                                 weight: .black,
                                 design: .monospaced
@@ -248,7 +249,7 @@ private struct BattleHUDView: View {
 
                     Text(game.lastTimingVerdict)
                         .font(
-                            .system(
+                            .vhs(
                                 size: 10,
                                 weight: .black,
                                 design: .monospaced
@@ -271,7 +272,7 @@ private struct BattleHUDView: View {
                             )
                         }
                         .font(
-                            .system(size: 10, weight: .black, design: .rounded)
+                            .vhs(size: 10, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(
                             game.canActivateStyleFreeze
@@ -298,7 +299,7 @@ private struct BattleHUDView: View {
 
                     Text(game.currentLevel.title)
                         .font(
-                            .system(
+                            .vhs(
                                 size: 10,
                                 weight: .black,
                                 design: .monospaced
@@ -336,10 +337,10 @@ private struct EnemyIntentBadgeView: View {
         VStack(spacing: 3) {
             HStack(spacing: 6) {
                 Image(systemName: intent.symbol)
-                    .font(.system(size: 12, weight: .black))
+                    .font(.vhs(size: 12, weight: .black))
 
                 Text(isStyleRushActive ? "STYLE RUSH" : intent.title)
-                    .font(.system(size: 13, weight: .black, design: .rounded))
+                    .font(.vhs(size: 13, weight: .black, design: .rounded))
                     .lineLimit(1)
                     .minimumScaleFactor(0.65)
             }
@@ -348,7 +349,7 @@ private struct EnemyIntentBadgeView: View {
                 Text(intent.hint)
                 Text("CHAIN \(chain)")
             }
-            .font(.system(size: 8, weight: .black, design: .monospaced))
+            .font(.vhs(size: 8, weight: .black, design: .monospaced))
             .opacity(0.72)
         }
         .foregroundStyle(isStyleRushActive ? .yellow : intent.color)
@@ -429,7 +430,7 @@ private struct BattleHealthBarView: View {
                     ? "BROKEN"
                     : "\(game.currentEnemy.title) \(game.enemyHealth)/\(game.enemyMaxHealth)"
             )
-            .font(.system(size: 10, weight: .black, design: .monospaced))
+            .font(.vhs(size: 10, weight: .black, design: .monospaced))
             .foregroundStyle(.white.opacity(0.8))
             .padding(.trailing, 8)
         }
@@ -442,7 +443,7 @@ private struct BattleStatusView: View {
     var body: some View {
         VStack(spacing: 6) {
             Text("BOSS: \(game.bossVerdict)")
-                .font(.system(size: 12, weight: .black, design: .monospaced))
+                .font(.vhs(size: 12, weight: .black, design: .monospaced))
                 .foregroundStyle(.white.opacity(0.82))
 
             Text(
@@ -450,7 +451,7 @@ private struct BattleStatusView: View {
                     ? "TAP FOR FINISHER / SWIPE STYLE"
                     : "TAP ATTACK / SWIPE STYLE"
             )
-            .font(.system(size: 13, weight: .black, design: .rounded))
+            .font(.vhs(size: 13, weight: .black, design: .rounded))
             .foregroundStyle(.white.opacity(0.58))
             .tracking(1.2)
         }
@@ -539,13 +540,13 @@ struct RewardChoiceOverlayView: View {
 
             VStack(spacing: 16) {
                 Text("CHOOSE YOUR STYLE")
-                    .font(.system(size: 24, weight: .black, design: .rounded))
+                    .font(.vhs(size: 24, weight: .black, design: .rounded))
                     .foregroundStyle(.white)
                     .tracking(1.4)
 
                 Text("FIGHT \(fightLevel + 1) WAITS")
                     .font(
-                        .system(size: 11, weight: .black, design: .monospaced)
+                        .vhs(size: 11, weight: .black, design: .monospaced)
                     )
                     .foregroundStyle(.white.opacity(0.58))
 
@@ -557,7 +558,7 @@ struct RewardChoiceOverlayView: View {
                             VStack(alignment: .leading, spacing: 5) {
                                 Text(reward.title)
                                     .font(
-                                        .system(
+                                        .vhs(
                                             size: 16,
                                             weight: .black,
                                             design: .rounded
@@ -567,7 +568,7 @@ struct RewardChoiceOverlayView: View {
 
                                 Text(reward.description)
                                     .font(
-                                        .system(
+                                        .vhs(
                                             size: 12,
                                             weight: .bold,
                                             design: .monospaced

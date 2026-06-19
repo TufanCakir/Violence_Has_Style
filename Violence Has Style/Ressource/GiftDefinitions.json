@@ -13,7 +13,7 @@
                 "description": "Starter coins",
                 "rewardType": "coins",
                 "rewardValue": "coins",
-                "amount": 500,
+                "amoun  t": 500,
                 "colorHex": "#FFCC33",
                 "symbol": "circle.hexagongrid.fill"
             },

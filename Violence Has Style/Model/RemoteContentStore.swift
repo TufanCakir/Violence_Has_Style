@@ -10,6 +10,7 @@ import Observation
 
 @Observable
 final class RemoteContentStore {
+
     static let shared = RemoteContentStore()
 
     static let manifestURL = URL(
@@ -47,6 +48,7 @@ final class RemoteContentStore {
     private var musicBaseURL: URL?
     private var assetURLs: [String: URL] = [:]
     private var musicURLs: [String: URL] = [:]
+    private var remoteContentVersion = 1
     private var warmedURLStrings: Set<String> = []
     private let urlSession: URLSession
 
@@ -57,7 +59,7 @@ final class RemoteContentStore {
         )
         let configuration = URLSessionConfiguration.default
         configuration.urlCache = cache
-        configuration.requestCachePolicy = .returnCacheDataElseLoad
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.timeoutIntervalForRequest = 12
         configuration.timeoutIntervalForResource = 24
         urlSession = URLSession(configuration: configuration)
@@ -76,6 +78,7 @@ final class RemoteContentStore {
             return
         }
         advanceLoading(status: "MANIFEST LOADED")
+        remoteContentVersion = manifest.version
 
         assetsBaseURL = resolvedURL(
             manifest.assetsBaseURL
@@ -320,7 +323,10 @@ final class RemoteContentStore {
         let startupAssetIds = Set(
             CharacterCatalog.shared.defaultCharacter.attackFrames
                 + [CharacterCatalog.shared.defaultCharacter.idleAsset]
-                + ["logo_vhs"]
+                + [
+                    uiConfig.titleLogoAssetId ?? "logo_vhs_purple",
+                    uiConfig.appLogoAssetId ?? "logo_vhs_purple",
+                ]
         )
 
         let startupMusicURLs = MusicCatalog.shared.playlist(for: nil)
@@ -379,8 +385,11 @@ final class RemoteContentStore {
 
     private func loadJSON<T: Decodable>(from url: URL) async -> T? {
         do {
-            var request = URLRequest(url: url)
-            request.cachePolicy = .returnCacheDataElseLoad
+            var request = URLRequest(url: cacheBustedURL(url))
+            request.cachePolicy = .reloadIgnoringLocalCacheData
+            request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+            request.setValue("no-cache", forHTTPHeaderField: "Pragma")
+            request.setValue("0", forHTTPHeaderField: "Expires")
             let (data, response) = try await urlSession.data(for: request)
 
             guard let http = response as? HTTPURLResponse else {
@@ -511,6 +520,7 @@ final class RemoteContentStore {
         musicBaseURL = nil
         assetURLs = [:]
         musicURLs = [:]
+        remoteContentVersion = 1
         isOnline = false
         statusMessage = status
         loadingProgress = 0
@@ -588,9 +598,45 @@ final class RemoteContentStore {
                     return nil
                 }
 
-                return (file.id, url)
+                return (file.id, versionedMediaURL(url))
             }
         )
+    }
+
+    private func cacheBustedURL(_ url: URL) -> URL {
+        urlWithQueryItem(
+            url,
+            name: "_refresh",
+            value: String(Int(Date().timeIntervalSince1970 * 1000))
+        )
+    }
+
+    private func versionedMediaURL(_ url: URL) -> URL {
+        urlWithQueryItem(
+            url,
+            name: "v",
+            value: String(remoteContentVersion)
+        )
+    }
+
+    private func urlWithQueryItem(
+        _ url: URL,
+        name: String,
+        value: String
+    ) -> URL {
+        guard var components = URLComponents(
+            url: url,
+            resolvingAgainstBaseURL: true
+        ) else {
+            return url
+        }
+
+        var queryItems = components.queryItems ?? []
+        queryItems.removeAll { $0.name == name }
+        queryItems.append(URLQueryItem(name: name, value: value))
+        components.queryItems = queryItems
+
+        return components.url ?? url
     }
 }
 

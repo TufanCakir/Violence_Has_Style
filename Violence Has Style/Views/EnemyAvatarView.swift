@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct EnemyAvatarBattleSprite: View {
+
     let enemy: EnemyType
     let isBroken: Bool
     let isHit: Bool
@@ -33,7 +34,7 @@ struct EnemyAvatarBattleSprite: View {
 
             if isBroken {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: enemy.isBoss ? 38 : 30, weight: .black))
+                    .font(.vhs(size: enemy.isBoss ? 38 : 30, weight: .black))
                     .foregroundStyle(enemy.brokenColor)
                     .shadow(color: enemy.brokenColor, radius: 12)
                     .offset(y: -86)

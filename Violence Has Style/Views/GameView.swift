@@ -14,6 +14,7 @@ struct GameView: View {
 
     @Query private var progressEntries: [PlayerProgress]
     @Query private var wallets: [EventWallet]
+
     @State private var network = NetworkMonitor.shared
     @State private var remoteContentStore = RemoteContentStore.shared
     @State private var currentScreen: GameScreen = .title
@@ -30,6 +31,7 @@ struct GameView: View {
     @State private var remoteContentStatus = "CONNECTING TO STYLE SERVER"
     @State private var selectedEventId: String?
     @State private var isDailyLoginPopupDismissed = false
+
     @AppStorage("settingsScreenShakeEnabled") private var isScreenShakeEnabled =
         true
     @AppStorage("settingsFlashFXEnabled") private var isFlashFXEnabled = true
@@ -193,6 +195,7 @@ struct GameView: View {
                 openGallery: { currentScreen = .gallery },
                 openStylePasses: { currentScreen = .stylePasses },
                 openGiftBox: { currentScreen = .giftBox },
+                backToTitle: { currentScreen = .title },
                 openSettings: { currentScreen = .settings }
             )
         case .storyMode:

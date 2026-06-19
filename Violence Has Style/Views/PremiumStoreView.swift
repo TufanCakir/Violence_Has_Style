@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct PremiumStoreView: View {
+
     let products: [PremiumStoreProduct]
     let purchasedProductIds: [String]
     let unlockProduct: (String) -> Void
@@ -31,7 +32,7 @@ struct PremiumStoreView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("PREMIUM STORE")
                                 .font(
-                                    .system(
+                                    .vhs(
                                         size: 30,
                                         weight: .black,
                                         design: .rounded
@@ -41,7 +42,7 @@ struct PremiumStoreView: View {
 
                             Text("COSMETICS ONLY. NO PAY TO WIN.")
                                 .font(
-                                    .system(
+                                    .vhs(
                                         size: 10,
                                         weight: .black,
                                         design: .monospaced
@@ -62,7 +63,7 @@ struct PremiumStoreView: View {
                             } label: {
                                 Text("RESTORE")
                                     .font(
-                                        .system(
+                                        .vhs(
                                             size: 10,
                                             weight: .black,
                                             design: .monospaced
@@ -94,7 +95,7 @@ struct PremiumStoreView: View {
 
                     Text(store.statusMessage)
                         .font(
-                            .system(
+                            .vhs(
                                 size: 10,
                                 weight: .black,
                                 design: .monospaced
@@ -184,14 +185,14 @@ private struct PremiumStoreHero: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 12) {
                 Image(systemName: product.symbol)
-                    .font(.system(size: 32, weight: .black))
+                    .font(.vhs(size: 32, weight: .black))
                     .foregroundStyle(product.color)
                     .frame(width: 52, height: 52)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(product.badge)
                         .font(
-                            .system(
+                            .vhs(
                                 size: 10,
                                 weight: .black,
                                 design: .monospaced
@@ -201,7 +202,7 @@ private struct PremiumStoreHero: View {
 
                     Text(product.title)
                         .font(
-                            .system(size: 20, weight: .black, design: .rounded)
+                            .vhs(size: 20, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
                 }
@@ -210,13 +211,13 @@ private struct PremiumStoreHero: View {
             }
 
             Text(product.description)
-                .font(.system(size: 13, weight: .bold, design: .rounded))
+                .font(.vhs(size: 13, weight: .bold, design: .rounded))
                 .foregroundStyle(.white.opacity(0.68))
 
             Button(action: buy) {
                 Text(buttonTitle)
                     .font(
-                        .system(size: 13, weight: .black, design: .monospaced)
+                        .vhs(size: 13, weight: .black, design: .monospaced)
                     )
                     .frame(maxWidth: .infinity)
                     .frame(height: 44)
@@ -269,7 +270,7 @@ private struct PremiumProductCard: View {
         Button(action: buy) {
             HStack(spacing: 12) {
                 Image(systemName: product.symbol)
-                    .font(.system(size: 22, weight: .black))
+                    .font(.vhs(size: 22, weight: .black))
                     .foregroundStyle(product.color)
                     .frame(width: 34, height: 34)
 
@@ -277,7 +278,7 @@ private struct PremiumProductCard: View {
                     HStack(spacing: 8) {
                         Text(product.category)
                             .font(
-                                .system(
+                                .vhs(
                                     size: 9,
                                     weight: .black,
                                     design: .monospaced
@@ -288,7 +289,7 @@ private struct PremiumProductCard: View {
                         if product.isFeatured {
                             Text(product.badge)
                                 .font(
-                                    .system(
+                                    .vhs(
                                         size: 9,
                                         weight: .black,
                                         design: .monospaced
@@ -300,13 +301,13 @@ private struct PremiumProductCard: View {
 
                     Text(product.title)
                         .font(
-                            .system(size: 15, weight: .black, design: .rounded)
+                            .vhs(size: 15, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
 
                     Text(product.description)
                         .font(
-                            .system(size: 11, weight: .bold, design: .rounded)
+                            .vhs(size: 11, weight: .bold, design: .rounded)
                         )
                         .foregroundStyle(.white.opacity(0.56))
                         .lineLimit(2)
@@ -316,7 +317,7 @@ private struct PremiumProductCard: View {
 
                 Text(buttonTitle)
                     .font(
-                        .system(size: 10, weight: .black, design: .monospaced)
+                        .vhs(size: 10, weight: .black, design: .monospaced)
                     )
                     .foregroundStyle(product.color)
                     .multilineTextAlignment(.trailing)

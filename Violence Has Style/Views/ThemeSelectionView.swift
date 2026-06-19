@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ThemeSelectionView: View {
+
     let themes: [ThemeDefinition]
     let selectedTheme: ThemeDefinition
     let ownedThemeIds: [String]
@@ -22,7 +23,7 @@ struct ThemeSelectionView: View {
                 HStack {
                     Text("THEME SELECT")
                         .font(
-                            .system(size: 24, weight: .black, design: .rounded)
+                            .vhs(size: 24, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
 
@@ -43,14 +44,14 @@ struct ThemeSelectionView: View {
                             } label: {
                                 HStack(spacing: 12) {
                                     Image(systemName: theme.symbol)
-                                        .font(.system(size: 22, weight: .black))
+                                        .font(.vhs(size: 22, weight: .black))
                                         .foregroundStyle(theme.primaryColor)
                                         .frame(width: 30)
 
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(theme.title)
                                             .font(
-                                                .system(
+                                                .vhs(
                                                     size: 16,
                                                     weight: .black,
                                                     design: .rounded
@@ -64,7 +65,7 @@ struct ThemeSelectionView: View {
                                                 : "REMOTE THEME"
                                         )
                                         .font(
-                                            .system(
+                                            .vhs(
                                                 size: 9,
                                                 weight: .black,
                                                 design: .monospaced
@@ -82,7 +83,7 @@ struct ThemeSelectionView: View {
                                         )
                                     )
                                     .font(
-                                        .system(
+                                        .vhs(
                                             size: 10,
                                             weight: .black,
                                             design: .monospaced

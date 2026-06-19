@@ -66,12 +66,20 @@
     ],
     "assets": [
         {
-            "id": "logo_vhs",
-            "url": "logo_vhs.png"
+            "id": "logo_vhs_blood",
+            "url": "logo_vhs_blood.png"
+        },
+        {
+            "id": "logo_vhs_purple",
+            "url": "logo_vhs_purple.png"
         },
         {
             "id": "character_vhs_idle",
             "url": "character_vhs_idle.png"
+        },
+        {
+            "id": "character_vance_idle",
+            "url": "character_vance_idle.png"
         },
         {
             "id": "character_vhs_attack1",

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct FighterSprite: View {
+
     let assetName: String
     let fallbackTitle: String
     let tint: Color
@@ -54,7 +55,7 @@ struct FighterSprite: View {
                 .overlay {
                     Text(fallbackTitle)
                         .font(
-                            .system(
+                            .vhs(
                                 size: 12,
                                 weight: .black,
                                 design: .monospaced

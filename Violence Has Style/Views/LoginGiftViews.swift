@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct GiftBoxView: View {
+
     let gifts: [GiftDefinition]
     let claimedGiftIds: [String]
     let claimGift: (GiftDefinition) -> Void
@@ -21,7 +22,7 @@ struct GiftBoxView: View {
                 HStack {
                     Text("GIFT BOX")
                         .font(
-                            .system(size: 26, weight: .black, design: .rounded)
+                            .vhs(size: 26, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
 
@@ -64,7 +65,7 @@ struct DailyLoginPopupView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(campaign.title)
                             .font(
-                                .system(
+                                .vhs(
                                     size: 24,
                                     weight: .black,
                                     design: .rounded
@@ -74,7 +75,7 @@ struct DailyLoginPopupView: View {
 
                         Text(campaign.subtitle)
                             .font(
-                                .system(
+                                .vhs(
                                     size: 10,
                                     weight: .black,
                                     design: .monospaced
@@ -87,7 +88,7 @@ struct DailyLoginPopupView: View {
 
                     Button("LATER", action: close)
                         .font(
-                            .system(size: 11, weight: .black, design: .rounded)
+                            .vhs(size: 11, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
                         .padding(.horizontal, 12)
@@ -100,7 +101,7 @@ struct DailyLoginPopupView: View {
 
                 Text("NEXT REWARDS")
                     .font(
-                        .system(size: 10, weight: .black, design: .monospaced)
+                        .vhs(size: 10, weight: .black, design: .monospaced)
                     )
                     .foregroundStyle(.white.opacity(0.55))
 
@@ -110,7 +111,7 @@ struct DailyLoginPopupView: View {
                             VStack(spacing: 7) {
                                 Text("DAY \(reward.day)")
                                     .font(
-                                        .system(
+                                        .vhs(
                                             size: 8,
                                             weight: .black,
                                             design: .monospaced
@@ -119,12 +120,12 @@ struct DailyLoginPopupView: View {
                                     .foregroundStyle(.white.opacity(0.48))
 
                                 Image(systemName: reward.reward.symbol)
-                                    .font(.system(size: 18, weight: .black))
+                                    .font(.vhs(size: 18, weight: .black))
                                     .foregroundStyle(reward.reward.color)
 
                                 Text(reward.reward.title)
                                     .font(
-                                        .system(
+                                        .vhs(
                                             size: 8,
                                             weight: .black,
                                             design: .rounded
@@ -154,7 +155,7 @@ struct DailyLoginPopupView: View {
                 Button(action: claim) {
                     Text("CLAIM DAILY")
                         .font(
-                            .system(size: 16, weight: .black, design: .rounded)
+                            .vhs(size: 16, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.black)
                         .frame(maxWidth: .infinity)
@@ -189,13 +190,13 @@ private struct GiftCardView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(gift.title)
                         .font(
-                            .system(size: 17, weight: .black, design: .rounded)
+                            .vhs(size: 17, weight: .black, design: .rounded)
                         )
                         .foregroundStyle(.white)
 
                     Text(gift.message)
                         .font(
-                            .system(
+                            .vhs(
                                 size: 9,
                                 weight: .black,
                                 design: .monospaced
@@ -208,7 +209,7 @@ private struct GiftCardView: View {
 
                 Text(isClaimed ? "CLAIMED" : gift.isActive ? "CLAIM" : "LOCKED")
                     .font(
-                        .system(size: 10, weight: .black, design: .monospaced)
+                        .vhs(size: 10, weight: .black, design: .monospaced)
                     )
                     .foregroundStyle(isClaimed ? .gray : gift.themeColor)
             }
@@ -219,7 +220,7 @@ private struct GiftCardView: View {
 
             Button(action: claim) {
                 Text(isClaimed ? "ALREADY CLAIMED" : "CLAIM GIFT")
-                    .font(.system(size: 12, weight: .black, design: .rounded))
+                    .font(.vhs(size: 12, weight: .black, design: .rounded))
                     .foregroundStyle(isClaimed ? .white.opacity(0.42) : .black)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
@@ -248,14 +249,14 @@ private struct RewardGrantRowView: View {
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: reward.symbol)
-                .font(.system(size: isCompact ? 16 : 22, weight: .black))
+                .font(.vhs(size: isCompact ? 16 : 22, weight: .black))
                 .foregroundStyle(reward.color)
                 .frame(width: isCompact ? 24 : 34)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(reward.title)
                     .font(
-                        .system(
+                        .vhs(
                             size: isCompact ? 12 : 16,
                             weight: .black,
                             design: .rounded
@@ -264,7 +265,7 @@ private struct RewardGrantRowView: View {
                     .foregroundStyle(.white)
 
                 Text(reward.description)
-                    .font(.system(size: 8, weight: .black, design: .monospaced))
+                    .font(.vhs(size: 8, weight: .black, design: .monospaced))
                     .foregroundStyle(.white.opacity(0.48))
             }
 
@@ -273,7 +274,7 @@ private struct RewardGrantRowView: View {
             if reward.amount > 1 {
                 Text("+\(reward.amount)")
                     .font(
-                        .system(
+                        .vhs(
                             size: isCompact ? 12 : 16,
                             weight: .black,
                             design: .rounded

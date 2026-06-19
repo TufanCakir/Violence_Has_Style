@@ -1,5 +1,27 @@
 [
     {
+        "id": "vance",
+        "title": "VANCE",
+        "idleAsset": "character_vance_idle",
+        "attackFrames": [
+            "character_vance_idle",
+            "character_vance_idle",
+            "character_vance_idle",
+            "character_vance_idle",
+            "character_vance_idle",
+            "character_vance_idle",
+            "character_vance_idle",
+            "character_vance_idle",
+            "character_vance_idle"
+        ],
+        "maxHP": 105,
+        "styleGainBonus": 3,
+        "damageBonus": 2,
+        "bloodCostModifier": 0,
+        "phantomDodgeBonus": 4,
+        "tintHex": "#8F5CFF"
+    },
+    {
         "id": "vhs_blade",
         "title": "VHS BLADE",
         "idleAsset": "character_vhs_idle",

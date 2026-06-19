@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ThemeDefinition: Codable, Equatable, Identifiable {
+
     let id: String
     let title: String
     let primaryHex: String
@@ -28,14 +29,14 @@ struct ThemeDefinition: Codable, Equatable, Identifiable {
 
     static let fallback = ThemeDefinition(
         id: "vhs_default",
-        title: "VHS DEFAULT",
-        primaryHex: "#FF1744",
-        secondaryHex: "#7CFFCE",
-        accentHex: "#FFFFFF",
-        backgroundHex: "#050505",
-        panelHex: "#111111",
+        title: "VANCE WHITE",
+        primaryHex: "#FFFFFF",
+        secondaryHex: "#8F5CFF",
+        accentHex: "#C9B6FF",
+        backgroundHex: "#06030D",
+        panelHex: "#15101F",
         textHex: "#FFFFFF",
-        symbol: "slash.circle.fill",
+        symbol: "sparkle",
         isStylePassExclusive: false
     )
 

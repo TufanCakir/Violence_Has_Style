@@ -9,6 +9,7 @@ import SwiftUI
 
 @Observable
 final class ThemeManager {
+
     static let shared = ThemeManager()
 
     private let selectedThemeKey = "selectedThemeId"
