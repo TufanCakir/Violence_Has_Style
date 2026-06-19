@@ -82,6 +82,18 @@
             "url": "character_vance_idle.png"
         },
         {
+            "id": "character_vance_attack1",
+            "url": "character_vance_attack1.png"
+        },
+        {
+            "id": "character_vance_attack2",
+            "url": "character_vance_attack2.png"
+        },
+        {
+            "id": "character_vance_attack3",
+            "url": "character_vance_attack3.png"
+        },
+        {
             "id": "character_vhs_attack1",
             "url": "character_vhs_attack1.png"
         },

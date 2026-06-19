@@ -4,15 +4,9 @@
         "title": "VANCE",
         "idleAsset": "character_vance_idle",
         "attackFrames": [
-            "character_vance_idle",
-            "character_vance_idle",
-            "character_vance_idle",
-            "character_vance_idle",
-            "character_vance_idle",
-            "character_vance_idle",
-            "character_vance_idle",
-            "character_vance_idle",
-            "character_vance_idle"
+            "character_vance_attack1",
+            "character_vance_attack2",
+            "character_vance_attack3"
         ],
         "maxHP": 105,
         "styleGainBonus": 3,
