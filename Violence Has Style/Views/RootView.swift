@@ -227,10 +227,8 @@ private struct CurrencyInfoRowView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: currency.symbol)
-                .font(.vhs(size: 20, weight: .black))
-                .foregroundStyle(currency.color)
-                .frame(width: 30)
+            CurrencySymbolView(symbol: currency.symbol, color: currency.color)
+                .frame(width: 30, height: 30)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(currency.title)
@@ -268,9 +266,7 @@ private struct HeaderCurrencyView: View {
 
     var body: some View {
         HStack(spacing: 4) {
-            Image(systemName: symbol)
-                .font(.vhs(size: 12, weight: .black))
-                .foregroundStyle(color)
+            CurrencySymbolView(symbol: symbol, color: color)
                 .frame(width: 14, height: 14)
 
             VStack(alignment: .leading, spacing: 0) {
@@ -288,6 +284,156 @@ private struct HeaderCurrencyView: View {
             }
         }
         .frame(width: 76, height: 24, alignment: .leading)
+    }
+}
+
+struct CurrencySymbolView: View {
+    let symbol: String
+    let color: Color
+
+    var body: some View {
+        if symbol == "vhs.devilHand" {
+            DevilHandSymbol()
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            color.opacity(0.95),
+                            color.opacity(0.55),
+                            .white.opacity(0.85),
+                        ],
+                        startPoint: .bottomLeading,
+                        endPoint: .topTrailing
+                    )
+                )
+                .overlay {
+                    DevilHandSymbol()
+                        .stroke(.white.opacity(0.42), lineWidth: 1.4)
+                }
+                .shadow(color: color.opacity(0.7), radius: 4)
+                .aspectRatio(1, contentMode: .fit)
+        } else {
+            Image(systemName: symbol)
+                .font(.vhs(size: 16, weight: .black))
+                .foregroundStyle(color)
+        }
+    }
+}
+
+struct DevilHandSymbol: Shape {
+    func path(in rect: CGRect) -> Path {
+        let width = rect.width
+        let height = rect.height
+
+        func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
+            CGPoint(
+                x: rect.minX + x * width,
+                y: rect.minY + y * height
+            )
+        }
+
+        var path = Path()
+        path.move(to: point(0.50, 0.93))
+        path.addCurve(
+            to: point(0.22, 0.78),
+            control1: point(0.40, 0.92),
+            control2: point(0.27, 0.88)
+        )
+        path.addCurve(
+            to: point(0.18, 0.46),
+            control1: point(0.16, 0.66),
+            control2: point(0.16, 0.55)
+        )
+        path.addCurve(
+            to: point(0.06, 0.18),
+            control1: point(0.15, 0.35),
+            control2: point(0.09, 0.26)
+        )
+        path.addCurve(
+            to: point(0.16, 0.06),
+            control1: point(0.03, 0.11),
+            control2: point(0.09, 0.04)
+        )
+        path.addCurve(
+            to: point(0.32, 0.34),
+            control1: point(0.25, 0.09),
+            control2: point(0.27, 0.24)
+        )
+        path.addCurve(
+            to: point(0.37, 0.09),
+            control1: point(0.33, 0.24),
+            control2: point(0.33, 0.14)
+        )
+        path.addCurve(
+            to: point(0.50, 0.08),
+            control1: point(0.40, 0.04),
+            control2: point(0.47, 0.03)
+        )
+        path.addCurve(
+            to: point(0.54, 0.37),
+            control1: point(0.55, 0.15),
+            control2: point(0.52, 0.27)
+        )
+        path.addCurve(
+            to: point(0.67, 0.12),
+            control1: point(0.58, 0.26),
+            control2: point(0.60, 0.16)
+        )
+        path.addCurve(
+            to: point(0.79, 0.17),
+            control1: point(0.72, 0.08),
+            control2: point(0.78, 0.11)
+        )
+        path.addCurve(
+            to: point(0.72, 0.46),
+            control1: point(0.81, 0.26),
+            control2: point(0.75, 0.37)
+        )
+        path.addCurve(
+            to: point(0.89, 0.32),
+            control1: point(0.78, 0.38),
+            control2: point(0.84, 0.32)
+        )
+        path.addCurve(
+            to: point(0.96, 0.44),
+            control1: point(0.95, 0.31),
+            control2: point(0.99, 0.37)
+        )
+        path.addCurve(
+            to: point(0.77, 0.72),
+            control1: point(0.92, 0.58),
+            control2: point(0.83, 0.66)
+        )
+        path.addCurve(
+            to: point(0.66, 0.91),
+            control1: point(0.72, 0.77),
+            control2: point(0.69, 0.84)
+        )
+        path.addCurve(
+            to: point(0.50, 0.93),
+            control1: point(0.61, 0.95),
+            control2: point(0.55, 0.95)
+        )
+        path.closeSubpath()
+
+        path.move(to: point(0.33, 0.55))
+        path.addCurve(
+            to: point(0.68, 0.59),
+            control1: point(0.43, 0.48),
+            control2: point(0.56, 0.50)
+        )
+        path.addCurve(
+            to: point(0.51, 0.72),
+            control1: point(0.59, 0.64),
+            control2: point(0.55, 0.68)
+        )
+        path.addCurve(
+            to: point(0.33, 0.55),
+            control1: point(0.43, 0.68),
+            control2: point(0.37, 0.62)
+        )
+        path.closeSubpath()
+
+        return path
     }
 }
 

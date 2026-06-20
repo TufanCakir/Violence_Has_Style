@@ -16,18 +16,11 @@
             "colorHex": "#FF1744"
         },
         {
-            "id": "event",
-            "title": "EVENT",
-            "symbol": "sparkles",
-            "screen": "eventMode",
-            "colorHex": "#9B5CFF"
-        },
-        {
-            "id": "endless",
-            "title": "ENDLESS",
-            "symbol": "infinity",
-            "screen": "endlessMode",
-            "colorHex": "#FF9F1A"
+            "id": "create",
+            "title": "CREATE",
+            "symbol": "person.crop.circle.badge.plus",
+            "screen": "createCharacter",
+            "colorHex": "#C9B6FF"
         },
         {
             "id": "style",
@@ -42,7 +35,14 @@
             "symbol": "bag.fill",
             "screen": "premiumStore",
             "colorHex": "#FFCC33"
-        }
+        },
+        {
+            "id": "trade",
+            "title": "TRADE",
+            "symbol": "arrow.left.arrow.right",
+            "screen": "trade",
+            "colorHex": "#9B5CFF"
+        },
     ],
     "headerCurrencies": [
         {
@@ -62,6 +62,12 @@
             "title": "STYLE POINTS",
             "symbol": "bolt.fill",
             "colorHex": "#FF2A2A"
+        },
+        {
+            "id": "devilHands",
+            "title": "DEVIL HANDS",
+            "symbol": "vhs.devilHand",
+            "colorHex": "#8F5CFF"
         },
         {
             "id": "event",

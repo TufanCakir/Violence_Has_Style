@@ -41,6 +41,8 @@ struct GameView: View {
         var selectedMusicTrackId =
         ""
     @AppStorage("settingsSelectedPaintFxId") private var selectedPaintFxId = ""
+    @AppStorage("createdCharacterName") private var createdCharacterName =
+        "VANCE"
 
     private var activeEvent: EventDefinition? {
         EventCatalog.shared.event(id: selectedEventId)
@@ -289,6 +291,24 @@ struct GameView: View {
                 claimGift: claimGift,
                 back: { currentScreen = .menu }
             )
+        case .trade:
+            TradeView(
+                trades: TradeCatalog.shared.trades,
+                balance: currencyBalance,
+                trade: executeTrade,
+                back: { currentScreen = .menu }
+            )
+        case .createCharacter:
+            CreateCharacterView(
+                characters: CharacterCatalog.shared.characters,
+                selectedCharacter: game.currentCharacter,
+                customName: $createdCharacterName,
+                selectCharacter: { character in
+                    game.currentCharacter = character
+                    restartRun()
+                },
+                back: { currentScreen = .menu }
+            )
         case .settings:
             SettingsView(
                 isScreenShakeEnabled: $isScreenShakeEnabled,
@@ -461,6 +481,14 @@ struct GameView: View {
                     title: definition.title,
                     symbol: definition.symbol,
                     value: progress.stylePassPoints,
+                    color: definition.color
+                )
+            case "devilHands":
+                return HeaderCurrencyDisplay(
+                    id: definition.id,
+                    title: definition.title,
+                    symbol: definition.symbol,
+                    value: wallet(for: definition.id).balance,
                     color: definition.color
                 )
             case "event":
@@ -648,6 +676,45 @@ struct GameView: View {
         try? modelContext.save()
     }
 
+    private func currencyBalance(for currencyId: String) -> Int {
+        switch currencyId {
+        case "coins":
+            return progress.coins
+        case "crystals":
+            return progress.crystals
+        case "stylePoints":
+            return progress.stylePassPoints
+        default:
+            return wallet(for: currencyId).balance
+        }
+    }
+
+    private func executeTrade(_ trade: TradeDefinition) {
+        guard trade.isEnabled,
+            currencyBalance(for: trade.fromCurrencyId) >= trade.fromAmount
+        else {
+            return
+        }
+
+        addCurrency(trade.fromCurrencyId, amount: -trade.fromAmount)
+        addCurrency(trade.toCurrencyId, amount: trade.toAmount)
+        try? modelContext.save()
+    }
+
+    private func addCurrency(_ currencyId: String, amount: Int) {
+        switch currencyId {
+        case "coins":
+            progress.coins = max(0, progress.coins + amount)
+        case "crystals":
+            progress.crystals = max(0, progress.crystals + amount)
+        case "stylePoints":
+            progress.stylePassPoints = max(0, progress.stylePassPoints + amount)
+        default:
+            let wallet = wallet(for: currencyId)
+            wallet.balance = max(0, wallet.balance + amount)
+        }
+    }
+
     private func grantReward(_ reward: RewardGrant) {
         switch reward.rewardType {
         case "coins":
@@ -656,6 +723,8 @@ struct GameView: View {
             progress.crystals += max(0, reward.amount)
         case "stylePassPoints":
             progress.stylePassPoints += max(0, reward.amount)
+        case "devilHands":
+            addCurrency(reward.rewardType, amount: max(0, reward.amount))
         case "theme":
             appendUnique(reward.rewardValue, to: &progress.ownedThemeIds)
         case "musicPack":
@@ -667,7 +736,9 @@ struct GameView: View {
         case "premiumPass":
             appendUnique(reward.rewardValue, to: &progress.ownedPremiumPassIds)
         default:
-            break
+            if reward.amount > 0 {
+                addCurrency(reward.rewardType, amount: reward.amount)
+            }
         }
     }
 

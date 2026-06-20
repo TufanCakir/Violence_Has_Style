@@ -1,0 +1,47 @@
+[
+    {
+        "id": "coins_to_devil_hands",
+        "title": "COINS TO DEVIL HANDS",
+        "fromCurrencyId": "coins",
+        "fromTitle": "COINS",
+        "fromSymbol": "circle.hexagongrid.fill",
+        "fromColorHex": "#FFCC33",
+        "fromAmount": 250,
+        "toCurrencyId": "devilHands",
+        "toTitle": "DEVIL HANDS",
+        "toSymbol": "vhs.devilHand",
+        "toColorHex": "#8F5CFF",
+        "toAmount": 1,
+        "isEnabled": true
+    },
+    {
+        "id": "style_points_to_devil_hands",
+        "title": "STYLE POINTS TO DEVIL HANDS",
+        "fromCurrencyId": "stylePoints",
+        "fromTitle": "STYLE POINTS",
+        "fromSymbol": "bolt.fill",
+        "fromColorHex": "#FF2A2A",
+        "fromAmount": 120,
+        "toCurrencyId": "devilHands",
+        "toTitle": "DEVIL HANDS",
+        "toSymbol": "vhs.devilHand",
+        "toColorHex": "#8F5CFF",
+        "toAmount": 1,
+        "isEnabled": true
+    },
+    {
+        "id": "devil_hands_to_crystals",
+        "title": "DEVIL HANDS TO CRYSTALS",
+        "fromCurrencyId": "devilHands",
+        "fromTitle": "DEVIL HANDS",
+        "fromSymbol": "vhs.devilHand",
+        "fromColorHex": "#8F5CFF",
+        "fromAmount": 2,
+        "toCurrencyId": "crystals",
+        "toTitle": "CRYSTAL",
+        "toSymbol": "diamond.fill",
+        "toColorHex": "#20D9FF",
+        "toAmount": 1,
+        "isEnabled": true
+    }
+]

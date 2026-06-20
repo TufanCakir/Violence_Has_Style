@@ -62,6 +62,10 @@
         {
             "id": "gifts",
             "url": "GiftDefinitions.json"
+        },
+        {
+            "id": "trades",
+            "url": "TradeDefinitions.json"
         }
     ],
     "assets": [

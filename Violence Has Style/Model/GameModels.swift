@@ -22,6 +22,8 @@ enum GameScreen {
     case stylePasses
     case premiumStore
     case giftBox
+    case trade
+    case createCharacter
     case themeSelection
     case musicSelection
     case paintSelection
@@ -57,6 +59,10 @@ extension GameScreen {
             self = .premiumStore
         case "giftBox":
             self = .giftBox
+        case "trade":
+            self = .trade
+        case "createCharacter":
+            self = .createCharacter
         case "themeSelection":
             self = .themeSelection
         case "musicSelection":
@@ -139,18 +145,11 @@ struct UIConfig: Codable, Equatable {
                 colorHex: "#FF1744"
             ),
             FooterTabDefinition(
-                id: "event",
-                title: "EVENT",
-                symbol: "sparkles",
-                screen: "eventMode",
-                colorHex: "#9B5CFF"
-            ),
-            FooterTabDefinition(
-                id: "endless",
-                title: "ENDLESS",
-                symbol: "infinity",
-                screen: "endlessMode",
-                colorHex: "#FF9F1A"
+                id: "create",
+                title: "CREATE",
+                symbol: "person.crop.circle.badge.plus",
+                screen: "createCharacter",
+                colorHex: "#C9B6FF"
             ),
             FooterTabDefinition(
                 id: "style",
@@ -165,6 +164,13 @@ struct UIConfig: Codable, Equatable {
                 symbol: "bag.fill",
                 screen: "premiumStore",
                 colorHex: "#FFCC33"
+            ),
+            FooterTabDefinition(
+                id: "trade",
+                title: "TRADE",
+                symbol: "arrow.left.arrow.right",
+                screen: "trade",
+                colorHex: "#9B5CFF"
             ),
         ],
         headerCurrencies: [
@@ -249,6 +255,53 @@ struct HeaderCurrencyDisplay: Identifiable {
     let symbol: String
     let value: Int
     let color: Color
+}
+
+struct TradeDefinition: Codable, Equatable, Identifiable {
+    let id: String
+    let title: String
+    let fromCurrencyId: String
+    let fromTitle: String
+    let fromSymbol: String
+    let fromColorHex: String
+    let fromAmount: Int
+    let toCurrencyId: String
+    let toTitle: String
+    let toSymbol: String
+    let toColorHex: String
+    let toAmount: Int
+    let isEnabled: Bool
+
+    var fromColor: Color { Color(hex: fromColorHex) }
+    var toColor: Color { Color(hex: toColorHex) }
+}
+
+struct TradeCatalog {
+    static let shared = TradeCatalog()
+
+    var trades: [TradeDefinition] {
+        let remoteTrades = RemoteContentStore.shared.tradeDefinitions
+        return remoteTrades.isEmpty
+            ? Self.loadBundledTrades() : remoteTrades.filter(\.isEnabled)
+    }
+
+    private static func loadBundledTrades() -> [TradeDefinition] {
+        guard
+            let url = Bundle.main.url(
+                forResource: "TradeDefinitions",
+                withExtension: "json"
+            ),
+            let data = try? Data(contentsOf: url),
+            let decoded = try? JSONDecoder().decode(
+                [TradeDefinition].self,
+                from: data
+            )
+        else {
+            return []
+        }
+
+        return decoded.filter(\.isEnabled)
+    }
 }
 
 struct StyleAwakeningDefinition: Codable, Equatable, Identifiable {

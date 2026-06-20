@@ -26,6 +26,7 @@ final class RemoteContentStore {
     private(set) var musicTracks: [MusicTrack] = []
     private(set) var themeDefinitions: [ThemeDefinition] = []
     private(set) var stylePassDefinitions: [StylePassDefinition] = []
+    private(set) var tradeDefinitions: [TradeDefinition] = []
     private(set) var premiumStoreProducts: [PremiumStoreProduct] = []
     private(set) var enemyAvatarDefinitions: [EnemyAvatarDefinition] =
         EnemyAvatarDefinition.fallback
@@ -67,7 +68,7 @@ final class RemoteContentStore {
 
     @MainActor
     func refresh() async {
-        beginLoading(totalItems: 15, status: "LOADING MANIFEST")
+        beginLoading(totalItems: 16, status: "LOADING MANIFEST")
 
         guard
             let manifest: RemoteManifest = await loadJSON(
@@ -173,6 +174,10 @@ final class RemoteContentStore {
             for: "styleAwakenings",
             baseURL: Self.manifestURL
         )
+        let tradeURL = manifest.dataURL(
+            for: "trades",
+            baseURL: Self.manifestURL
+        )
 
         async let enemies: [EnemyDefinition]? = loadJSON(from: enemyURL)
         async let levels: [LevelDefinition]? = loadJSON(from: levelURL)
@@ -197,6 +202,9 @@ final class RemoteContentStore {
             loadOptionalGifts(from: giftURL)
         async let styleAwakenings: [StyleAwakeningDefinition]? =
             loadOptionalStyleAwakenings(from: styleAwakeningsURL)
+        async let trades: [TradeDefinition]? = loadOptionalTrades(
+            from: tradeURL
+        )
         let remoteConfig: GameConfig? = await loadJSON(from: configURL)
 
         let loadedEnemies =
@@ -238,6 +246,9 @@ final class RemoteContentStore {
         let loadedStyleAwakenings =
             await styleAwakenings
             ?? StyleAwakeningDefinition.fallback
+        let loadedTrades =
+            await trades
+            ?? loadBundledJSON("TradeDefinitions", fallback: [])
         let loadedConfig =
             remoteConfig
             ?? loadBundledJSON("GameConfig", fallback: GameConfig.fallback)
@@ -264,6 +275,7 @@ final class RemoteContentStore {
         }
         themeDefinitions = loadedThemes
         stylePassDefinitions = loadedStylePasses
+        tradeDefinitions = loadedTrades
         premiumStoreProducts = loadedPremiumStore
         enemyAvatarDefinitions =
             loadedEnemyAvatars.isEmpty
@@ -499,6 +511,15 @@ final class RemoteContentStore {
             ? awakenings : StyleAwakeningDefinition.fallback
     }
 
+    private func loadOptionalTrades(from url: URL?) async -> [TradeDefinition]?
+    {
+        guard let url else {
+            return []
+        }
+
+        return await loadJSON(from: url) ?? []
+    }
+
     private func resetRemoteContent(status: String) {
         enemyDefinitions = [:]
         levelDefinitions = []
@@ -509,6 +530,7 @@ final class RemoteContentStore {
         musicTracks = []
         themeDefinitions = []
         stylePassDefinitions = []
+        tradeDefinitions = []
         premiumStoreProducts = []
         enemyAvatarDefinitions = EnemyAvatarDefinition.fallback
         loginCampaignDefinitions = LoginCampaignDefinition.fallback
@@ -624,10 +646,12 @@ final class RemoteContentStore {
         name: String,
         value: String
     ) -> URL {
-        guard var components = URLComponents(
-            url: url,
-            resolvingAgainstBaseURL: true
-        ) else {
+        guard
+            var components = URLComponents(
+                url: url,
+                resolvingAgainstBaseURL: true
+            )
+        else {
             return url
         }
 
